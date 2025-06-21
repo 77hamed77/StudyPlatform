@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %} {# إذا كنت تستخدمه لـ filter_form، أو احذفه #}
+
+{% block title %}قائمة المهام - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    /* أنماط المؤقت */
+    .pomodoro-timer-container { border: 1px solid var(--card-border-color); padding: 1.5rem; margin-top: 2.5rem; border-radius: 0.375rem; background-color: var(--bs-light); text-align: center; }
+    body.dark-mode .pomodoro-timer-container { background-color: var(--card-bg-dark); border-color: var(--card-border-color-dark); }
+    .pomodoro-timer-container h4 { margin-bottom: 1rem; }
+    #pomodoro-time-display { font-size: 3.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--bs-dark); letter-spacing: -1px; }
+    body.dark-mode #pomodoro-time-display { color: var(--text-color-dark); }
+    .pomodoro-controls button { margin: 0.3rem; min-width: 90px; }
+    #pomodoro-status { margin-top: 0.75rem; margin-bottom: 1rem; font-style: italic; color: #6c757d; }
+    body.dark-mode #pomodoro-status { color: #adb5bd; }
+    .sound-controls label { font-size: 0.9rem; margin-right: 0.5rem; }
+    .sound-controls select, .sound-controls input[type="range"] { margin-top: 0.5rem; max-width: 180px; display: inline-block; vertical-align: middle;}
+
+    /* أنماط كروت المهام */
+    .task-card .card-title a { color: inherit; text-decoration: none; }
+    .task-card .card-title a:hover { color: var(--bs-primary); text-decoration: underline; }
+    body.dark-mode .task-card .card-title a:hover { color: var(--link-color-dark); }
+    .task-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border-left-width: 5px;
+        border-left-style: solid;
+    }
+    .task-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .4rem .8rem rgba(0,0,0,.12)!important;
+    }
+    .task-card.status-completed { border-left-color: var(--bs-success); }
+    .task-card.status-pending { border-left-color: var(--bs-warning); }
+    .task-card.status-in_progress { border-left-color: var(--bs-info); }
+    .task-card.status-postponed { border-left-color: var(--bs-secondary); }
+
+    /* أنماط نموذج الفلترة */
+    .filter-form .form-label {
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+    .filter-form .form-select, .filter-form .form-control {
+        font-size: 0.875rem; /* استخدام حجم أصغر قليلاً للفلتر */
+        /* padding: 0.375rem 0.75rem; (يأتي من form-control-sm إذا استخدمتها) */
+    }
+    .filter-form .btn {
+        padding-top: 0.45rem; /* تعديل بسيط لمحاذاة الأزرار مع الحقول */
+        padding-bottom: 0.45rem;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h1 class="h2 mb-0"><i class="fas fa-clipboard-list me-2"></i>قائمة مهامك الدراسية</h1>
+        <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> إضافة مهمة جديدة
+        </a>
+    </div>
+
+    <!-- قسم الإحصائيات السريعة للمهام -->
+    <div class="row mb-4">
+        <div class="col-sm-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="display-6 fw-bold text-warning">{{ pending_tasks_count|default:0 }}</h4>
+                    <p class="text-muted mb-0">مهام قيد الانتظار</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="display-6 fw-bold text-info">{{ inprogress_tasks_count|default:0 }}</h4>
+                    <p class="text-muted mb-0">مهام قيد التنفيذ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="display-6 fw-bold text-success">{{ completed_tasks_count|default:0 }}</h4>
+                    <p class="text-muted mb-0">مهام مكتملة</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3 mb-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="display-6 fw-bold text-secondary">{{ total_tasks_count|default:0 }}</h4>
+                    <p class="text-muted mb-0">إجمالي المهام</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {# نموذج فلترة المهام #}
+    {% if filter_form %}
+    <div class="card shadow-sm mb-4 filter-form">
+        <div class="card-header bg-light py-2">
+            <h6 class="mb-0"><i class="fas fa-filter me-1"></i> فلترة المهام</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row gx-3 gy-2 align-items-end">
+                {# إذا كنت تستخدم crispy-forms وتريد أن يعرض الحقول في صف واحد، ستحتاج لتخصيص layout #}
+                {# الطريقة اليدوية لـ Bootstrap Grid: #}
+                {% for field in filter_form %}
+                    <div class="col-md-6 col-lg-3"> {# أو أي تقسيم أعمدة مناسب #}
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }} {# يفترض أن Widget لديه فئة form-control أو form-select من TaskFilter #}
+                        {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                
+                <div class="col-md-auto mt-3 mt-md-0">
+                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="fas fa-search"></i> تطبيق الفلتر</button>
+                </div>
+                <div class="col-md-auto mt-2 mt-md-0">
+                    <a href="{% url 'tasks:task_list' %}" class="btn btn-sm btn-outline-secondary w-100"><i class="fas fa-times"></i> مسح الفلتر</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+
+    {% if tasks %}
+        <div class="row">
+            {% for task_item in tasks %}
+            <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
+                <div class="card h-100 shadow-sm task-card status-{{ task_item.status }}">
+                    <div class="card-body d-flex flex-column pb-0">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0 flex-grow-1">
+                                <a href="{{ task_item.get_absolute_url }}" title="{{ task_item.title }}">{{ task_item.title|truncatechars:50 }}</a>
+                            </h5>
+                            <span class="badge flex-shrink-0 ms-2
+                                {% if task_item.status == 'pending' %}bg-warning text-dark
+                                {% elif task_item.status == 'in_progress' %}bg-info text-dark
+                                {% elif task_item.status == 'completed' %}bg-success
+                                {% elif task_item.status == 'postponed' %}bg-secondary
+                                {% endif %}">{{ task_item.get_status_display }}</span>
+                        </div>
+                        <p class="card-text small text-muted flex-grow-1" style="min-height: 40px;"> {# ارتفاع أدنى للوصف #}
+                            {{ task_item.description|striptags|truncatewords_html:15|default_if_none:"-" }}
+                        </p>
+                        <div class="mt-auto">
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+                                <span>
+                                    {% if task_item.subject %}<i class="fas fa-book me-1"></i>{{ task_item.subject.name }}{% endif %}
+                                </span>
+                                <span {% if task_item.is_overdue %}class="text-danger fw-bold"{% endif %} title="الموعد النهائي">
+                                    {% if task_item.due_date %}
+                                        <i class="far fa-calendar-times me-1"></i>{{ task_item.due_date|date:"Y/m/d" }}
+                                        {% if task_item.is_overdue %} (متأخرة!){% endif %}
+                                    {% else %}
+                                        <i class="far fa-calendar-minus me-1"></i>بلا موعد
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-center py-2">
+                        <a href="{{ task_item.get_absolute_url }}" class="btn btn-sm btn-outline-primary me-1" title="عرض تفاصيل المهمة"><i class="fas fa-eye"></i> تفاصيل</a>
+                        <a href="{% url 'tasks:task_edit' task_item.pk %}" class="btn btn-sm btn-outline-secondary" title="تعديل المهمة"><i class="fas fa-edit"></i> تعديل</a>
+                        <a href="{% url 'tasks:task_delete' task_item.pk %}" class="btn btn-sm btn-outline-danger ms-1" title="حذف المهمة"><i class="fas fa-trash-alt"></i> حذف</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            {% include "partials/_pagination.html" with page_obj=page_obj %} {# تأكد من أن اسم page_obj صحيح #}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center shadow-sm">
+            <h4 class="alert-heading"><i class="fas fa-check-circle"></i> عمل رائع!</h4>
+            {% if request.GET %} {# إذا كان هناك فلتر مطبق #}
+                <p>لم يتم العثور على مهام تطابق معايير الفلترة الحالية. <a href="{% url 'tasks:task_list' %}" class="alert-link">اعرض جميع المهام</a>.</p>
+            {% else %}
+                <p>لا توجد لديك مهام حالياً. يمكنك الاسترخاء أو <a href="{% url 'tasks:task_create' %}" class="alert-link">إضافة مهمة جديدة</a>.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# قسم مؤقت بومودورو #}
+    <div class="pomodoro-timer-container mt-5 shadow-sm"
+        data-work-duration="{{ user_profile.pomodoro_work_duration|default_if_none:25 }}"
+        data-short-break-duration="{{ user_profile.pomodoro_short_break_duration|default_if_none:5 }}"
+        data-long-break-duration="{{ user_profile.pomodoro_long_break_duration|default_if_none:15 }}"
+        data-sessions-before-long-break="{{ user_profile.pomodoro_sessions_before_long_break|default_if_none:4 }}">
+       <h4 class="mb-3"><i class="fas fa-stopwatch text-primary me-2"></i>مؤقت التركيز (بومودورو)</h4>
+       <div id="pomodoro-time-display">25:00</div>
+       <div id="pomodoro-status">جاهز للبدء</div>
+       <div class="pomodoro-controls mt-3 mb-2">
+           <button id="pomodoro-start" class="btn btn-success btn-lg"><i class="fas fa-play"></i> ابدأ</button>
+           <button id="pomodoro-pause" class="btn btn-warning btn-lg" disabled><i class="fas fa-pause"></i> إيقاف مؤقت</button>
+           <button id="pomodoro-reset" class="btn btn-danger btn-lg"><i class="fas fa-undo"></i> إعادة تعيين</button>
+       </div>
+       <div class="mb-3">
+           <button id="pomodoro-skip-break" class="btn btn-sm btn-outline-secondary" disabled>تخطي فترة الراحة الحالية</button>
+       </div>
+       <hr>
+       <div class="sound-controls row justify-content-center gx-2 gy-2">
+           <div class="col-md-5">
+               <label for="alarm-sound-select" class="form-label d-block text-center">صوت التنبيه عند الانتهاء:</label>
+               <select id="alarm-sound-select" class="form-select form-select-sm mx-auto">
+                   <option value="{% static 'sounds/alarms/alarm1.mp3' %}" selected>بحر</option>
+                   <option value="{% static 'sounds/alarms/alarm2.mp3' %}">جرس غير متوفر حاليا</option>
+                   <option value="none">بدون صوت</option>
+               </select>
+           </div>
+           <div class="col-md-7">
+               <label for="background-sound-select" class="form-label d-block text-center">موسيقى خلفية هادئة:</label>
+               <div class="input-group input-group-sm mx-auto">
+                    <select id="background-sound-select" class="form-select">
+                       <option value="none" selected>بدون موسيقى</option>
+                       <option value="{% static 'sounds/background/rain.mp3' %}">صوت مطر</option>
+                       <option value="{% static 'sounds/background/quran_calm.mp3' %}">قرآن هادئ (مقطع)</option>
+                   </select>
+                   <input type="range" id="background-sound-volume" class="form-range w-50 align-self-center ms-2" min="0" max="1" step="0.1" value="0.5" title="مستوى الصوت" style="max-width: 100px;background:#8baeff">
+                </div>
+           </div>
+       </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ block.super }}
+    <script src="{% static 'js/pomodoro.js' %}"></script>
+    {# JavaScript لتطبيق فئات CSS على حقول الفلتر إذا لم تستخدم crispy-forms #}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.querySelector('.filter-form form');
+        if (filterForm) {
+            {% if not CRISPY_ALLOWED_TEMPLATE_PACKS or not filter_form %} {# أو أي شرط مناسب #}
+                filterForm.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select').forEach(function(el) {
+                    if (!el.classList.contains('form-check-input') && !el.classList.contains('form-range')) {
+                         if (!el.classList.contains('form-control-sm') && !el.classList.contains('form-select-sm')) {
+                            if (el.tagName === 'SELECT') {
+                                el.classList.add('form-select', 'form-select-sm');
+                            } else {
+                                el.classList.add('form-control', 'form-control-sm');
+                            }
+                        }
+                    }
+                });
+            {% endif %}
+        }
+    });
+    </script>
+{% endblock %}

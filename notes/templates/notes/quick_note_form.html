@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}تعديل الملاحظة{% else %}إنشاء ملاحظة جديدة{% endif %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header {% if form.instance.pk %}bg-info text-dark{% else %}bg-primary text-white{% endif %} text-center">
+                    <h4 class="mb-0">
+                        {% if form.instance.pk %}
+                            <i class="fas fa-edit me-2"></i>تعديل الملاحظة: {{ form.instance.title|truncatechars:30 }}
+                        {% else %}
+                            <i class="fas fa-plus-circle me-2"></i>إنشاء ملاحظة سريعة جديدة
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <strong>خطأ!</strong> يرجى تصحيح الأخطاء الموضحة أدناه.
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if CRISPY_ALLOWED_TEMPLATE_PACKS %} {# *** إعادة الشرط *** #}
+                            {{ form|crispy }}
+                        {% else %}
+                            {# عرض الحقول يدوياً لمزيد من التحكم #}
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-bold"><i class="fas fa-heading me-1"></i>{{ form.title.label }}</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors }}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.content.id_for_label }}" class="form-label fw-bold"><i class="fas fa-paragraph me-1"></i>{{ form.content.label }}</label>
+                                {{ form.content }}
+                                {% if form.content.errors %}<div class="invalid-feedback d-block">{{ form.content.errors }}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label fw-bold"><i class="fas fa-tag me-1"></i>{{ form.category.label }}</label>
+                                {{ form.category }}
+                                <small class="form-text text-muted d-block mt-1">
+                                    يمكنك <a href="{% url 'notes:category_create' %}?next={{ request.path }}" class="text-decoration-none">إضافة تصنيف جديد</a> إذا لم تجد ما تبحث عنه.
+                                </small>
+                                {% if form.category.errors %}<div class="invalid-feedback d-block">{{ form.category.errors }}</div>{% endif %}
+                            </div>
+                        {% endif %} {# *** إعادة وسم النهاية للشرط *** #}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn {% if form.instance.pk %}btn-info text-dark{% else %}btn-primary{% endif %} btn-lg">
+                                <i class="fas {% if form.instance.pk %}fa-save{% else %}fa-check-circle{% endif %} me-1"></i>
+                                {% if form.instance.pk %}حفظ التعديلات{% else %}إنشاء الملاحظة{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% if form.instance.pk and form.instance.get_absolute_url %}{{ form.instance.get_absolute_url }}{% else %}{% url 'notes:note_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> 
+                        {% if form.instance.pk %}العودة إلى تفاصيل الملاحظة{% else %}العودة إلى قائمة الملاحظات{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        {% if not CRISPY_ALLOWED_TEMPLATE_PACKS %} {# شرط لـ JavaScript أيضًا #}
+            const titleField = document.getElementById('{{ form.title.id_for_label }}');
+            if (titleField) titleField.classList.add('form-control');
+            
+            const contentField = document.getElementById('{{ form.content.id_for_label }}');
+            if (contentField) contentField.classList.add('form-control');
+            
+            const categoryField = document.getElementById('{{ form.category.id_for_label }}');
+            if (categoryField && categoryField.tagName === 'SELECT') {
+                categoryField.classList.add('form-select');
+            } else if (categoryField) {
+                 categoryField.classList.add('form-control');
+            }
+        {% endif %}
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}مرحباً بك في المنصة المساعدة للدراسة - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url("{% static 'images/backgrounds/background.png' %}");
+        background-size: cover;
+        background-position: center center;
+        color: #fff;
+        padding: 6rem 1rem; /* تعديل الحشو للشاشات الصغيرة */
+        text-align: center;
+    }
+    body.dark-mode .hero-section {
+        background: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.8)), url("{% static 'images/backgrounds/back_night.png' %}");
+        /* تأكد من وجود study_hero_dark.jpg أو استخدم نفس الصورة مع تعتيم مختلف */
+    }
+    .hero-section h1 {
+        font-size: 2.8rem; /* تعديل حجم الخط للشاشات المختلفة */
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .hero-section .lead {
+        font-size: 1.2rem; /* تعديل حجم الخط */
+        margin-bottom: 2rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .features-section {
+        padding: 4rem 1rem; /* تعديل الحشو */
+    }
+    .features-section .feature-icon {
+        font-size: 2.8rem; /* تعديل حجم الأيقونة */
+        color: var(--bs-primary);
+        margin-bottom: 1rem;
+    }
+    body.dark-mode .features-section .feature-icon {
+        color: var(--bs-primary-dark);
+    }
+    .features-section h4 {
+        font-size: 1.3rem; /* تعديل حجم العنوان الفرعي */
+        margin-bottom: 0.5rem;
+    }
+    .features-section p {
+        font-size: 0.95rem; /* تعديل حجم النص */
+    }
+    .cta-section {
+        background-color: var(--bs-light);
+        padding: 4rem 1rem; /* تعديل الحشو */
+    }
+    body.dark-mode .cta-section {
+        background-color: var(--card-bg-dark);
+    }
+
+    @media (min-width: 768px) { /* تعديلات للشاشات الأكبر */
+        .hero-section { padding: 8rem 0; }
+        .hero-section h1 { font-size: 3.5rem; }
+        .hero-section .lead { font-size: 1.3rem; }
+        .features-section { padding: 5rem 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <i class="fas fa-graduation-cap fa-3x mb-3 animate__animated animate__fadeInDown"></i> {# مثال لإضافة حركة بسيطة #}
+        <h1 class="display-4 animate__animated animate__fadeInUp animate__delay-0.5s">المنصة المساعدة للدراسة</h1>
+        <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+            مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة.
+            انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!
+        </p>
+        <div class="mt-4 animate__animated animate__fadeInUp animate__delay-1.5s">
+            {% if not user.is_authenticated %}
+            <a href="{% url 'core:signup' %}" class="btn btn-primary btn-lg px-4 me-sm-2 mb-2 mb-sm-0 shadow">
+                <i class="fas fa-user-plus me-2"></i>أنشئ حساباً مجانياً
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 shadow">
+                <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+            </a>
+            {% else %}
+            <a href="{% url 'core:dashboard' %}" class="btn btn-success btn-lg px-5 shadow">
+                <i class="fas fa-tachometer-alt me-2"></i>الذهاب إلى لوحة التحكم
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="features-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title-underline"><span>ميزات المنصة</span></h2> {# عنوان قسم مع خط تحته #}
+            <p class="text-muted" style="color:rgb(209 209 209 / 75%)">اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية.</p>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h4>مكتبة ملفات شاملة</h4>
+                <p class="text-muted">وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h4>أخبار وإعلانات فورية</h4>
+                <p class="text-muted">كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h4>إدارة مهام ذكية</h4>
+                <p class="text-muted">نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if not user.is_authenticated %}
+<section class="cta-section text-center">
+    <div class="container">
+        <i class="fas fa-rocket fa-2x text-success mb-3"></i>
+        <h2 class="mb-3">جاهز لتبدأ رحلتك نحو النجاح؟</h2>
+        <p class="lead text-muted mb-4">انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة.</p>
+        <a href="{% url 'core:signup' %}" class="btn btn-success btn-lg px-5 shadow">
+            ابدأ الآن!
+        </a>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+{{ block.super }}
+{% comment %} إذا كنت تستخدم Animate.css، قم بتضمينها في base.html أو هنا {% endcomment %}
+{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> {% endcomment %}
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %} {# إذا كنت تستخدمه، أو احذفه إذا لم تكن تستخدم crispy-forms نهائيًا #}
+
+{% block title %}{% if form.instance.pk %}تعديل التصنيف{% else %}إنشاء تصنيف جديد{% endif %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header {% if form.instance.pk %}bg-warning text-dark{% else %}bg-success text-white{% endif %} text-center">
+                    <h4 class="mb-0">
+                        {% if form.instance.pk %}
+                            <i class="fas fa-edit me-2"></i>تعديل التصنيف: {{ form.instance.name }}
+                        {% else %}
+                            <i class="fas fa-tag me-2"></i>إنشاء تصنيف جديد للملاحظات
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <strong>خطأ!</strong>
+                            {% if form.non_field_errors %}
+                                {{ form.non_field_errors|striptags }}
+                            {% elif form.errors.name %}
+                                {{ form.errors.name|striptags }}
+                            {% else %}
+                                يرجى تصحيح الخطأ.
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% if form.instance.pk %}{% url 'notes:category_edit' form.instance.pk %}{% else %}{% url 'notes:category_create' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}{% endif %}">
+                        {% csrf_token %}
+                        
+                        {# *** تم إزالة الشرط form|is_crispy من هنا *** #}
+                        {% if CRISPY_ALLOWED_TEMPLATE_PACKS %} {# تحقق عام لمعرفة ما إذا كان crispy مُعدًا #}
+                            {{ form|crispy }}
+                        {% else %}
+                            {# عرض الحقول يدوياً #}
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-bold"><i class="fas fa-pencil-alt me-1"></i>{{ form.name.label }}</label>
+                                {{ form.name }}
+                                {% if form.name.help_text %}<small class="form-text text-muted d-block mt-1">{{ form.name.help_text|safe }}</small>{% endif %}
+                                {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors }}</div>{% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn {% if form.instance.pk %}btn-warning text-dark{% else %}btn-success{% endif %} btn-lg">
+                                <i class="fas {% if form.instance.pk %}fa-save{% else %}fa-check-circle{% endif %} me-1"></i>
+                                {% if form.instance.pk %}حفظ التعديلات{% else %}إنشاء التصنيف{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% if request.GET.next %}{{ request.GET.next }}{% else %}{% url 'notes:note_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> 
+                        {% if request.GET.next %}العودة إلى الصفحة السابقة{% else %}العودة إلى قائمة الملاحظات{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة فئة form-control لحقول النموذج إذا لم تكن تستخدم crispy-forms
+    // أو إذا كان الجزء اليدوي هو الذي يتم عرضه
+    {% if not CRISPY_ALLOWED_TEMPLATE_PACKS %}
+        const nameField = document.getElementById('{{ form.name.id_for_label }}');
+        if (nameField) {
+            nameField.classList.add('form-control');
+            nameField.placeholder = 'مثال: أفكار مشاريع، مهام شخصية...';
+        }
+    {% endif %}
+});
+</script>
+{% endblock %}
+{% endblock %}

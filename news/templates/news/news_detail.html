@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ news_item.title }} - الأخبار{% endblock %} {# افترض أن الـ context_object_name هو news_item #}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .news-content img { /* لجعل الصور داخل المحتوى متجاوبة */
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.25rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+    }
+    .news-meta-data {
+        font-size: 0.9rem;
+        color: #6c757d; /* لون Bootstrap muted */
+    }
+    body.dark-mode .news-meta-data {
+        color: #adb5bd;
+    }
+    .news-content {
+        line-height: 1.7; /* زيادة ارتفاع السطر لتحسين القراءة */
+        font-size: 1.1rem; /* تكبير الخط قليلاً للمحتوى */
+    }
+    body.dark-mode .news-content {
+        color: #dcdcdc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9"> {# أعرض قليلاً لتوفير مساحة قراءة أفضل #}
+            <article class="news-article">
+                <header class="mb-4">
+                    <h1 class="fw-bold display-5">{{ news_item.title }}</h1>
+                    <hr>
+                    <div class="news-meta-data d-flex flex-wrap justify-content-between">
+                        <span>
+                            <i class="far fa-calendar-alt me-1"></i> تاريخ النشر: {{ news_item.publication_date|date:"l, d F Y, P" }}
+                        </span>
+                        {% if news_item.author %}
+                        <span>
+                            <i class="fas fa-user-edit me-1"></i> الناشر: {{ news_item.author.get_full_name|default:news_item.author.username }}
+                        </span>
+                        {% endif %}
+                        {% if news_item.category %}
+                        <span>
+                            <i class="fas fa-tag me-1"></i> التصنيف: 
+                            <a href="{% url 'news:news_list' %}?category={{ news_item.category.pk }}" class="text-decoration-none">{{ news_item.category.name }}</a>
+                        </span>
+                        {% endif %}
+                    </div>
+                </header>
+
+                {% if news_item.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ news_item.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ news_item.title }}" style="max-height: 400px;">
+                </div>
+                {% endif %}
+
+                <section class="news-content">
+                    {{ news_item.content|linebreaksbr }} {# linebreaksbr لتحويل الأسطر الجديدة إلى <br> #}
+                </section>
+
+                {% if perms.news.change_newsitem or perms.news.delete_newsitem %}
+                <hr class="my-4">
+                <div class="admin-actions text-end">
+                    {% if perms.news.change_newsitem %}
+                    <a href="{% url 'admin:news_newsitem_change' news_item.pk %}" class="btn btn-sm btn-outline-secondary me-2" target="_blank">
+                        <i class="fas fa-edit"></i> تعديل الخبر (Admin)
+                    </a>
+                    {% endif %}
+                    {% if perms.news.delete_newsitem %}
+                    <a href="{% url 'admin:news_newsitem_delete' news_item.pk %}" class="btn btn-sm btn-outline-danger" target="_blank">
+                        <i class="fas fa-trash-alt"></i> حذف الخبر (Admin)
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </article>
+
+            <div class="mt-5 text-center">
+                <a href="{% url 'news:news_list' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الأخبار
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

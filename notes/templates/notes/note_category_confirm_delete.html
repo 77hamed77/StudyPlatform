@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}تأكيد حذف التصنيف - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>تأكيد الحذف</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="fs-5">هل أنت متأكد أنك تريد حذف التصنيف:</p>
+                    <h5 class="mb-3">"<strong>{{ object.name }}</strong>"؟</h5>
+                    <p class="text-danger">
+                        <strong>ملاحظة:</strong> سيتم إزالة هذا التصنيف من جميع الملاحظات المرتبطة به (لن يتم حذف الملاحظات نفسها، ستصبح "بدون تصنيف"). لا يمكن التراجع عن هذا الإجراء.
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg me-2">
+                            <i class="fas fa-trash-alt me-1"></i> نعم، احذف التصنيف
+                        </button>
+                        <a href="{% url 'notes:note_list' %}" class="btn btn-secondary btn-lg"> {# أو رابط لإدارة التصنيفات #}
+                            <i class="fas fa-times me-1"></i> لا، ألغِ الأمر
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}  

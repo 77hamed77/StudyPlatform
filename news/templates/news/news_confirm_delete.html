@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}تأكيد حذف الخبر - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg border-danger"> {# استخدام حدود حمراء للتأكيد #}
+                <div class="card-header bg-danger text-white text-center">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>تأكيد حذف الخبر</h4>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="fs-5">هل أنت متأكد أنك تريد حذف الخبر التالي نهائياً؟</p>
+                    <h3 class="mb-3 text-danger">"<strong>{{ news_item.title }}</strong>"</h3>
+                    
+                    {% if news_item.image %}
+                    <div class="my-3">
+                        <img src="{{ news_item.image.url }}" alt="{{ news_item.title }}" class="img-thumbnail" style="max-height: 150px; max-width: 100%;">
+                    </div>
+                    {% endif %}
+                    
+                    <p class="text-muted small">
+                        تاريخ النشر: {{ news_item.publication_date|date:"d M Y" }}
+                        {% if news_item.category %} | التصنيف: {{ news_item.category.name }}{% endif %}
+                    </p>
+
+                    <p class="text-danger fw-bold mt-4">
+                        <i class="fas fa-exclamation-circle"></i> تحذير: لا يمكن التراجع عن هذا الإجراء!
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="fas fa-trash-alt me-1"></i> نعم، قم بالحذف
+                            </button>
+                            <a href="{{ news_item.get_absolute_url }}" class="btn btn-secondary btn-lg px-4">
+                                <i class="fas fa-times me-1"></i> لا، ألغِ الأمر
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

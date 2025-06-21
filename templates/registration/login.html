@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %} {# إذا كنت تستخدمه، أو احذفه #}
+
+{% block title %}تسجيل الدخول - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول إلى حسابك</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if form.errors and not form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            يرجى تصحيح الأخطاء أدناه.
+                        </div>
+                    {% endif %}
+                    {% if form.non_field_errors %}
+                        {% for error in form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        
+                        {# *** تم إزالة الشرط form|is_crispy من هنا *** #}
+                        {# إذا كان crispy_forms مُعدًا، سيتم استخدام هذا الجزء #}
+                        {# إذا لم يكن مُعدًا، سيفشل {% load crispy_forms_tags %} أعلاه، أو يمكنك اختيار عرضه يدويًا دائمًا #}
+                        
+                        {# الخيار 1: استخدام crispy إذا كان مُحملاً، وإلا اعرض يدويًا #}
+                        {% if CRISPY_ALLOWED_TEMPLATE_PACKS %} {# تحقق عام لمعرفة ما إذا كان crispy مُعدًا بشكل ما #}
+                            {{ form|crispy }}
+                        {% else %}
+                            {# عرض الحقول يدويًا #}
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>{{ form.username.label }}
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.username.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>{{ form.password.label }}
+                                </label>
+                                {{ form.password }}
+                                 {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <input type="hidden" name="next" value="{{ next }}">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> دخول
+                            </button>
+                        </div>
+                    </form>
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <p class="mb-2">
+                            <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                                <i class="fas fa-question-circle me-1"></i>نسيت كلمة المرور؟
+                            </a>
+                        </p>
+                        <p class="mb-0">
+                            ليس لديك حساب؟ 
+                            <a href="{% url 'core:signup' %}" class="fw-bold text-decoration-none">
+                                <i class="fas fa-user-plus me-1"></i>أنشئ حساباً جديداً
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // إضافة فئة form-control لحقول النموذج إذا لم تكن تستخدم crispy-forms
+        // أو إذا كان الجزء اليدوي هو الذي يتم عرضه
+        {% if not CRISPY_ALLOWED_TEMPLATE_PACKS %}
+            const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+            if (usernameField) usernameField.classList.add('form-control');
+            
+            const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+            if (passwordField) passwordField.classList.add('form-control');
+        {% endif %}
+    });
+</script>
+{% endblock %}
+{% endblock %}

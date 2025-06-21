@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}إشعاراتي - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .notification-item {
+        border-left: 4px solid transparent;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .notification-item.unread {
+        background-color: rgba(var(--bs-info-rgb), 0.08); /* لون خلفية خفيف للإشعارات غير المقروءة */
+        border-left-color: var(--bs-info);
+    }
+    body.dark-mode .notification-item.unread {
+        background-color: rgba(var(--bs-info-dark-rgb), 0.15); /* افترض أن لديك --bs-info-dark-rgb */
+        border-left-color: var(--bs-info-dark);
+    }
+    .notification-item:hover {
+        background-color: rgba(0,0,0,0.03);
+    }
+    body.dark-mode .notification-item:hover {
+        background-color: rgba(255,255,255,0.05);
+    }
+    .notification-verb {
+        font-weight: 500;
+    }
+    .notification-target {
+        color: var(--bs-primary);
+    }
+    body.dark-mode .notification-target {
+        color: var(--link-color-dark);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="mb-0"><i class="fas fa-bell me-2"></i>قائمة الإشعارات</h2>
+        {# تم حذف النموذج المُعلّق من هنا #}
+    </div>
+
+    {% if notifications_list %}
+        <div class="list-group shadow-sm">
+            {% for notification_item_page in notifications_list %}
+                <a href="{{ notification_item_page.get_target_url|default:'#' }}"
+                   class="list-group-item list-group-item-action notification-item {% if notification_item_page.unread %}unread{% endif %}"
+                   aria-current="{% if notification_item_page.unread %}true{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1 notification-verb">
+                            {% if notification_item_page.actor %}
+                                <i class="fas fa-user-circle text-muted me-1"></i><strong>{{ notification_item_page.actor }}</strong>
+                            {% else %}
+                                <i class="fas fa-info-circle text-muted me-1"></i>
+                            {% endif %}
+                            {{ notification_item_page.verb }}
+                            {% if notification_item_page.target %}
+                                "<span class="notification-target">{{ notification_item_page.target|truncatechars:30 }}</span>"
+                            {% endif %}
+                        </p>
+                        <small class="text-muted flex-shrink-0 ms-2" title="{{ notification_item_page.timestamp|date:'l, d F Y, P' }}">
+                            <i class="far fa-clock"></i> {{ notification_item_page.timestamp|timesince }}
+                        </small>
+                    </div>
+                    {% if notification_item_page.description %}
+                        <small class="text-muted d-block mt-1">{{ notification_item_page.description }}</small>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            {% include "partials/_pagination.html" %}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center shadow-sm">
+            <h4 class="alert-heading"><i class="fas fa-bell-slash"></i> لا توجد إشعارات!</h4>
+            <p>صندوق إشعاراتك فارغ حالياً.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task.title }} - تفاصيل المهمة{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-tasks me-2"></i>تفاصيل المهمة: {{ task.title }}</h4>
+            <div>
+                <a href="{% url 'tasks:task_edit' task.pk %}" class="btn btn-sm btn-outline-light me-2"><i class="fas fa-edit"></i> تعديل</a>
+                <a href="{% url 'tasks:task_delete' task.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i> حذف</a>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="card-title">{{ task.title }}</h5>
+                    {% if task.description %}
+                        <p class="card-text text-muted">{{ task.description|linebreaksbr }}</p>
+                    {% else %}
+                        <p class="card-text text-muted fst-italic">لا يوجد وصف لهذه المهمة.</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>الحالة:</strong> 
+                            <span class="badge 
+                                {% if task.status == 'pending' %}bg-warning text-dark
+                                {% elif task.status == 'in_progress' %}bg-info text-dark
+                                {% elif task.status == 'completed' %}bg-success
+                                {% elif task.status == 'postponed' %}bg-secondary
+                                {% endif %}">{{ task.get_status_display }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>المادة الدراسية:</strong> 
+                            {{ task.subject.name|default:"غير محددة" }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>الموعد النهائي:</strong> 
+                            {{ task.due_date|date:"l, d F Y"|default:"غير محدد" }}
+                            {% if task.due_date and task.due_date < timezone.now.date and task.status != 'completed' %}
+                                <span class="badge bg-danger ms-1">متأخرة</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>تاريخ الإنشاء:</strong> 
+                            {{ task.created_at|date:"d M Y, P" }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>آخر تحديث:</strong> 
+                            {{ task.updated_at|date:"d M Y, P" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            {# يمكنك إضافة قسم لتغيير حالة المهمة هنا باستخدام نموذج صغير أو أزرار AJAX #}
+            <hr class="my-4">
+            <div class="d-flex justify-content-start">
+                 {# مثال لأزرار تغيير الحالة - ستحتاج لـ views و URLs لها #}
+                {% if task.status != 'completed' %}
+                <form method="post" action="{% url 'tasks:task_mark_complete' task.pk %}" class="me-2"> {# افترض وجود هذا المسار #}
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> تمييز كمكتملة</button>
+                </form>
+                {% endif %}
+                {% if task.status == 'pending' %}
+                <form method="post" action="{% url 'tasks:task_mark_inprogress' task.pk %}" class="me-2"> {# افترض وجود هذا المسار #}
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-info text-dark"><i class="fas fa-hourglass-half"></i> بدء العمل عليها</button>
+                </form>
+                {% endif %}
+            </div>
+
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'tasks:task_list' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة المهام
+            </a>
+        </div>
+    </div>
+
+    {# يمكنك وضع مؤقت بومودورو هنا أيضًا إذا كان منطقيًا لصفحة تفاصيل المهمة #}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{# إذا كنت ستضيف تفاعلات AJAX لتغيير الحالة #}
+<script>
+// أي JavaScript خاص بصفحة التفاصيل
+</script>
+{% endblock %}

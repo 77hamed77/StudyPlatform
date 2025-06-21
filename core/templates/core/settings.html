@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}الإعدادات - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <h2 class="mb-4 text-center border-bottom pb-3"><i class="fas fa-cogs me-2"></i>إعدادات الحساب والتفضيلات</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>معلومات المستخدم</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if user_form.non_field_errors %}
+                            <div class="alert alert-danger p-2 small">{{ user_form.non_field_errors }}</div>
+                        {% endif %}
+                        {% for field in user_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }} {# يفترض أن widget لديه فئة form-control من forms.py #}
+                                {% if field.help_text %}<small class="form-text text-muted d-block mt-1">{{ field.help_text|safe }}</small>{% endif %}
+                                {% if field.errors %}<div class="invalid-feedback d-block small">{{ field.errors|striptags }}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-palette me-2"></i>تفضيلات المظهر</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if profile_form.non_field_errors and 'dark_mode_enabled' in profile_form.errors %}
+                             <div class="alert alert-danger p-2 small">{{ profile_form.non_field_errors }}</div>
+                        {% endif %}
+                        <div class="form-check form-switch mb-3"> {# استخدام form-switch لمظهر أفضل #}
+                            {{ profile_form.dark_mode_enabled }}
+                            <label class="form-check-label fw-bold" for="{{ profile_form.dark_mode_enabled.id_for_label }}">
+                                {{ profile_form.dark_mode_enabled.label }}
+                            </label>
+                            {% if profile_form.dark_mode_enabled.errors %}<div class="invalid-feedback d-block small">{{ profile_form.dark_mode_enabled.errors|striptags }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-stopwatch-20 me-2"></i>إعدادات مؤقت بومودورو</h5>
+                    </div>
+                     <div class="card-body p-4">
+                        {% if profile_form.non_field_errors and 'pomodoro' in profile_form.non_field_errors|join:"" %} {# تحقق عام لوجود أخطاء بومودورو #}
+                            <div class="alert alert-danger p-2 small">{{ profile_form.non_field_errors }}</div>
+                        {% endif %}
+                        <div class="row">
+                        {% for field in profile_form %}
+                            {% if 'pomodoro' in field.name %} {# عرض حقول بومودورو فقط هنا #}
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                                {{ field }} {# يفترض أن widget هو NumberInput(attrs={'class': 'form-control'}) #}
+                                {% if field.help_text %}<small class="form-text text-muted d-block mt-1">{{ field.help_text|safe }}</small>{% endif %}
+                                {% if field.errors %}<div class="invalid-feedback d-block small">{{ field.errors|striptags }}</div>{% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'core:profile' %}" class="btn btn-outline-secondary px-4"><i class="fas fa-times me-1"></i> إلغاء</a>
+                    <button type="submit" class="btn btn-success px-4"><i class="fas fa-save me-1"></i> حفظ التغييرات</button>
+                </div>
+            </form>
+            
+            <hr class="my-4">
+            <div class="text-center">
+                <a href="{% url 'password_change' %}" class="btn btn-outline-warning text-dark">
+                    <i class="fas fa-key me-1"></i> تغيير كلمة المرور
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        // تطبيق فئات Bootstrap على الحقول إذا لم تكن تستخدم crispy-forms
+        // وللتأكد من أن الحقول التي قد لا يتم التقاطها بواسطة crispy يتم تنسيقها
+        form.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea').forEach(function(el) {
+            if (!el.classList.contains('form-control')) {
+                 el.classList.add('form-control');
+            }
+        });
+        form.querySelectorAll('select').forEach(function(el) {
+             if (!el.classList.contains('form-select')) {
+                el.classList.add('form-select');
+            }
+        });
+        // form-check-input يتم التعامل معه بشكل جيد بواسطة Bootstrap
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

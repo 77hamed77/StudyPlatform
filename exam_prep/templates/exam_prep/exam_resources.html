@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ركن الاستعداد للامتحانات - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .prayer-card, .tips-card {
+        border-left: 4px solid var(--bs-warning); /* لون مميز لهذا القسم */
+    }
+    body.dark-mode .prayer-card, body.dark-mode .tips-card {
+        border-left-color: var(--bs-warning-dark);
+    }
+    .prayer-card .list-group-item, .tips-card .list-group-item {
+        border-right: none;
+        border-left: none;
+        padding-left: 1.25rem; /* نفس padding الكرت */
+        padding-right: 1.25rem;
+    }
+    .prayer-card .list-group-item:first-child, .tips-card .list-group-item:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .prayer-card .list-group-item:last-child, .tips-card .list-group-item:last-child {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: none; /* إزالة الحد السفلي لآخر عنصر */
+    }
+    .prayer-text {
+        white-space: pre-wrap; /* للحفاظ على تنسيق الأسطر الجديدة في الأدعية */
+        font-size: 1.1rem; /* تكبير خط الدعاء قليلاً */
+        line-height: 1.7;
+    }
+    .tip-title {
+        font-weight: 500;
+    }
+    .section-divider {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        border-top: 1px dashed #ccc;
+    }
+    body.dark-mode .section-divider {
+        border-top-color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5"> {# إضافة mb-5 لمسافة سفلية #}
+    <div class="text-center mb-5">
+        <i class="fas fa-book-reader fa-3x text-warning mb-3"></i>
+        <h1 class="display-5 fw-bold">ركن الاستعداد للامتحانات</h1>
+        <p class="lead text-muted">هنا تجد مجموعة من الأدعية والنصائح التي قد تساعدك في رحلتك الدراسية وأثناء الامتحانات.</p>
+    </div>
+
+    <div class="row g-4"> {# g-4 لإضافة مسافات بين الكروت #}
+        <!-- قسم الأدعية -->
+        <div class="col-lg-6 mb-4 mb-lg-0 d-flex align-items-stretch">
+            <div class="card shadow-sm prayer-card w-100">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-hands-praying me-2"></i>أدعية الامتحانات</h4>
+                </div>
+                {% if prayers %}
+                    <ul class="list-group list-group-flush">
+                        {% for prayer in prayers %}
+                            <li class="list-group-item">
+                                {% if prayer.title %}
+                                    <h5 class="tip-title mb-1">{{ prayer.title }}</h5>
+                                {% endif %}
+                                <p class="prayer-text mb-0">{{ prayer.text }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p>لا توجد أدعية متاحة حالياً. سيتم إضافتها قريباً بإذن الله.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- قسم النصائح والترتيبات -->
+        <div class="col-lg-6 d-flex align-items-stretch">
+            <div class="card shadow-sm tips-card w-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-lightbulb me-2"></i>نصائح وترتيبات الامتحان</h4>
+                </div>
+                {% if tips_general or tips_before or tips_during or tips_after %}
+                    <div class="card-body">
+                        {% if tips_general %}
+                            <h5 class="mt-2 mb-2 text-primary"><i class="fas fa-check-double me-1"></i>نصائح عامة وترتيبات أساسية:</h5>
+                            <ul class="list-group list-group-flush mb-3">
+                                {% for tip in tips_general %}
+                                    <li class="list-group-item">
+                                        <strong class="tip-title d-block">{{ tip.title }}:</strong>
+                                        <span class="text-muted">{{ tip.description|linebreaksbr }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if tips_before %}
+                             {% if tips_general %}<div class="section-divider"></div>{% endif %}
+                            <h5 class="mt-2 mb-2 text-primary"><i class="fas fa-book-open me-1"></i>نصائح قبل الامتحان (أثناء المذاكرة):</h5>
+                            <ul class="list-group list-group-flush mb-3">
+                                {% for tip in tips_before %}
+                                    <li class="list-group-item">
+                                        <strong class="tip-title d-block">{{ tip.title }}:</strong>
+                                        <span class="text-muted">{{ tip.description|linebreaksbr }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if tips_during %}
+                             {% if tips_before or tips_general %}<div class="section-divider"></div>{% endif %}
+                            <h5 class="mt-2 mb-2 text-primary"><i class="fas fa-pencil-alt me-1"></i>نصائح أثناء الامتحان:</h5>
+                            <ul class="list-group list-group-flush mb-3">
+                                {% for tip in tips_during %}
+                                    <li class="list-group-item">
+                                        <strong class="tip-title d-block">{{ tip.title }}:</strong>
+                                        <span class="text-muted">{{ tip.description|linebreaksbr }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        {% if tips_after %}
+                            {% if tips_during or tips_before or tips_general %}<div class="section-divider"></div>{% endif %}
+                            <h5 class="mt-2 mb-2 text-primary"><i class="fas fa-flag-checkered me-1"></i>نصائح بعد الامتحان:</h5>
+                            <ul class="list-group list-group-flush">
+                                {% for tip in tips_after %}
+                                    <li class="list-group-item">
+                                        <strong class="tip-title d-block">{{ tip.title }}:</strong>
+                                        <span class="text-muted">{{ tip.description|linebreaksbr }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="card-body text-center text-muted">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p>لا توجد نصائح أو ترتيبات متاحة حالياً. سيتم إضافتها قريباً.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,257 @@
+/* static/css/style.css */
+
+/* --- Variables --- */
+:root {
+    --bs-primary-rgb: 13, 110, 253; /* Bootstrap's default */
+    --bs-secondary-rgb: 108, 117, 125;
+    --bs-success-rgb: 25, 135, 84;
+    --bs-info-rgb: 13, 202, 240;
+    --bs-warning-rgb: 255, 193, 7;
+    --bs-danger-rgb: 220, 53, 69;
+    --bs-light-rgb: 248, 249, 250;
+    --bs-dark-rgb: 33, 37, 41;
+
+    --bs-primary: rgb(var(--bs-primary-rgb));
+    --bs-secondary: rgb(var(--bs-secondary-rgb));
+    --bs-success: rgb(var(--bs-success-rgb));
+    --bs-info: rgb(var(--bs-info-rgb));
+    --bs-warning: rgb(var(--bs-warning-rgb));
+    --bs-danger: rgb(var(--bs-danger-rgb));
+    --bs-light: rgb(var(--bs-light-rgb));
+    --bs-dark: rgb(var(--bs-dark-rgb));
+    --bs-white: #fff;
+    --bs-black: #000;
+
+    /* Custom Theme Variables - Light Mode Defaults */
+    --custom-font: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --text-color: #212529;
+    --text-muted-color: #6c757d;
+    --body-bg: #f8f9fa;
+    --card-bg: var(--bs-white);
+    --card-border-color: #dee2e6;
+    --card-header-bg: #f1f3f5;
+    --card-footer-bg: var(--card-header-bg);
+    --link-color: var(--bs-primary);
+    --link-hover-color: #0a58ca;
+    --navbar-bg: var(--bs-dark); /* Navbar background for light mode */
+    --navbar-link-color: rgba(255, 255, 255, 0.75);
+    --navbar-link-hover-color: var(--bs-white);
+    --navbar-brand-color: var(--bs-white);
+    --form-control-bg: var(--bs-white);
+    --form-control-color: var(--text-color);
+    --form-control-border-color: #ced4da;
+    --button-outline-light-color: var(--navbar-link-color); /* For theme toggle button */
+    --button-outline-light-hover-bg: var(--navbar-link-hover-color);
+    --button-outline-light-hover-color: var(--navbar-bg);
+
+    /* Specific component colors that might need dark mode override */
+    --blockquote-footer-color: #6c757d;
+    --table-hover-bg: rgba(0,0,0,0.04);
+    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.08); /* For unread notifications */
+    --hr-color: rgba(0,0,0,0.1);
+}
+
+/* --- General Styles --- */
+body {
+    font-family: var(--custom-font);
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #343a40; /* Slightly darker than body text */
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+hr {
+    border-top-color: var(--hr-color);
+}
+
+/* --- Navbar --- */
+.navbar {
+    background-color: var(--navbar-bg) !important; /* Use important if Bootstrap's .bg-dark overrides */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--navbar-brand-color) !important;
+}
+.navbar .nav-link {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    color: var(--navbar-link-color) !important;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+    color: var(--navbar-link-hover-color) !important;
+}
+.navbar-toggler {
+    border-color: rgba(255,255,255,0.1);
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.dropdown-menu {
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    font-size: 0.95rem;
+    background-color: var(--bs-white); /* Default dropdown bg */
+    border-color: var(--card-border-color);
+}
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    color: var(--text-color);
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #e9ecef; /* Light hover for dropdown items */
+    color: var(--text-color);
+}
+#theme-toggle-btn.btn-outline-light {
+    color: var(--button-outline-light-color);
+    border-color: var(--button-outline-light-color);
+}
+#theme-toggle-btn.btn-outline-light:hover {
+    background-color: var(--button-outline-light-hover-bg);
+    color: var(--button-outline-light-hover-color);
+}
+
+
+/* --- Main Content & Containers --- */
+main.container {
+    flex-grow: 1;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+/* --- Cards --- */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+}
+.card-header {
+    background-color: var(--card-header-bg);
+    border-bottom: 1px solid var(--card-border-color);
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-color);
+}
+.card-body { padding: 1.25rem; }
+.card-footer {
+    background-color: var(--card-footer-bg);
+    border-top: 1px solid var(--card-border-color);
+    padding: 0.75rem 1.25rem;
+}
+.list-group-item { /* For list groups inside cards or standalone */
+    background-color: var(--card-bg); /* Usually same as card bg */
+    border-color: var(--card-border-color);
+    color: var(--text-color);
+}
+.list-group-item-light { /* For unread notifications in light mode */
+    background-color: var(--list-group-item-light-bg) !important;
+}
+
+/* --- Forms --- */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+.form-control, .form-select {
+    background-color: var(--form-control-bg);
+    color: var(--form-control-color);
+    border: 1px solid var(--form-control-border-color);
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+.form-check-input { /* Basic styling for checkbox */
+    border-color: var(--form-control-border-color);
+}
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+
+/* --- Buttons --- */
+.btn {
+    border-radius: 0.25rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+/* Specific button colors are usually handled by Bootstrap classes like .btn-primary, .btn-success */
+
+/* --- Alerts (Messages) --- */
+.alert {
+    border-radius: 0.25rem;
+    padding: 1rem;
+}
+.alert-heading { font-weight: 500; }
+
+/* --- Tables --- */
+.table { margin-bottom: 1.5rem; }
+.table th { font-weight: 500; }
+.table-hover tbody tr:hover { background-color: var(--table-hover-bg); }
+
+/* --- Pagination --- */
+.pagination .page-link {
+    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out;
+    color: var(--bs-primary); /* Link color for pagination */
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+.pagination .page-item.disabled .page-link {
+    color: var(--text-muted-color);
+}
+
+/* --- Footer --- */
+footer.border-top {
+    background-color: var(--card-header-bg);
+    padding-top: 1.5rem; /* Increased padding */
+    padding-bottom: 1.5rem;
+}
+footer .text-muted { color: var(--text-muted-color) !important; }
+
+/* --- Scroll to Top Button --- */
+#scrollToTopBtn {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,.1);
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+#scrollToTopBtn:hover {
+    transform: scale(1.05);
+    background-color: var(--link-hover-color);
+}
+
+/* Import Google Font (Cairo) - Place this at the top or in base.html <head> */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
