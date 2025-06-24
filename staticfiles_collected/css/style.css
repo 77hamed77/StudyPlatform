@@ -1,5 +1,5 @@
 /* static/css/style.css */
-
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
 /* --- Variables --- */
 :root {
     --bs-primary-rgb: 13, 110, 253; /* Bootstrap's default */
@@ -254,4 +254,3 @@ footer .text-muted { color: var(--text-muted-color) !important; }
 }
 
 /* Import Google Font (Cairo) - Place this at the top or in base.html <head> */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
