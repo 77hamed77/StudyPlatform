@@ -1,8 +1,10 @@
 /* static/css/style.css */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap'); /* Added more weights */
+
 /* --- Variables --- */
 :root {
-    --bs-primary-rgb: 13, 110, 253; /* Bootstrap's default */
+    /* Bootstrap's default (can be overridden by theme variables if desired) */
+    --bs-primary-rgb: 13, 110, 253;
     --bs-secondary-rgb: 108, 117, 125;
     --bs-success-rgb: 25, 135, 84;
     --bs-info-rgb: 13, 202, 240;
@@ -24,31 +26,34 @@
 
     /* Custom Theme Variables - Light Mode Defaults */
     --custom-font: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --text-color: #212529;
+    --text-color: #343a40; /* Slightly darker for better readability */
     --text-muted-color: #6c757d;
-    --body-bg: #f8f9fa;
+    --body-bg: #f8f9fa; /* Light gray background */
     --card-bg: var(--bs-white);
-    --card-border-color: #dee2e6;
-    --card-header-bg: #f1f3f5;
+    --card-border-color: #e9ecef; /* Lighter, subtle border */
+    --card-header-bg: #f0f2f5; /* Light header bg */
     --card-footer-bg: var(--card-header-bg);
-    --link-color: var(--bs-primary);
-    --link-hover-color: #0a58ca;
-    --navbar-bg: var(--bs-dark); /* Navbar background for light mode */
-    --navbar-link-color: rgba(255, 255, 255, 0.75);
-    --navbar-link-hover-color: var(--bs-white);
-    --navbar-brand-color: var(--bs-white);
+    --link-color: #0d6efd; /* Bootstrap primary blue */
+    --link-hover-color: #0a58ca; /* Darker blue on hover */
+    --navbar-bg: var(--bs-white); /* White navbar for light mode */
+    --navbar-link-color: #495057; /* Dark gray for links */
+    --navbar-link-hover-color: var(--link-color);
+    --navbar-brand-color: #212529; /* Dark brand color */
     --form-control-bg: var(--bs-white);
     --form-control-color: var(--text-color);
     --form-control-border-color: #ced4da;
-    --button-outline-light-color: var(--navbar-link-color); /* For theme toggle button */
+    --button-outline-light-color: var(--navbar-link-color);
     --button-outline-light-hover-bg: var(--navbar-link-hover-color);
-    --button-outline-light-hover-color: var(--navbar-bg);
+    --button-outline-light-hover-color: var(--bs-white); /* Text color on hover for toggle button */
 
     /* Specific component colors that might need dark mode override */
     --blockquote-footer-color: #6c757d;
-    --table-hover-bg: rgba(0,0,0,0.04);
-    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.08); /* For unread notifications */
+    --table-hover-bg: rgba(0,0,0,0.03); /* Lighter hover for tables */
+    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.08);
     --hr-color: rgba(0,0,0,0.1);
+    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
+    --shadow-md: 0 .25rem .5rem rgba(0,0,0,.1);
+    --shadow-lg: 0 .5rem 1rem rgba(0,0,0,.15);
 }
 
 /* --- General Styles --- */
@@ -59,16 +64,21 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    font-size: 1rem;
+    font-size: 0.95rem; /* Slightly smaller base font */
     line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 500;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: #343a40; /* Slightly darker than body text */
+    font-weight: 700; /* Bolder headings */
+    margin-top: 2rem; /* More spacing */
+    margin-bottom: 1rem;
+    color: #343a40; /* Consistent dark gray */
 }
+
+h1 { font-size: 2.2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.5rem; }
 
 a {
     color: var(--link-color);
@@ -81,52 +91,63 @@ a:hover {
 }
 
 hr {
+    border-top-width: 1px;
+    border-top-style: solid;
     border-top-color: var(--hr-color);
+    margin: 2rem 0; /* More vertical space */
 }
 
 /* --- Navbar --- */
 .navbar {
-    background-color: var(--navbar-bg) !important; /* Use important if Bootstrap's .bg-dark overrides */
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    background-color: var(--navbar-bg) !important;
+    box-shadow: var(--shadow-sm); /* Soft shadow */
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
 }
 .navbar-brand {
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-weight: 800; /* Extra bold brand */
+    font-size: 1.4rem; /* Slightly larger brand text */
     color: var(--navbar-brand-color) !important;
 }
 .navbar .nav-link {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
     color: var(--navbar-link-color) !important;
+    font-weight: 500;
 }
 .navbar .nav-link:hover,
 .navbar .nav-link.active {
     color: var(--navbar-link-hover-color) !important;
 }
 .navbar-toggler {
-    border-color: rgba(255,255,255,0.1);
+    border-color: rgba(0,0,0,0.1);
+    background-color: rgba(0,0,0,0.03); /* Light background for toggler */
 }
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* Darker icon for light mode */
 }
 .dropdown-menu {
-    border-radius: 0.375rem;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
-    font-size: 0.95rem;
-    background-color: var(--bs-white); /* Default dropdown bg */
-    border-color: var(--card-border-color);
+    border-radius: 0.5rem; /* More rounded */
+    box-shadow: var(--shadow-md); /* Clearer shadow */
+    font-size: 0.9rem;
+    background-color: var(--card-bg); /* Consistent with card bg */
+    border: 1px solid var(--card-border-color);
+    padding: 0.5rem 0; /* Padding inside menu */
 }
 .dropdown-item {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem; /* More padding */
     color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 .dropdown-item:hover, .dropdown-item:focus {
-    background-color: #e9ecef; /* Light hover for dropdown items */
-    color: var(--text-color);
+    background-color: var(--card-header-bg); /* Use header bg for hover */
+    color: var(--link-hover-color); /* Highlight text */
 }
 #theme-toggle-btn.btn-outline-light {
     color: var(--button-outline-light-color);
     border-color: var(--button-outline-light-color);
+    font-size: 0.9rem;
+    padding: 0.4rem 0.75rem;
 }
 #theme-toggle-btn.btn-outline-light:hover {
     background-color: var(--button-outline-light-hover-bg);
@@ -137,57 +158,73 @@ hr {
 /* --- Main Content & Containers --- */
 main.container {
     flex-grow: 1;
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
+    padding-top: 2rem; /* More top padding */
+    padding-bottom: 2.5rem; /* More bottom padding */
 }
 
 /* --- Cards --- */
 .card {
     background-color: var(--card-bg);
-    border: 1px solid var(--card-border-color);
-    border-radius: 0.375rem;
+    border: none; /* Remove default border, rely on shadow */
+    border-radius: 0.75rem; /* More rounded corners */
     margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm); /* Soft shadow for cards */
+    overflow: hidden; /* Ensure content respects border-radius */
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+}
+.card:hover {
+    box-shadow: var(--shadow-md); /* Slightly larger shadow on hover */
+    transform: translateY(-2px); /* Slight lift effect */
 }
 .card-header {
     background-color: var(--card-header-bg);
     border-bottom: 1px solid var(--card-border-color);
-    font-weight: 500;
-    padding: 0.75rem 1.25rem;
+    font-weight: 600; /* Slightly bolder header text */
+    padding: 1rem 1.5rem; /* More padding */
     color: var(--text-color);
+    font-size: 1.05rem; /* Slightly larger header font */
 }
-.card-body { padding: 1.25rem; }
+.card-body { padding: 1.5rem; } /* More padding */
 .card-footer {
     background-color: var(--card-footer-bg);
     border-top: 1px solid var(--card-border-color);
-    padding: 0.75rem 1.25rem;
+    padding: 1rem 1.5rem; /* More padding */
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
 }
-.list-group-item { /* For list groups inside cards or standalone */
-    background-color: var(--card-bg); /* Usually same as card bg */
+.list-group-item {
+    background-color: var(--card-bg);
     border-color: var(--card-border-color);
     color: var(--text-color);
+    padding: 0.85rem 1.25rem; /* Increased padding for list items */
 }
-.list-group-item-light { /* For unread notifications in light mode */
+.list-group-item-light {
     background-color: var(--list-group-item-light-bg) !important;
 }
 
 /* --- Forms --- */
 .form-label {
-    font-weight: 500;
-    margin-bottom: 0.3rem;
+    font-weight: 600; /* Bolder labels */
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
 }
 .form-control, .form-select {
     background-color: var(--form-control-bg);
     color: var(--form-control-color);
     border: 1px solid var(--form-control-border-color);
-    border-radius: 0.25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    border-radius: 0.375rem; /* Slightly more rounded */
+    padding: 0.75rem 1rem; /* More vertical padding */
+    font-size: 0.95rem;
 }
 .form-control:focus, .form-select:focus {
     border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.35); /* Stronger focus shadow */
 }
-.form-check-input { /* Basic styling for checkbox */
+.form-check-input {
     border-color: var(--form-control-border-color);
+    width: 1.25em; /* Larger checkbox */
+    height: 1.25em;
+    margin-top: 0.25em; /* Adjust alignment */
 }
 .form-check-input:checked {
     background-color: var(--bs-primary);
@@ -197,44 +234,111 @@ main.container {
 
 /* --- Buttons --- */
 .btn {
-    border-radius: 0.25rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out, box-shadow .15s ease-in-out;
+    border-radius: 0.5rem; /* More rounded buttons */
+    font-weight: 600; /* Bolder button text */
+    padding: 0.6rem 1.2rem; /* More padding */
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out; /* Smooth transition */
 }
-/* Specific button colors are usually handled by Bootstrap classes like .btn-primary, .btn-success */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    box-shadow: var(--shadow-sm); /* Add shadow to primary button */
+}
+.btn-primary:hover {
+    background-color: var(--link-hover-color);
+    border-color: var(--link-hover-color);
+    box-shadow: var(--shadow-md); /* Larger shadow on hover */
+    transform: translateY(-1px); /* Slight lift */
+}
+/* Ensure consistency for other Bootstrap buttons */
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+    box-shadow: var(--shadow-sm);
+}
+.btn-success, .btn-danger, .btn-info, .btn-warning, .btn-secondary {
+    box-shadow: var(--shadow-sm);
+}
+.btn-success:hover, .btn-danger:hover, .btn-info:hover, .btn-warning:hover, .btn-secondary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
 
 /* --- Alerts (Messages) --- */
 .alert {
-    border-radius: 0.25rem;
-    padding: 1rem;
+    border-radius: 0.5rem; /* More rounded alerts */
+    padding: 1.25rem 1.5rem; /* More padding */
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-sm); /* Subtle shadow for alerts */
 }
-.alert-heading { font-weight: 500; }
+.alert-heading { font-weight: 700; font-size: 1.1rem; } /* Bolder heading */
 
 /* --- Tables --- */
-.table { margin-bottom: 1.5rem; }
-.table th { font-weight: 500; }
+.table {
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem; /* Rounded corners for table container/border if it has one */
+    overflow: hidden; /* Important for border-radius on tables */
+    border: 1px solid var(--card-border-color); /* Added a subtle border */
+}
+.table thead {
+    background-color: var(--card-header-bg); /* Header background for table */
+    color: var(--text-color);
+}
+.table th {
+    font-weight: 600; /* Bolder table headers */
+    padding: 1rem 1.25rem; /* More padding */
+    border-bottom: 1px solid var(--card-border-color);
+}
+.table td {
+    padding: 0.85rem 1.25rem; /* More padding for cells */
+    border-top: 1px solid var(--card-border-color);
+}
 .table-hover tbody tr:hover { background-color: var(--table-hover-bg); }
 
 /* --- Pagination --- */
-.pagination .page-link {
-    transition: background-color .15s ease-in-out, border-color .15s ease-in-out, color .15s ease-in-out;
-    color: var(--bs-primary); /* Link color for pagination */
+.pagination {
+    --bs-pagination-border-radius: 0.5rem; /* More rounded pagination */
+    --bs-pagination-border-color: var(--card-border-color);
+    --bs-pagination-bg: var(--card-bg);
+}
+.pagination .page-item .page-link {
+    transition: all 0.2s ease-in-out;
+    color: var(--link-color);
+    padding: 0.6rem 1rem; /* Consistent padding */
+    font-size: 0.95rem;
+    border: 1px solid var(--bs-pagination-border-color);
+    background-color: var(--bs-pagination-bg);
+}
+.pagination .page-link:hover {
+    background-color: var(--card-header-bg); /* Use header bg for hover */
+    color: var(--link-hover-color);
+    border-color: var(--bs-primary);
 }
 .pagination .page-item.active .page-link {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
     color: var(--bs-white);
+    font-weight: 600;
 }
 .pagination .page-item.disabled .page-link {
     color: var(--text-muted-color);
+    background-color: var(--card-bg);
+    border-color: var(--card-border-color);
 }
 
 /* --- Footer --- */
 footer.border-top {
-    background-color: var(--card-header-bg);
-    padding-top: 1.5rem; /* Increased padding */
-    padding-bottom: 1.5rem;
+    background-color: var(--navbar-bg); /* Use same as navbar for consistency */
+    padding-top: 2rem; /* Increased padding */
+    padding-bottom: 2rem;
+    border-top: 1px solid var(--card-border-color) !important; /* Ensure consistent border */
+    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.03); /* Subtle top shadow */
 }
 footer .text-muted { color: var(--text-muted-color) !important; }
 
@@ -242,15 +346,43 @@ footer .text-muted { color: var(--text-muted-color) !important; }
 #scrollToTopBtn {
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s, transform 0.2s ease;
     border-radius: 50%;
-    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,.1);
+    box-shadow: var(--shadow-md); /* Clearer shadow */
     background-color: var(--bs-primary);
     color: var(--bs-white);
+    width: 45px; /* Slightly larger button */
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
 }
 #scrollToTopBtn:hover {
-    transform: scale(1.05);
+    transform: scale(1.1); /* More prominent lift */
     background-color: var(--link-hover-color);
 }
+#scrollToTopBtn.show {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
 
-/* Import Google Font (Cairo) - Place this at the top or in base.html <head> */
+/* --- Utility/Custom Classes --- */
+.container-fluid {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+.text-primary-emphasis {
+    color: var(--bs-primary) !important;
+}
+
+/* Placeholder for custom component styling if needed later (e.g. Pomodoro timer, specific cards) */
+/* Example for custom cards */
+.custom-card-border-left {
+    border-left: 5px solid; /* Placeholder, specific color will be defined for each type */
+}
+
+/* Custom styling inspired by Sham University website */
+/* Overall theme: Clean, modern, good use of dark background (in dark mode) and clear cards.
+   Emphasis on typography and subtle shadows. */

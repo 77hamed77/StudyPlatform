@@ -2,58 +2,63 @@
 
 body.dark-mode {
     /* --- Dark Mode Color Palette --- */
-    --text-color: #e0e1e6; /* Light gray for text */
-    --text-muted-color: #989ea8; /* Muted light gray */
-    --body-bg: #1a1b26; /* Very dark blue/gray - main background */
-    --card-bg: #24283b; /* Darker element background (cards, navbar inner) */
-    --card-border-color: #3b3f51; /* Subtle borders */
-    --card-header-bg: #2a2f42; /* Slightly different bg for headers/footers */
+    --text-color: #e0e1e6; /* Light gray for main text */
+    --text-muted-color: #989ea8; /* Muted light gray for secondary text */
+    --body-bg: #1a1b26; /* Very dark blue/gray - main background, inspired by Sham Uni dark areas */
+    --card-bg: #24283b; /* Darker element background (cards, navbar inner), for contrast */
+    --card-border-color: #3b3f51; /* Subtle borders for cards and elements */
+    --card-header-bg: #2a2f42; /* Slightly lighter dark bg for headers/footers */
     --card-footer-bg: var(--card-header-bg);
-    --link-color: #7aa2f7; /* Bright blue for links */
-    --link-hover-color: #9eceff; /* Lighter blue for hover */
-    --hr-color: rgba(255,255,255,0.1); /* Lighter hr */
+    --link-color: #7aa2f7; /* Bright blue for links, stands out well */
+    --link-hover-color: #9eceff; /* Lighter blue for hover effect */
+    --hr-color: rgba(255,255,255,0.15); /* Lighter and slightly more visible HR */
 
-    /* Bootstrap color overrides for dark mode */
-    --bs-primary-rgb: 122, 162, 247; /* --link-color */
+    /* Bootstrap color overrides for dark mode - adapted for better dark mode contrast */
+    --bs-primary-rgb: 122, 162, 247; /* Based on --link-color */
     --bs-primary: rgb(var(--bs-primary-rgb));
-    --bs-secondary-rgb: 152, 158, 168; /* --text-muted-color */
+    --bs-secondary-rgb: 152, 158, 168; /* Based on --text-muted-color */
     --bs-secondary: rgb(var(--bs-secondary-rgb));
-    --bs-success-rgb: 110, 203, 133; /* Bright green */
+    --bs-success-rgb: 110, 203, 133; /* Bright green for success */
     --bs-success: rgb(var(--bs-success-rgb));
-    --bs-info-rgb: 63, 187, 237; /* Bright cyan */
+    --bs-info-rgb: 63, 187, 237; /* Bright cyan for info */
     --bs-info: rgb(var(--bs-info-rgb));
-    --bs-warning-rgb: 255, 198, 102; /* Bright yellow/orange */
+    --bs-warning-rgb: 255, 198, 102; /* Bright yellow/orange for warning */
     --bs-warning: rgb(var(--bs-warning-rgb));
-    --bs-danger-rgb: 247, 100, 119; /* Bright red/pink */
+    --bs-danger-rgb: 247, 100, 119; /* Bright red/pink for danger */
     --bs-danger: rgb(var(--bs-danger-rgb));
-    --bs-light-rgb: 42, 47, 66;  /* --card-header-bg */
+    --bs-light-rgb: 42, 47, 66;    /* Darker "light" color, for backgrounds of light-themed elements */
     --bs-light: rgb(var(--bs-light-rgb));
-    --bs-dark-rgb: 26, 27, 38; /* --body-bg */
+    --bs-dark-rgb: 26, 27, 38; /* Even darker "dark" color, almost black */
     --bs-dark: rgb(var(--bs-dark-rgb));
-    --bs-white-rgb: 224, 225, 230; /* --text-color */
+    --bs-white-rgb: 224, 225, 230; /* Lighter "white" for text contrast */
     --bs-white: rgb(var(--bs-white-rgb));
-    --bs-black-rgb: 26, 27, 38; /* --body-bg */
+    --bs-black-rgb: 26, 27, 38; /* Darkest color for true black-like elements */
     --bs-black: rgb(var(--bs-black-rgb));
+
+    /* Shadows for dark mode to maintain depth */
+    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.2);
+    --shadow-md: 0 .25rem .5rem rgba(0,0,0,.3);
+    --shadow-lg: 0 .5rem 1rem rgba(0,0,0,.4);
 
 
     /* Form specific dark variables */
     --form-control-bg: #2e344e; /* Darker input background */
     --form-control-color: var(--text-color);
     --form-control-border-color: var(--card-border-color);
-    --form-control-placeholder-color: #7a8299;
+    --form-control-placeholder-color: #7a8299; /* Lighter placeholder text */
 
     /* Navbar dark variables */
-    --navbar-bg: var(--card-bg);
+    --navbar-bg: var(--card-bg); /* Navbar background consistent with cards */
     --navbar-link-color: var(--text-muted-color);
     --navbar-link-hover-color: var(--link-color);
     --navbar-brand-color: var(--text-color);
     --button-outline-light-color: var(--text-muted-color);
     --button-outline-light-hover-bg: var(--text-muted-color);
-    --button-outline-light-hover-color: var(--body-bg);
+    --button-outline-light-hover-color: var(--body-bg); /* Dark text on light hover for toggle */
 
     /* Other component specific dark variables */
-    --table-hover-bg: rgba(255,255,255,0.05);
-    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.12) !important; /* Unread notifications */
+    --table-hover-bg: rgba(255,255,255,0.06); /* Slightly more prominent hover for tables */
+    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.15) !important; /* Brighter for unread notifications */
     --blockquote-footer-color: var(--text-muted-color);
 }
 
@@ -63,7 +68,7 @@ body.dark-mode {
     color: var(--text-color) !important;
 }
 body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
-    color: #c8cce4; /* Slightly brighter for headings */
+    color: #c8cce4; /* Slightly brighter headings for better visibility */
 }
 body.dark-mode a { color: var(--link-color); }
 body.dark-mode a:hover { color: var(--link-hover-color); }
@@ -74,26 +79,30 @@ body.dark-mode .text-muted { color: var(--text-muted-color) !important; }
 /* --- Dark Mode: Navbar --- */
 body.dark-mode .navbar {
     background-color: var(--navbar-bg) !important;
-    border-bottom: 1px solid var(--card-border-color);
+    border-bottom: 1px solid var(--card-border-color); /* Clear border at bottom */
+    box-shadow: var(--shadow-sm); /* Consistent shadow */
 }
 body.dark-mode .navbar-brand { color: var(--navbar-brand-color) !important; }
 body.dark-mode .navbar-nav .nav-link { color: var(--navbar-link-color) !important; }
 body.dark-mode .navbar-nav .nav-link:hover,
 body.dark-mode .navbar-nav .nav-link.active { color: var(--navbar-link-hover-color) !important; }
-body.dark-mode .navbar-toggler { border-color: var(--card-border-color); }
+body.dark-mode .navbar-toggler {
+    border-color: var(--card-border-color);
+    background-color: var(--card-header-bg); /* Match header background */
+}
 body.dark-mode .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(122, 162, 247, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(122, 162, 247, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* Brighter icon for visibility */
 }
 body.dark-mode .dropdown-menu {
     background-color: var(--card-bg);
     border-color: var(--card-border-color);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.3);
+    box-shadow: var(--shadow-md); /* Clearer shadow */
     color: var(--text-color);
 }
 body.dark-mode .dropdown-item { color: var(--text-color); }
 body.dark-mode .dropdown-item:hover,
 body.dark-mode .dropdown-item:focus {
-    background-color: var(--card-header-bg);
+    background-color: var(--card-header-bg); /* Consistent hover */
     color: var(--link-hover-color);
 }
 body.dark-mode #theme-toggle-btn.btn-outline-light {
@@ -108,7 +117,12 @@ body.dark-mode #theme-toggle-btn.btn-outline-light:hover {
 /* --- Dark Mode: Cards & List Groups --- */
 body.dark-mode .card {
     background-color: var(--card-bg);
-    border-color: var(--card-border-color);
+    border: none; /* No border, rely on shadow */
+    box-shadow: var(--shadow-sm); /* Soft shadow */
+}
+body.dark-mode .card:hover {
+    box-shadow: var(--shadow-md); /* Clearer shadow on hover */
+    transform: translateY(-2px); /* Slight lift */
 }
 body.dark-mode .card-header {
     background-color: var(--card-header-bg);
@@ -124,7 +138,7 @@ body.dark-mode .list-group-item {
     border-color: var(--card-border-color);
     color: var(--text-color);
 }
-body.dark-mode .list-group-item-light.fw-bold { /* Unread notifications */
+body.dark-mode .list-group-item-light.fw-bold {
     background-color: var(--list-group-item-light-bg) !important;
 }
 body.dark-mode .blockquote-footer { color: var(--blockquote-footer-color); }
@@ -140,17 +154,17 @@ body.dark-mode .form-select {
 body.dark-mode .form-control::placeholder { color: var(--form-control-placeholder-color); }
 body.dark-mode .form-control:focus,
 body.dark-mode .form-select:focus {
-    background-color: var(--form-control-bg); /* Keep bg same on focus */
+    background-color: var(--form-control-bg);
     color: var(--form-control-color);
-    border-color: var(--link-color); /* Use link color for focus border */
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.35);
+    border-color: var(--link-color); /* Highlight border on focus */
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.45); /* Stronger focus shadow */
 }
 body.dark-mode .form-check-input {
     background-color: var(--form-control-bg);
     border-color: var(--form-control-border-color);
 }
 body.dark-mode .form-check-input:checked {
-    background-color: var(--bs-primary); /* Use the overridden --bs-primary */
+    background-color: var(--bs-primary);
     border-color: var(--bs-primary);
 }
 body.dark-mode .form-range::-webkit-slider-thumb { background: var(--bs-primary); }
@@ -158,19 +172,25 @@ body.dark-mode .form-range::-moz-range-thumb { background: var(--bs-primary); }
 body.dark-mode .form-range::-ms-thumb { background: var(--bs-primary); }
 
 
-/* --- Dark Mode: Buttons (Bootstrap classes will mostly work with overridden CSS vars) --- */
-/* We only need to ensure text color contrasts well if Bootstrap's default doesn't */
-body.dark-mode .btn-light { /* Make btn-light darker */
+/* --- Dark Mode: Buttons --- */
+body.dark-mode .btn-light {
     background-color: var(--bs-light);
     border-color: var(--bs-light);
     color: var(--text-color);
 }
 body.dark-mode .btn-light:hover {
-    background-color: #5a5a5a; /* Darker hover for btn-light */
-    border-color: #5a5a5a;
+    background-color: var(--card-header-bg); /* Darker hover for btn-light */
+    border-color: var(--card-header-bg);
 }
-body.dark-mode .btn-warning, body.dark-mode .btn-info { /* Ensure text is dark on these bright bg */
-    color: #101014 !important; /* Dark text for better contrast */
+body.dark-mode .btn-primary {
+    box-shadow: var(--shadow-sm);
+}
+body.dark-mode .btn-primary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+body.dark-mode .btn-warning, body.dark-mode .btn-info {
+    color: #1a1b26 !important; /* Dark text for better contrast on bright backgrounds */
 }
 body.dark-mode .btn-outline-secondary {
     color: var(--text-muted-color);
@@ -178,39 +198,45 @@ body.dark-mode .btn-outline-secondary {
 }
 body.dark-mode .btn-outline-secondary:hover {
     background-color: var(--text-muted-color);
-    color: var(--body-bg);
+    color: var(--body-bg); /* Dark background on hover */
 }
 
 
-/* --- Dark Mode: Alerts --- */
-body.dark-mode .alert { border-width: 0; } /* Remove border for a flatter look */
-body.dark-mode .alert-primary { background-color: rgba(var(--bs-primary-rgb), 0.3); color: var(--bs-primary); }
-body.dark-mode .alert-secondary { background-color: rgba(var(--bs-secondary-rgb), 0.3); color: var(--bs-secondary); }
-body.dark-mode .alert-success { background-color: rgba(var(--bs-success-rgb), 0.3); color: var(--bs-success); }
-body.dark-mode .alert-danger { background-color: rgba(var(--bs-danger-rgb), 0.25); color: var(--bs-danger); }
-body.dark-mode .alert-warning { background-color: rgba(var(--bs-warning-rgb), 0.3); color: #b36f00; /* Darker text for yellow */ }
-body.dark-mode .alert-info { background-color: rgba(var(--bs-info-rgb), 0.3); color: var(--bs-info); }
-body.dark-mode .alert-light { background-color: var(--card-header-bg); color: var(--text-color); } /* Darker light alert */
-body.dark-mode .alert-dark { background-color: #101114; color: var(--text-muted-color); } /* Even darker dark alert */
-body.dark-mode .alert .btn-close { filter: invert(1) grayscale(100%) brightness(150%); }
+/* --- Dark Mode: Alerts (Messages) --- */
+body.dark-mode .alert {
+    border-width: 0; /* Remove border for flatter look */
+    box-shadow: var(--shadow-sm); /* Subtle shadow */
+}
+body.dark-mode .alert-primary { background-color: rgba(var(--bs-primary-rgb), 0.35); color: var(--bs-primary); }
+body.dark-mode .alert-secondary { background-color: rgba(var(--bs-secondary-rgb), 0.35); color: var(--bs-secondary); }
+body.dark-mode .alert-success { background-color: rgba(var(--bs-success-rgb), 0.35); color: var(--bs-success); }
+body.dark-mode .alert-danger { background-color: rgba(var(--bs-danger-rgb), 0.3); color: var(--bs-danger); }
+body.dark-mode .alert-warning { background-color: rgba(var(--bs-warning-rgb), 0.35); color: #b36f00; /* Darker text for yellow */ }
+body.dark-mode .alert-info { background-color: rgba(var(--bs-info-rgb), 0.35); color: var(--bs-info); }
+body.dark-mode .alert-light { background-color: var(--card-header-bg); color: var(--text-color); }
+body.dark-mode .alert-dark { background-color: var(--bs-dark); color: var(--text-muted-color); }
+body.dark-mode .alert .btn-close { filter: invert(1) grayscale(100%) brightness(180%); } /* Make close button more visible */
 
 
 /* --- Dark Mode: Tables --- */
-body.dark-mode .table { color: var(--text-color); }
+body.dark-mode .table {
+    color: var(--text-color);
+    border: 1px solid var(--card-border-color); /* Subtle border for tables */
+}
 body.dark-mode .table th,
 body.dark-mode .table td,
 body.dark-mode .table thead th,
 body.dark-mode .table tfoot th { border-color: var(--card-border-color); }
-body.dark-mode .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255, 255, 255, 0.03); }
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255, 255, 255, 0.04); } /* Slightly darker stripe */
 body.dark-mode .table-hover tbody tr:hover { background-color: var(--table-hover-bg); }
-body.dark-mode .table-light { /* Override Bootstrap's .table-light for dark mode */
+body.dark-mode .table-light {
     --bs-table-bg: var(--card-header-bg);
     --bs-table-striped-bg: #31364a;
     color: var(--text-color);
     border-color: var(--card-border-color);
 }
-body.dark-mode .table-dark { /* Make .table-dark even darker if needed */
-    --bs-table-bg: #161720;
+body.dark-mode .table-dark {
+    --bs-table-bg: #1f202c; /* Even darker for table-dark */
     --bs-table-striped-bg: var(--body-bg);
 }
 
@@ -221,31 +247,34 @@ body.dark-mode .pagination .page-link {
     color: var(--link-color);
 }
 body.dark-mode .pagination .page-item.active .page-link {
-    background-color: var(--bs-primary); /* Use overridden --bs-primary */
+    background-color: var(--bs-primary);
     border-color: var(--bs-primary);
     color: var(--body-bg); /* Dark text on primary bg */
 }
 body.dark-mode .pagination .page-item.disabled .page-link {
     background-color: var(--card-header-bg);
     border-color: var(--card-border-color);
-    color: #666;
+    color: #888; /* Slightly lighter disabled text */
 }
 body.dark-mode .pagination .page-link:hover {
     background-color: var(--card-header-bg);
     color: var(--link-hover-color);
+    border-color: var(--bs-primary);
 }
 
 /* --- Dark Mode: Footer --- */
 body.dark-mode footer.border-top {
-    background-color: var(--card-bg) !important;
+    background-color: var(--navbar-bg) !important;
     border-top-color: var(--card-border-color) !important;
+    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.07); /* Slightly stronger shadow */
 }
 body.dark-mode footer .text-muted { color: var(--text-muted-color) !important; }
 
 /* --- Dark Mode: Scroll to Top Button --- */
 body.dark-mode #scrollToTopBtn {
     background-color: var(--bs-primary);
-    color: var(--body-bg); /* Dark icon on primary bg */
+    color: var(--body-bg);
+    box-shadow: var(--shadow-md);
 }
 body.dark-mode #scrollToTopBtn:hover {
     background-color: var(--link-hover-color);
@@ -254,7 +283,9 @@ body.dark-mode #scrollToTopBtn:hover {
 /* --- Dark Mode: Pomodoro Timer --- */
 body.dark-mode .pomodoro-timer-container {
     background-color: var(--card-bg);
-    border-color: var(--card-border-color);
+    border: none;
+    box-shadow: var(--shadow-sm);
+    color: var(--text-color);
 }
 body.dark-mode #pomodoro-time-display { color: var(--text-color); }
 body.dark-mode #pomodoro-status { color: var(--text-muted-color); }
@@ -269,4 +300,11 @@ body.dark-mode .summary-card { border-left-color: #9575cd !important; } /* Custo
 body.dark-mode .prayer-card, body.dark-mode .tips-card { border-left-color: var(--bs-warning) !important; }
 
 /* Dark Mode: Badge text color fix for light backgrounds */
-body.dark-mode .badge.bg-warning, body.dark-mode .badge.bg-info { color: #101014 !important; }
+body.dark-mode .badge.bg-warning, body.dark-mode .badge.bg-info { color: #1a1b26 !important; } /* Ensure very dark text for contrast */
+body.dark-mode .badge.bg-primary { color: var(--body-bg) !important; } /* Dark background text for primary badge */
+body.dark-mode .badge.bg-success, body.dark-mode .badge.bg-danger { color: #1a1b26 !important; } /* Dark text for success/danger badges */
+
+/* Custom styling inspired by Sham University website for Dark Mode */
+/* Using darker, richer blues and grays for background and card elements,
+   with bright, clear primary colors and text for excellent contrast.
+   Subtle shadows provide depth. */
