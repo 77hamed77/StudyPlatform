@@ -15,17 +15,17 @@ from django.utils.translation import gettext_lazy as _ # للترجمة (جيد 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# إعدادات التطوير السريع - غير مناسبة للإنتاج
-# راجع https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
-# تحذير أمني: حافظ على سرية المفتاح السري المستخدم في الإنتاج!
+# SECURITY WARNING: keep the secret key used in production secret!
 # اقرأ SECRET_KEY من متغير بيئة، مع قيمة افتراضية للتطوير المحلي فقط
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
     'insecure-fallback-secret-key-for-local-development-only-replace-me-12345' # !!! هام: قم بتغيير هذا لمفتاح سري فريد إذا كنت ستستخدمه حتى في الإنتاج الصغير !!!
 )
 
-# تحذير أمني: لا تقم بتشغيل DEBUG في وضع الإنتاج!
+# SECURITY WARNING: don't run with debug turned on in production!
 # اقرأ DEBUG من متغير بيئة، افتراضيًا يكون False للإنتاج
 # على Koyeb، قم بتعيين DJANGO_DEBUG=False للإنتاج.
 # محليًا، يمكنك تعيين DJANGO_DEBUG=True في ملف .env الخاص بك.
@@ -34,20 +34,17 @@ DEBUG = DEBUG_VALUE.lower() in ('true', '1', 't')
 
 
 ALLOWED_HOSTS = []
-# Koyeb (أو Render سابقاً) يضبط متغير بيئة لاسم المضيف الخارجي.
-# يمكن أن يكون RENDER_EXTERNAL_HOSTNAME، KOYEB_EXTERNAL_HOSTNAME، أو ما شابه.
-# ابحث عن اسم المتغير في وثائق Koyeb أو سجلات النشر.
-EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME') or \
-                    os.environ.get('KOYEB_EXTERNAL_HOSTNAME') # مثال لمتغير Koyeb
-if EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(EXTERNAL_HOSTNAME)
+# اقرأ النطاق من متغير بيئة جديد خصيصًا لـ ALLOWED_HOSTS (مثل DJANGO_ALLOWED_HOST)
+KOYEB_PUBLIC_HOST = os.environ.get('DJANGO_ALLOWED_HOST')
+if KOYEB_PUBLIC_HOST:
+    ALLOWED_HOSTS.append(KOYEB_PUBLIC_HOST)
 
 # أضف localhost و 127.0.0.1 للتطوير المحلي فقط
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
-# تعريف التطبيقات
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -70,6 +67,14 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
 ]
 
+# Cloudinary Storage for media files (Uploads)
+# تأكد من أن هذه التطبيقات موجودة إذا كنت تستخدم Cloudinary لتخزين الملفات المرفوعة
+# إذا كنت لا تستخدم Cloudinary، يمكنك إزالة هذه السطور
+INSTALLED_APPS += [
+    'cloudinary',
+    'cloudinary_storage',
+]
+
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_DEFAULT_TEMPLATE_PACK = "bootstrap5"
 
@@ -81,7 +86,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware', # <--- تم إصلاح هذا السطر
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -156,9 +161,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Media files (Uploaded by users)
+# إذا كنت تستخدم Cloudinary لتخزين ملفات الميديا، يجب عليك تفعيل هذا.
+# تأكد من إضافة CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET في متغيرات البيئة بـ Koyeb
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' # <--- مهم جداً لتخزين الميديا على Cloudinary
 
 # Authentication settings
 LOGIN_REDIRECT_URL = 'core:dashboard'
@@ -172,14 +178,15 @@ LOGIN_URL = 'login'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CSRF_TRUSTED_ORIGINS (مهم إذا كنت تستخدم HTTPS في الإنتاج)
-# Render/Koyeb قد توفر اسم النطاق عبر متغير بيئة.
-CSRF_TRUSTED_ORIGINS_ENV = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
-if CSRF_TRUSTED_ORIGINS_ENV:
-    CSRF_TRUSTED_ORIGINS = [CSRF_TRUSTED_ORIGINS_ENV]
-elif EXTERNAL_HOSTNAME: # استخدام متغير EXTERNAL_HOSTNAME الجديد
-    CSRF_TRUSTED_ORIGINS = [f'https://{EXTERNAL_HOSTNAME}']
-else:
-    CSRF_TRUSTED_ORIGINS = []
+# سيتم تعيينها بناءً على ALLOWED_HOSTS في وضع الإنتاج
+CSRF_TRUSTED_ORIGINS = []
+if not DEBUG and KOYEB_PUBLIC_HOST:
+     # تأكد من أنها HTTPS للنطاق العام
+    CSRF_TRUSTED_ORIGINS = [f'https://{KOYEB_PUBLIC_HOST}']
+elif DEBUG:
+    # للتطوير المحلي، يمكنك إضافة http://127.0.0.1:8000
+    CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
+
 
 # لإجبار الاتصالات على HTTPS في الإنتاج (إذا كان DEBUG=False)
 if not DEBUG:
