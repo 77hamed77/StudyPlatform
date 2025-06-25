@@ -2,17 +2,28 @@
 from pathlib import Path
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured # استيراد ImproperlyConfigured
 
+# NEW: تحميل متغيرات البيئة من ملف .env للاختبار المحلي
+# تأكد من تثبيت python-dotenv: pip install python-dotenv
 from dotenv import load_dotenv
 load_dotenv()
+# ---------------------------------------------------------------------------
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _ # للترجمة (جيد إبقاؤه)
 
+# مسارات البناء داخل المشروع
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# اقرأ SECRET_KEY من متغير بيئة، مع قيمة افتراضية للتطوير المحلي فقط
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
-    'insecure-fallback-secret-key-for-local-development-only-replace-me-12345' # !!! هام: قم بتغيير هذا لمفتاح سري فريد إذا كنت ستستخدمه حتى في الإنتاج الصغير !!!
+    '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE' # !!! هام: قم بتغيير هذا لمفتاح سري فريد إذا كنت ستستخدمه حتى في الإنتاج الصغير !!!
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -98,15 +109,22 @@ WSGI_APPLICATION = 'study_platform.wsgi.application'
 
 
 # Database
-DEFAULT_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
-
+# تم إزالة DEFAULT_DATABASE_URL كقيمة افتراضية لـ dj_database_url.config
+# مما يجبره على استخدام DATABASE_URL من متغيرات البيئة.
+# إذا لم يتم تعيين DATABASE_URL بشكل صحيح، فسيتم رفع ImproperlyConfigured.
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', DEFAULT_DATABASE_URL),
+        default=os.environ.get('DATABASE_URL'), # لا يوجد fallback على SQLite هنا
         conn_max_age=600,
         conn_health_checks=True,
     )
 }
+
+# هذا الشرط سيجعل Django يفشل مبكراً إذا لم يتم تكوين قاعدة البيانات بشكل صحيح
+# مما يوفر رسالة خطأ أوضح في سجلات البناء/التشغيل
+if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
+    raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL.")
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -154,7 +172,7 @@ if not DEBUG and KOYEB_PUBLIC_HOST:
      # تأكد من أنها HTTPS للنطاق العام لـ Koyeb
     CSRF_TRUSTED_ORIGINS = [f'https://{KOYEB_PUBLIC_HOST}']
 elif DEBUG:
-    # للتطوير المحلي، فقط إذا كنت تختبر CSRF
+    # للتطوير المحلي
     CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
 
 
@@ -166,25 +184,25 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
 
 
-  # أضف هذا الجزء في نهاية ملف settings.py الخاص بك
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
+# إعدادات التسجيل (LOGGING) - سيتم توجيه السجلات إلى الـ console (سجلات Koyeb)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO', # يمكنك تغييرها إلى 'DEBUG' إذا كنت تريد المزيد من التفاصيل
-                'propagate': True,
-            },
-            '': { # لـ loggers التطبيق الأخرى
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propagate': True,
-            },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO', # يمكنك تغييرها إلى 'DEBUG' إذا كنت تريد المزيد من التفاصيل
+            'propagate': True,
         },
-    }
+        '': { # لـ loggers التطبيق الأخرى
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
