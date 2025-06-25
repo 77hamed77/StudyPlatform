@@ -1,0 +1,20 @@
+# Ignore local development database
+db.sqlite3
+
+# Ignore virtual environments
+venv/
+.venv/
+env/
+
+# Ignore Python cache and bytecode
+__pycache__/
+*.pyc
+
+# Ignore .git directory
+.git/
+
+# Ignore local .env file (as env vars are set in Koyeb)
+.env
+
+# If you have a local media folder that you don't want copied to the image
+# media/
