@@ -1,36 +1,53 @@
+# study_platform/settings.py
 from pathlib import Path
 import os
-import dj_database_url
-from django.utils.translation import gettext_lazy as _
+import dj_database_url # لاستيراد dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# NEW: تحميل متغيرات البيئة من ملف .env للاختبار المحلي
+# تأكد من تثبيت python-dotenv: pip install python-dotenv
+from dotenv import load_dotenv
+load_dotenv()
+# ---------------------------------------------------------------------------
+
+from django.utils.translation import gettext_lazy as _ # للترجمة (جيد إبقاؤه)
+
+# مسارات البناء داخل المشروع
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+# إعدادات التطوير السريع - غير مناسبة للإنتاج
+# راجع https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# تحذير أمني: حافظ على سرية المفتاح السري المستخدم في الإنتاج!
+# اقرأ SECRET_KEY من متغير بيئة، مع قيمة افتراضية للتطوير المحلي فقط
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
-    'fallback_secret_key_for_development_only_123!@#abc' # استبدل هذا بمفتاح قوي أو قم بإزالته إذا كنت ستعتمد كليًا على متغير البيئة
+    'insecure-fallback-secret-key-for-local-development-only-replace-me-12345' # !!! هام: قم بتغيير هذا لمفتاح سري فريد إذا كنت ستستخدمه حتى في الإنتاج الصغير !!!
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# تحذير أمني: لا تقم بتشغيل DEBUG في وضع الإنتاج!
+# اقرأ DEBUG من متغير بيئة، افتراضيًا يكون False للإنتاج
+# على Koyeb، قم بتعيين DJANGO_DEBUG=False للإنتاج.
+# محليًا، يمكنك تعيين DJANGO_DEBUG=True في ملف .env الخاص بك.
 DEBUG_VALUE = os.environ.get('DJANGO_DEBUG', 'False')
 DEBUG = DEBUG_VALUE.lower() in ('true', '1', 't')
 
 
 ALLOWED_HOSTS = []
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# Koyeb (أو Render سابقاً) يضبط متغير بيئة لاسم المضيف الخارجي.
+# يمكن أن يكون RENDER_EXTERNAL_HOSTNAME، KOYEB_EXTERNAL_HOSTNAME، أو ما شابه.
+# ابحث عن اسم المتغير في وثائق Koyeb أو سجلات النشر.
+EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME') or \
+                    os.environ.get('KOYEB_EXTERNAL_HOSTNAME') # مثال لمتغير Koyeb
+if EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(EXTERNAL_HOSTNAME)
 
+# أضف localhost و 127.0.0.1 للتطوير المحلي فقط
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
-# Application definition
+# تعريف التطبيقات
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,9 +55,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic',
-    'django.contrib.staticfiles',
-    # تطبيقاتك
+    'whitenoise.runserver_nostatic', # يجب أن يكون أعلى من staticfiles للاستخدام مع runserver
+    'django.contrib.staticfiles',    # Django's own staticfiles app
+    # تطبيقاتك الخاصة
     'core.apps.CoreConfig',
     'files_manager.apps.FilesManagerConfig',
     'news.apps.NewsConfig',
@@ -58,13 +75,13 @@ CRISPY_DEFAULT_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # <--- بعد SecurityMiddleware وقبل معظم الـ middleware الأخرى
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware', # إذا كنت تستخدم ترجمة
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware', # <--- تم إصلاح هذا السطر
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -80,7 +97,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages', # <--- تأكد أن هذا السطر موجود وصحيح تمامًا
+                'django.contrib.messages.context_processors.messages',
                 'core.context_processors.common_context',
             ],
         },
@@ -93,15 +110,13 @@ WSGI_APPLICATION = 'study_platform.wsgi.application'
 # https://docs.djangoproject.com/en/stable/ref/settings/#databases
 
 # استخدم dj_database_url لقراءة DATABASE_URL من متغيرات البيئة
-# مع قيمة افتراضية لـ SQLite للتطوير المحلي إذا لم يتم العثور على DATABASE_URL
-# في الإنتاج، يجب تعيين DATABASE_URL كمتغير بيئة على Render
-# قم بتغيير القيمة الافتراضية هنا إلى URI قاعدة بيانات Supabase الخاصة بك للتطوير المحلي
-# أو اتركها لـ SQLite إذا كنت تفضل التبديل بينهما يدويًا في التكوين المحلي
-DEFAULT_DATABASE_URL = os.environ.get('DATABASE_URL', f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}")
+# محليًا، إذا لم يتم تعيين DATABASE_URL (مثلاً في ملف .env)، فسيستخدم SQLite.
+# في الإنتاج على Render أو Koyeb، يجب تعيين DATABASE_URL كمتغير بيئة ليشير إلى Supabase.
+DEFAULT_DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=DEFAULT_DATABASE_URL,
+        default=os.environ.get('DATABASE_URL', DEFAULT_DATABASE_URL),
         conn_max_age=600,
         conn_health_checks=True,
     )
@@ -156,12 +171,13 @@ LOGIN_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CSRF_TRUSTED_ORIGINS (مهم إذا كنت تستخدم HTTPS على Render)
+# CSRF_TRUSTED_ORIGINS (مهم إذا كنت تستخدم HTTPS في الإنتاج)
+# Render/Koyeb قد توفر اسم النطاق عبر متغير بيئة.
 CSRF_TRUSTED_ORIGINS_ENV = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS')
 if CSRF_TRUSTED_ORIGINS_ENV:
     CSRF_TRUSTED_ORIGINS = [CSRF_TRUSTED_ORIGINS_ENV]
-elif RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_EXTERNAL_HOSTNAME}']
+elif EXTERNAL_HOSTNAME: # استخدام متغير EXTERNAL_HOSTNAME الجديد
+    CSRF_TRUSTED_ORIGINS = [f'https://{EXTERNAL_HOSTNAME}']
 else:
     CSRF_TRUSTED_ORIGINS = []
 
