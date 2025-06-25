@@ -1,7 +1,7 @@
 # study_platform/settings.py
 from pathlib import Path
 import os
-import dj_database_url # لاستيراد dj_database_url
+import dj_database_url
 
 # NEW: تحميل متغيرات البيئة من ملف .env للاختبار المحلي
 # تأكد من تثبيت python-dotenv: pip install python-dotenv
@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 load_dotenv()
 # ---------------------------------------------------------------------------
 
-from django.utils.translation import gettext_lazy as _ # للترجمة (جيد إبقاؤه)
+from django.utils.translation import gettext_lazy as _
 
 # مسارات البناء داخل المشروع
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+# إعدادات التطوير السريع - غير مناسبة للإنتاج
+# راجع https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # اقرأ SECRET_KEY من متغير بيئة، مع قيمة افتراضية للتطوير المحلي فقط
@@ -26,25 +26,28 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# اقرأ DEBUG من متغير بيئة، افتراضيًا يكون False للإنتاج
-# على Koyeb، قم بتعيين DJANGO_DEBUG=False للإنتاج.
-# محليًا، يمكنك تعيين DJANGO_DEBUG=True في ملف .env الخاص بك.
-DEBUG_VALUE = os.environ.get('DJANGO_DEBUG', 'False')
-DEBUG = DEBUG_VALUE.lower() in ('true', '1', 't')
+# هذا الإعداد مؤقت للتشخيص. يجب تغييره إلى False في الإنتاج.
+# يتم تجاوز قراءة متغير البيئة DJANGO_DEBUG هنا مؤقتاً.
+DEBUG = True
 
 
-ALLOWED_HOSTS = []
-# اقرأ النطاق من متغير بيئة جديد خصيصًا لـ ALLOWED_HOSTS (مثل DJANGO_ALLOWED_HOST)
-KOYEB_PUBLIC_HOST = os.environ.get('DJANGO_ALLOWED_HOST')
-if KOYEB_PUBLIC_HOST:
-    ALLOWED_HOSTS.append(KOYEB_PUBLIC_HOST)
+# ALLOWED_HOSTS: السماح بجميع النطاقات مؤقتاً للتشخيص
+# هذا غير آمن للإنتاج. يجب تحديده بدقة (باستخدام متغير بيئة) لاحقًا.
+ALLOWED_HOSTS = ['*']
 
-# أضف localhost و 127.0.0.1 للتطوير المحلي فقط
+# لم يعد يتم استخدام EXTERNAL_HOSTNAME هنا بشكل مباشر في هذا التكوين المؤقت
+# EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME') or \
+#                     os.environ.get('KOYEB_EXTERNAL_HOSTNAME')
+# if EXTERNAL_HOSTNAME:
+#     ALLOWED_HOSTS.append(EXTERNAL_HOSTNAME)
+
+# أضف localhost و 127.0.0.1 للتطوير المحلي فقط (لا يزال مفيداً حتى مع ['*'])
+# إذا كنت تستخدم ['*']، فإن هذه السطور ليست ضرورية بشكل فني ولكن لا تضر.
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
-# Application definition
+# تعريف التطبيقات
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,7 +61,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'files_manager.apps.FilesManagerConfig',
     'news.apps.NewsConfig',
-    'tasks.apps.TasksConfig',
+    'tasks.apps.Tasks.apps.TasksConfig', # تم تصحيح الخطأ الإملائي هنا
     'notes.apps.NotesConfig',
     'exam_prep.apps.ExamPrepConfig',
     'achievements.apps.AchievementsConfig',
@@ -166,6 +169,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' # <--- مهم جداً لتخزين الميديا على Cloudinary
 
+
 # Authentication settings
 LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGOUT_REDIRECT_URL = 'core:home'
@@ -179,18 +183,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CSRF_TRUSTED_ORIGINS (مهم إذا كنت تستخدم HTTPS في الإنتاج)
 # سيتم تعيينها بناءً على ALLOWED_HOSTS في وضع الإنتاج
-CSRF_TRUSTED_ORIGINS = []
-if not DEBUG and KOYEB_PUBLIC_HOST:
-     # تأكد من أنها HTTPS للنطاق العام
-    CSRF_TRUSTED_ORIGINS = [f'https://{KOYEB_PUBLIC_HOST}']
-elif DEBUG:
-    # للتطوير المحلي، يمكنك إضافة http://127.0.0.1:8000
-    CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
+# CSRF_TRUSTED_ORIGINS = [] # تم التعليق عليه بما أننا نستخدم ALLOWED_HOSTS = ['*'] مؤقتاً
+# if not DEBUG and KOYEB_PUBLIC_HOST:
+#      # تأكد من أنها HTTPS للنطاق العام
+#     CSRF_TRUSTED_ORIGINS = [f'https://{KOYEB_PUBLIC_HOST}']
+# elif DEBUG:
+#     # للتطوير المحلي، يمكنك إضافة http://127.0.0.1:8000
+#     CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
 
 
 # لإجبار الاتصالات على HTTPS في الإنتاج (إذا كان DEBUG=False)
-if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+# تم التعليق عليه مؤقتاً بما أن DEBUG=True للتشخيص
+# if not DEBUG:
+#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
