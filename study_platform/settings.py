@@ -164,3 +164,27 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+
+  # أضف هذا الجزء في نهاية ملف settings.py الخاص بك
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO', # يمكنك تغييرها إلى 'DEBUG' إذا كنت تريد المزيد من التفاصيل
+                'propagate': True,
+            },
+            '': { # لـ loggers التطبيق الأخرى
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+        },
+    }
