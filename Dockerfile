@@ -21,22 +21,19 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir --default-timeout=100 -r requirements.txt
 
-# --- Debugging Steps (يمكنك إزالتها بعد نجاح النشر) ---
-RUN /usr/local/bin/python -c "import gunicorn" || (echo "Gunicorn import failed, checking pip list..." && pip list && exit 1)
-RUN which gunicorn || (echo "Gunicorn not found in PATH, trying common locations..." && ls -l /usr/local/bin/gunicorn /usr/bin/gunicorn /usr/local/pythons/bin/gunicorn && exit 1)
-# --- End Debugging Step ---
-
 # Copy the rest of the application code into the container
 COPY . .
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
+# Apply database migrations (crucial for production!)
+# This command will be run every time the image is built
+RUN python manage.py migrate
+
 # Define the PORT environment variable
 ENV PORT=8000
 
 # Gunicorn start command
-# Change CMD to use shell form to correctly interpret $(PORT)
-# OR, use ENTRYPOINT with CMD as arguments
-# Simpler: use shell form for CMD
+# Use shell form for CMD to correctly interpret environment variables like PORT
 CMD gunicorn study_platform.wsgi --bind 0.0.0.0:"${PORT}" --workers 2 --timeout 120
