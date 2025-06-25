@@ -1,10 +1,7 @@
 # Use an official Python base image
-# Use python:3.11-slim-buster to reduce image size
 FROM python:3.11-slim-buster
 
 # Update package lists and install essential build dependencies
-# libpq-dev is necessary for psycopg2-binary if a pre-built wheel is not available
-# build-essential, pkg-config, and git are common build tools
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \
@@ -17,26 +14,28 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Install Python dependencies
-# Copy the requirements.txt file to the working directory
 COPY requirements.txt .
 
 # Install Python dependencies
-# Use --no-cache-dir to reduce image size
-# Use --default-timeout to increase download timeout
-RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+# Ensure pip is up-to-date within the container for better compatibility
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+
+# --- New Debugging Step ---
+# Verify gunicorn is installed and available in the PATH for the CMD command
+# This step will fail the build if gunicorn is not found after installation
+RUN /usr/local/bin/python -c "import gunicorn" || (echo "Gunicorn import failed, checking pip list..." && pip list && exit 1)
+RUN which gunicorn || (echo "Gunicorn not found in PATH, trying common locations..." && ls -l /usr/local/bin/gunicorn /usr/bin/gunicorn /usr/local/pythons/bin/gunicorn && exit 1)
+# --- End Debugging Step ---
 
 # Copy the rest of the application code into the container
 COPY . .
 
 # Collect static files
-# --noinput to avoid interactive prompts
 RUN python manage.py collectstatic --noinput
 
-# Define the PORT environment variable that the application will receive from the environment
-# Koyeb will provide it automatically
+# Define the PORT environment variable
 ENV PORT=8000
 
-# Gunicorn start command
-# Use the full path to gunicorn to ensure it's found, and use python -m gunicorn
-# This is generally more robust in Docker environments
+# Gunicorn start command (already robust, but double-check)
 CMD ["/usr/local/bin/python", "-m", "gunicorn", "study_platform.wsgi", "--bind", "0.0.0.0:$(PORT)", "--workers", "2", "--timeout", "120"]
