@@ -15,8 +15,8 @@ from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# إعدادات التطوير السريع - غير مناسبة للإنتاج
-# راجع https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/stable/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # اقرأ SECRET_KEY من متغير بيئة، مع قيمة افتراضية للتطوير المحلي فقط
@@ -47,7 +47,7 @@ if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 
-# تعريف التطبيقات
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'files_manager.apps.FilesManagerConfig',
     'news.apps.NewsConfig',
-    'tasks.apps.Tasks.apps.TasksConfig', # تم تصحيح الخطأ الإملائي هنا
+    'tasks.apps.TasksConfig', # <--- تم تصحيح الخطأ الإملائي هنا
     'notes.apps.NotesConfig',
     'exam_prep.apps.ExamPrepConfig',
     'achievements.apps.AchievementsConfig',
@@ -167,7 +167,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # إذا كنت تستخدم Cloudinary لتخزين ملفات الميديا، يجب عليك تفعيل هذا.
 # تأكد من إضافة CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET في متغيرات البيئة بـ Koyeb
 MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' # <--- مهم جداً لتخزين الميديا على Cloudinary
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 # Authentication settings
@@ -183,17 +183,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CSRF_TRUSTED_ORIGINS (مهم إذا كنت تستخدم HTTPS في الإنتاج)
 # سيتم تعيينها بناءً على ALLOWED_HOSTS في وضع الإنتاج
-# CSRF_TRUSTED_ORIGINS = [] # تم التعليق عليه بما أننا نستخدم ALLOWED_HOSTS = ['*'] مؤقتاً
+# في وضع DEBUG = True، لا نحتاج CSRF_TRUSTED_ORIGINS بشكل صريح
+# ولن يتم استخدام SECURE_PROXY_SSL_HEADER, SECURE_SSL_REDIRECT, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE
+# لأن DEBUG = True يتجاوز هذه الإعدادات للأمان
+# لذا، تم التعليق على هذه الأجزاء مؤقتاً.
+
+# CSRF_TRUSTED_ORIGINS = []
 # if not DEBUG and KOYEB_PUBLIC_HOST:
-#      # تأكد من أنها HTTPS للنطاق العام
 #     CSRF_TRUSTED_ORIGINS = [f'https://{KOYEB_PUBLIC_HOST}']
 # elif DEBUG:
-#     # للتطوير المحلي، يمكنك إضافة http://127.0.0.1:8000
 #     CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
 
-
-# لإجبار الاتصالات على HTTPS في الإنتاج (إذا كان DEBUG=False)
-# تم التعليق عليه مؤقتاً بما أن DEBUG=True للتشخيص
 # if not DEBUG:
 #     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #     SECURE_SSL_REDIRECT = True
