@@ -37,5 +37,6 @@ RUN python manage.py collectstatic --noinput
 ENV PORT=8000
 
 # Gunicorn start command
-# Uses the PORT variable provided by Koyeb
-CMD ["gunicorn", "study_platform.wsgi", "--bind", "0.0.0.0:$(PORT)", "--workers", "2", "--timeout", "120"]
+# Use the full path to gunicorn to ensure it's found, and use python -m gunicorn
+# This is generally more robust in Docker environments
+CMD ["/usr/local/bin/python", "-m", "gunicorn", "study_platform.wsgi", "--bind", "0.0.0.0:$(PORT)", "--workers", "2", "--timeout", "120"]
