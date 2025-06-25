@@ -1,44 +1,41 @@
-    # استخدم صورة Python أساسية رسمية
-    # استخدم python:3.11-slim-buster لتقليل حجم الصورة
-    FROM python:3.11-slim-buster
+# Use an official Python base image
+# Use python:3.11-slim-buster to reduce image size
+FROM python:3.11-slim-buster
 
-    # تحديث قوائم الحزم وتثبيت التبعيات الأساسية المطلوبة للبناء
-    # libpq-dev ضروري لـ psycopg2-binary إذا لم يكن pre-built wheel متاحًا
-    # build-essential و pkg-config و default-libmysqlclient-dev (أو ما يعادله) يمكن أن يكون مفيدًا لحزم أخرى
-    RUN apt-get update && \
-        apt-get install -y --no-install-recommends \
-            build-essential \
-            libpq-dev \
-            pkg-config \
-            # إذا كنت تحتاج إلى أي أدوات تطوير أخرى، أضفها هنا
-            # git (إذا كنت تستخدم GitPython مثلاً)
-            # libmariadb-dev (إذا كنت تستخدم mysqlclient فعلاً، لكن يجب إزالته)
-        && rm -rf /var/lib/apt/lists/*
+# Update package lists and install essential build dependencies
+# libpq-dev is necessary for psycopg2-binary if a pre-built wheel is not available
+# build-essential, pkg-config, and git are common build tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        pkg-config \
+        git \
+    && rm -rf /var/lib/apt/lists/*
 
-    # تعيين دليل العمل داخل الحاوية
-    WORKDIR /app
+# Set the working directory inside the container
+WORKDIR /app
 
-    # تثبيت التبعيات المطلوبة
-    # نسخ ملف requirements.txt إلى دليل العمل
-    COPY requirements.txt .
+# Install Python dependencies
+# Copy the requirements.txt file to the working directory
+COPY requirements.txt .
 
-    # تثبيت تبعيات Python
-    # استخدام --no-cache-dir لتقليل حجم الصورة
-    # استخدام --default-timeout لزيادة المهلة الزمنية للتنزيل
-    RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
+# Install Python dependencies
+# Use --no-cache-dir to reduce image size
+# Use --default-timeout to increase download timeout
+RUN pip install --no-cache-dir --default-timeout=100 -r requirements.txt
 
-    # نسخ باقي كود التطبيق إلى الحاوية
-    COPY . .
+# Copy the rest of the application code into the container
+COPY . .
 
-    # جمع الملفات الثابتة
-    # --noinput لتجنب أي مطالبات تفاعلية
-    RUN python manage.py collectstatic --noinput
+# Collect static files
+# --noinput to avoid interactive prompts
+RUN python manage.py collectstatic --noinput
 
-    # تعريف متغير PORT الذي سيتلقاه التطبيق من البيئة
-    # Koyeb سيزوده تلقائياً
-    ENV PORT=8000
+# Define the PORT environment variable that the application will receive from the environment
+# Koyeb will provide it automatically
+ENV PORT=8000
 
-    # أمر بدء التشغيل لـ Gunicorn
-    # يستخدم المتغير PORT الذي يوفره Koyeb
-    CMD ["gunicorn", "study_platform.wsgi", "--bind", "0.0.0.0:$(PORT)", "--workers", "2", "--timeout", "120"]
-    
+# Gunicorn start command
+# Uses the PORT variable provided by Koyeb
+CMD ["gunicorn", "study_platform.wsgi", "--bind", "0.0.0.0:$(PORT)", "--workers", "2", "--timeout", "120"]
