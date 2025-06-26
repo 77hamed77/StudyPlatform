@@ -2,7 +2,7 @@
 from pathlib import Path
 import os
 import dj_database_url
-from django.core.exceptions import ImproperlyConfigured # استيراد ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 
 # NEW: تحميل متغيرات البيئة من ملف .env للاختبار المحلي
 # تأكد من تثبيت python-dotenv: pip install python-dotenv
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # ---------------------------------------------------------------------------
 
-from django.utils.translation import gettext_lazy as _ # للترجمة (جيد إبقاؤه)
+from django.utils.translation import gettext_lazy as _
 
 # مسارات البناء داخل المشروع
 BASE_DIR = Path(__file__).resolve().parent.parent
