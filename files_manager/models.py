@@ -6,6 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 import os # لاستخدامه في التحقق من امتداد الملف
 
+# NEW: استيراد CloudinaryStorage مباشرة
+from cloudinary_storage.storage import MediaCloudinaryStorage
+# ---------------------------------------------------------------------------
+
 # --- موديلات أساسية ---
 class Subject(models.Model):
     name = models.CharField(
@@ -88,7 +92,8 @@ class MainFile(models.Model):
     file = models.FileField(
         upload_to='main_files/%Y/%m/', # تنظيم الملفات حسب السنة والشهر
         validators=[validate_file_extension, validate_file_size], # إضافة مدققات
-        verbose_name=_("الملف")
+        verbose_name=_("الملف"),
+        storage=MediaCloudinaryStorage() # <--- NEW: تحديد التخزين صراحة هنا
     )
     subject = models.ForeignKey(
         Subject,
@@ -163,7 +168,8 @@ class StudentSummary(models.Model):
     file = models.FileField(
         upload_to='student_summaries/%Y/%m/',
         validators=[validate_file_extension, validate_file_size], # استخدام نفس المدققات
-        verbose_name=_("ملف الملخص")
+        verbose_name=_("ملف الملخص"),
+        storage=MediaCloudinaryStorage() # <--- NEW: تحديد التخزين صراحة هنا
     )
     subject = models.ForeignKey(
         Subject,
@@ -228,3 +234,4 @@ class UserFileInteraction(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.main_file.title} (مقروء: {self.marked_as_read})"
+
