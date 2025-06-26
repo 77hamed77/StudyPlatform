@@ -62,9 +62,8 @@ class MainFileAdmin(admin.ModelAdmin):
 
     @admin.display(description=_('حجم الملف'))
     def file_size_display(self, obj):
-        # هذا هو التعديل. يجب أن نعتمد على obj.file.size مباشرة.
-        # obj.file.size يتعامل مع DEFAULT_FILE_STORAGE بشكل تلقائي (أي Cloudinary).
-        if obj.file and obj.file.size is not None: # تأكد أن الحجم ليس None (قد يكون فارغاً)
+        # هذا هو التعديل الذي يجب أن يكون مطبقاً
+        if obj.file and obj.file.size is not None:
             size_bytes = obj.file.size
             if size_bytes >= (1024 * 1024 * 1024): # GB
                 size_value = size_bytes / (1024 * 1024 * 1024)
