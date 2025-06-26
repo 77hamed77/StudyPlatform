@@ -157,6 +157,19 @@ MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
+# NEW: إضافة قاموس CLOUDINARY_STORAGE لتوفير بيانات الاعتماد مباشرة لـ cloudinary_storage
+# هذا يحل مشكلة KeyError: 'CLOUD_NAME' و ImproperlyConfigured في وقت البناء.
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+# تأكيد وجود القيم (اختياري، ولكن يساعد في التشخيص)
+if not all([CLOUDINARY_STORAGE['CLOUD_NAME'], CLOUDINARY_STORAGE['API_KEY'], CLOUDINARY_STORAGE['API_SECRET']]):
+    raise ImproperlyConfigured("Cloudinary credentials (CLOUD_NAME, API_KEY, API_SECRET) are not set in environment variables. Please check your Koyeb settings.")
+
+
 # Authentication settings
 LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGOUT_REDIRECT_URL = 'core:home'
