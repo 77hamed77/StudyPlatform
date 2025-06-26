@@ -23,18 +23,23 @@ RUN pip install --upgrade pip && \
 # Copy the rest of the application code into the container
 COPY . .
 
-# IMPORTANT: Make DATABASE_URL available during build time for collectstatic and migrate
-# Define it as a build argument
+# IMPORTANT: Make DATABASE_URL and Cloudinary variables available during build time
+# Define them as build arguments
 ARG DATABASE_URL_BUILD
+ARG CLOUDINARY_CLOUD_NAME_BUILD # NEW
+ARG CLOUDINARY_API_KEY_BUILD    # NEW
+ARG CLOUDINARY_API_SECRET_BUILD # NEW
 
-# Set it as an environment variable for subsequent RUN commands
+# Set them as environment variables for subsequent RUN commands
 ENV DATABASE_URL=$DATABASE_URL_BUILD
+ENV CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME_BUILD # NEW
+ENV CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY_BUILD       # NEW
+ENV CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET_BUILD # NEW
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
 # Apply database migrations (crucial for production!)
-# Now DATABASE_URL is available as an ENV var for this RUN command
 RUN python manage.py migrate --noinput
 
 # Define the PORT environment variable
