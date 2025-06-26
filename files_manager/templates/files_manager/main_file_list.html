@@ -7,129 +7,129 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-    .file-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        border-left: 4px solid var(--bs-success); /* لون مميز لكروت الملفات الرئيسية */
-    }
-    .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    body.dark-mode .file-card {
-        border-left-color: var(--bs-success-dark);
-    }
-    .file-card .card-title a {
-        color: inherit; text-decoration: none;
-    }
-    .file-card .card-title a:hover {
-        color: var(--bs-primary); text-decoration: underline;
-    }
-    body.dark-mode .file-card .card-title a:hover {
-        color: var(--link-color-dark);
-    }
-    .file-icon { /* أيقونة لنوع الملف */
-        font-size: 1.5em;
-        margin-right: 0.5rem;
-    }
-    .filter-form .form-select, .filter-form .form-control {
-        font-size: 0.9rem;
-    }
-    .file-read-toggle.read { color: green; border-color: green; }
-    .file-read-toggle.read:hover { background-color: #e6ffe6; }
-    .file-read-toggle.unread:hover { background-color: #f8f9fa; }
-    body.dark-mode .file-read-toggle.read { color: var(--bs-success-dark); border-color: var(--bs-success-dark); }
-    body.dark-mode .file-read-toggle.read:hover { background-color: rgba(var(--bs-success-dark-rgb), 0.2); } /* استخدام RGBa للتعتيم */
-    body.dark-mode .file-read-toggle.unread:hover { background-color: var(--card-header-bg-dark); }
+    .file-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border-left: 4px solid var(--bs-success); /* لون مميز لكروت الملفات الرئيسية */
+    }
+    .file-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    body.dark-mode .file-card {
+        border-left-color: var(--bs-success-dark);
+    }
+    .file-card .card-title a {
+        color: inherit; text-decoration: none;
+    }
+    .file-card .card-title a:hover {
+        color: var(--bs-primary); text-decoration: underline;
+    }
+    body.dark-mode .file-card .card-title a:hover {
+        color: var(--link-color-dark);
+    }
+    .file-icon { /* أيقونة لنوع الملف */
+        font-size: 1.5em;
+        margin-right: 0.5rem;
+    }
+    .filter-form .form-select, .filter-form .form-control {
+        font-size: 0.9rem;
+    }
+    .file-read-toggle.read { color: green; border-color: green; }
+    .file-read-toggle.read:hover { background-color: #e6ffe6; }
+    .file-read-toggle.unread:hover { background-color: #f8f9fa; }
+    body.dark-mode .file-read-toggle.read { color: var(--bs-success-dark); border-color: var(--bs-success-dark); }
+    body.dark-mode .file-read-toggle.read:hover { background-color: rgba(var(--bs-success-dark-rgb), 0.2); } /* استخدام RGBa للتعتيم */
+    body.dark-mode .file-read-toggle.unread:hover { background-color: var(--card-header-bg-dark); }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h2 class="mb-0"><i class="fas fa-folder-open me-2"></i>الملفات والمصادر الرئيسية</h2>
-        {% if perms.files_manager.add_mainfile %} {# أو أي صلاحية لرفع الملفات الرئيسية #}
-        <a href="{% url 'admin:files_manager_mainfile_add' %}" class="btn btn-primary" target="_blank">
-            <i class="fas fa-upload me-1"></i> رفع ملف جديد (Admin)
-        </a>
-        {% endif %}
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="mb-0"><i class="fas fa-folder-open me-2"></i>الملفات والمصادر الرئيسية</h2>
+        {% if perms.files_manager.add_mainfile %} {# أو أي صلاحية لرفع الملفات الرئيسية #}
+        <a href="{% url 'admin:files_manager_mainfile_add' %}" class="btn btn-primary" target="_blank">
+            <i class="fas fa-upload me-1"></i> رفع ملف جديد (Admin)
+        </a>
+        {% endif %}
+    </div>
 
-    {# نموذج فلترة الملفات (إذا كان لديك واحد) #}
-    {% if filter_form %}
-    <div class="card shadow-sm mb-4 filter-form">
-        <div class="card-body">
-            <form method="get" class="row gx-2 gy-2 align-items-center">
-                {# ... حقول الفلتر (عنوان، مادة، محاضر، نوع الملف) ... #}
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i> تطبيق الفلتر</button>
-                    <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary ms-1"><i class="fas fa-times"></i> مسح الفلتر</a>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% endif %}
+    {# نموذج فلترة الملفات (إذا كان لديك واحد) #}
+    {% if filter_form %}
+    <div class="card shadow-sm mb-4 filter-form">
+        <div class="card-body">
+            <form method="get" class="row gx-2 gy-2 align-items-center">
+                {# ... حقول الفلتر (عنوان، مادة، محاضر، نوع الملف) ... #}
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fas fa-filter"></i> تطبيق الفلتر</button>
+                    <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary ms-1"><i class="fas fa-times"></i> مسح الفلتر</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 
-    {% if files %} {# افترض أن الـ context_object_name هو files (الذي قمت بتمريره بعد تعديل PageObject) #}
-        <div class="row">
-            {% for file_item in files %}
-            <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
-                <div class="card h-100 shadow-sm file-card" id="file-item-{{ file_item.pk }}">
-                    <div class="card-body d-flex flex-column pb-0">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0 flex-grow-1">
-                                <a href="{{ file_item.get_absolute_url|default:file_item.file.url }}" 
-                                   {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل/معاينة مباشرة" target="_blank" {% endif %}>
-                                   {{ file_item.title }}
-                                </a>
-                            </h5>
-                            <button class="btn btn-sm p-0 file-read-toggle flex-shrink-0 ms-2 {% if file_item.current_user_marked_as_read %}read btn-outline-success{% else %}unread btn-outline-secondary{% endif %}"
-                                    data-file-id="{{ file_item.pk }}"
-                                    title="{% if file_item.current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
-                                <i class="fas {% if file_item.current_user_marked_as_read %}fa-bookmark{% else %}fa-bookmark{% endif %}"></i> 
-                                {# استخدم far fa-bookmark إذا كنت تريد أيقونة فارغة للإشارة إلى "غير مقروء" #}
-                            </button>
-                        </div>
-                        <p class="card-text small text-muted flex-grow-1">
-                            {% if file_item.description %}
-                                {{ file_item.description|truncatewords_html:15 }}
-                            {% else %}
-                                لا يوجد وصف متاح.
-                            {% endif %}
-                        </p>
-                        <div class="mt-auto">
-                            <hr class="my-2">
-                            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
-                                <span>
-                                    {% if file_item.subject %}<i class="fas fa-book me-1"></i>{{ file_item.subject.name }}{% endif %}
-                                    {% if file_item.file_type %}<span class="badge bg-secondary ms-1">{{ file_item.file_type.name }}</span>{% endif %}
-                                </span>
-                                <span>
-                                    <i class="far fa-clock me-1"></i>{{ file_item.uploaded_at|timesince }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-light text-center py-2">
-                        <a href="{{ file_item.file.url }}" target="_blank" class="btn btn-sm btn-success w-100">
-                            <i class="fas fa-download"></i> تنزيل / معاينة 
-                            {% if file_item.current_user_marked_as_read %}
-                                <i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>
-                            {% endif %}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% if is_paginated %} {# تأكد من أنك تمرر page_obj للـ pagination template #}
-            {% include "partials/_pagination.html" %}
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info text-center shadow-sm">
-            <h4 class="alert-heading"><i class="fas fa-info-circle"></i> لا توجد ملفات!</h4>
-            <p>لا توجد ملفات أو مصادر رئيسية متاحة حالياً.</p>
-        </div>
-    {% endif %}
+    {% if files %} {# افترض أن الـ context_object_name هو files (الذي قمت بتمريره بعد تعديل PageObject) #}
+        <div class="row">
+            {% for file_item in files %}
+            <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
+                <div class="card h-100 shadow-sm file-card" id="file-item-{{ file_item.pk }}">
+                    <div class="card-body d-flex flex-column pb-0">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0 flex-grow-1">
+                                <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}" 
+                                   {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل/معاينة مباشرة" target="_blank" {% endif %}>
+                                   {{ file_item.title }}
+                                </a>
+                            </h5>
+                            <button class="btn btn-sm p-0 file-read-toggle flex-shrink-0 ms-2 {% if file_item.current_user_marked_as_read %}read btn-outline-success{% else %}unread btn-outline-secondary{% endif %}"
+                                    data-file-id="{{ file_item.pk }}"
+                                    title="{% if file_item.current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
+                                <i class="fas {% if file_item.current_user_marked_as_read %}fa-bookmark{% else %}fa-bookmark{% endif %}"></i> 
+                                {# استخدم far fa-bookmark إذا كنت تريد أيقونة فارغة للإشارة إلى "غير مقروء" #}
+                            </button>
+                        </div>
+                        <p class="card-text small text-muted flex-grow-1">
+                            {% if file_item.description %}
+                                {{ file_item.description|truncatewords_html:15 }}
+                            {% else %}
+                                لا يوجد وصف متاح.
+                            {% endif %}
+                        </p>
+                        <div class="mt-auto">
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+                                <span>
+                                    {% if file_item.subject %}<i class="fas fa-book me-1"></i>{{ file_item.subject.name }}{% endif %}
+                                    {% if file_item.file_type %}<span class="badge bg-secondary ms-1">{{ file_item.file_type.name }}</span>{% endif %}
+                                </span>
+                                <span>
+                                    <i class="far fa-clock me-1"></i>{{ file_item.uploaded_at|timesince }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-center py-2">
+                        <a href="{{ file_item.file_url }}" target="_blank" class="btn btn-sm btn-success w-100">
+                            <i class="fas fa-download"></i> تنزيل / معاينة 
+                            {% if file_item.current_user_marked_as_read %}
+                                <i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if is_paginated %} {# تأكد من أنك تمرر page_obj للـ pagination template #}
+            {% include "partials/_pagination.html" %}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center shadow-sm">
+            <h4 class="alert-heading"><i class="fas fa-info-circle"></i> لا توجد ملفات!</h4>
+            <p>لا توجد ملفات أو مصادر رئيسية متاحة حالياً.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
 
@@ -139,72 +139,71 @@
 // الكود الخاص بـ file-read-toggle (من الردود السابقة) يجب أن يكون هنا أو في main.js
 // للتذكير:
 document.addEventListener('DOMContentLoaded', function() {
-    const csrftoken = getCookie('csrftoken');
-    document.querySelectorAll('.file-read-toggle').forEach(button => {
-        button.addEventListener('click', function() {
-            const fileId = this.dataset.fileId;
-            const iconElement = this.querySelector('i'); // تم تغيير اسم المتغير هنا
-            const fileCard = this.closest('.file-card'); // الحصول على الكرت الأب
-            const downloadButton = fileCard ? fileCard.querySelector('.card-footer a.btn-success') : null;
+    const csrftoken = getCookie('csrftoken');
+    document.querySelectorAll('.file-read-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            const fileId = this.dataset.fileId;
+            const iconElement = this.querySelector('i'); // تم تغيير اسم المتغير هنا
+            const fileCard = this.closest('.file-card'); // الحصول على الكرت الأب
+            const downloadButton = fileCard ? fileCard.querySelector('.card-footer a.btn-success') : null;
 
 
-            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken
-                },
-                body: `file_id=${fileId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const readIconHtml = '<i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>';
-                    if (data.marked_as_read) {
-                        this.classList.remove('unread', 'btn-outline-secondary');
-                        this.classList.add('read', 'btn-outline-success');
-                        this.title = 'تمييز كغير مقروء';
-                        iconElement.classList.remove('far'); // إذا كنت تستخدم far
-                        iconElement.classList.add('fas'); // الأيقونة الملآنة
-                        // إضافة أيقونة الصح لزر التنزيل
-                        if (downloadButton && !downloadButton.querySelector('.fa-check-circle')) {
-                            downloadButton.insertAdjacentHTML('beforeend', readIconHtml);
-                        }
-                    } else {
-                        this.classList.remove('read', 'btn-outline-success');
-                        this.classList.add('unread', 'btn-outline-secondary');
-                        this.title = 'تمييز كمقروء';
-                        iconElement.classList.remove('fas');
-                        iconElement.classList.add('far'); // الأيقونة الفارغة (تأكد من فئة Font Awesome الصحيحة)
-                        // إزالة أيقونة الصح من زر التنزيل
-                        if (downloadButton) {
-                            const existingCheck = downloadButton.querySelector('.fa-check-circle');
-                            if (existingCheck) existingCheck.remove();
-                        }
-                    }
-                } else {
-                    console.error('Error toggling read status:', data.message);
-                    // يمكنك عرض رسالة خطأ للمستخدم هنا
-                }
-            })
-            .catch(error => console.error('Fetch error:', error));
-        });
-    });
+            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `file_id=${fileId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const readIconHtml = '<i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>';
+                    if (data.marked_as_read) {
+                        this.classList.remove('unread', 'btn-outline-secondary');
+                        this.classList.add('read', 'btn-outline-success');
+                        this.title = 'تمييز كغير مقروء';
+                        iconElement.classList.remove('far'); // إذا كنت تستخدم far
+                        iconElement.classList.add('fas'); // الأيقونة الملآنة
+                        // إضافة أيقونة الصح لزر التنزيل
+                        if (downloadButton && !downloadButton.querySelector('.fa-check-circle')) {
+                            downloadButton.insertAdjacentHTML('beforeend', readIconHtml);
+                        }
+                    } else {
+                        this.classList.remove('read', 'btn-outline-success');
+                        this.classList.add('unread', 'btn-outline-secondary');
+                        this.title = 'تمييز كمقروء';
+                        iconElement.classList.remove('fas');
+                        iconElement.classList.add('far'); // الأيقونة الفارغة (تأكد من فئة Font Awesome الصحيحة)
+                        // إزالة أيقونة الصح من زر التنزيل
+                        if (downloadButton) {
+                            const existingCheck = downloadButton.querySelector('.fa-check-circle');
+                            if (existingCheck) existingCheck.remove();
+                        }
+                    }
+                } else {
+                    console.error('Error toggling read status:', data.message);
+                    // يمكنك عرض رسالة خطأ للمستخدم هنا
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+        });
+    });
 
-    function getCookie(name) { // تأكد أن هذه الدالة موجودة
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+    function getCookie(name) { // تأكد أن هذه الدالة موجودة
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 });
 </script>
-{% endblock %}
