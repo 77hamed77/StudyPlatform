@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Subject, Lecturer, FileType, MainFile, StudentSummary, UserFileInteraction
 from django.utils.translation import gettext_lazy as _
+import os # تأكد من استيراد os إذا كنت تستخدم os.path.basename أو ما شابه
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -61,9 +62,23 @@ class MainFileAdmin(admin.ModelAdmin):
 
     @admin.display(description=_('حجم الملف'))
     def file_size_display(self, obj):
-        if obj.file and hasattr(obj.file, 'size'):
-            size_mb = obj.file.size / (1024 * 1024)
-            return f"{size_mb:.2f} MB"
+        # هذا هو التعديل. يجب أن نعتمد على obj.file.size مباشرة.
+        # obj.file.size يتعامل مع DEFAULT_FILE_STORAGE بشكل تلقائي (أي Cloudinary).
+        if obj.file and obj.file.size is not None: # تأكد أن الحجم ليس None (قد يكون فارغاً)
+            size_bytes = obj.file.size
+            if size_bytes >= (1024 * 1024 * 1024): # GB
+                size_value = size_bytes / (1024 * 1024 * 1024)
+                unit = "GB"
+            elif size_bytes >= (1024 * 1024): # MB
+                size_value = size_bytes / (1024 * 1024)
+                unit = "MB"
+            elif size_bytes >= 1024: # KB
+                size_value = size_bytes / 1024
+                unit = "KB"
+            else:
+                size_value = size_bytes
+                unit = "Bytes"
+            return f"{size_value:.2f} {unit}"
         return "-"
 
     def save_model(self, request, obj, form, change):
@@ -109,6 +124,8 @@ class StudentSummaryAdmin(admin.ModelAdmin):
     def file_link(self, obj):
         from django.utils.html import format_html
         if obj.file:
+            # obj.file.url سيعيد URL Cloudinary الصحيح
+            # os.path.basename(obj.file.name) لا يزال مفيدًا للحصول على اسم الملف فقط
             return format_html("<a href='{url}' target='_blank'>{name}</a>", url=obj.file.url, name=os.path.basename(obj.file.name))
         return "-"
 
