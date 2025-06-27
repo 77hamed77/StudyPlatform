@@ -1,8 +1,10 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %} {# إذا كنت تستخدمه لعرض النموذج الرئيسي #}
-{% load tasks.task_extras %}     {# *** تأكد أن هذا السطر يستخدم الاسم الكامل للمكتبة *** #}
+{% load crispy_forms_tags %}
+{% load tasks.task_extras %}
 
-{% block title %}{% if form.instance.pk %}تعديل المهمة{% else %}إنشاء مهمة جديدة{% endif %} - {{ block.super }}{% endblock %}
+{% block title %}
+    {% if form.instance.pk %}تعديل المهمة{% else %}إنشاء مهمة جديدة{% endif %} - {{ block.super }}
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -23,41 +25,43 @@
                         <div class="alert alert-danger" role="alert">
                             <strong>خطأ!</strong> يرجى تصحيح الأخطاء الموضحة أدناه:
                             <ul class="mt-2 mb-0">
-                            {% for field_name, field_errors in form.errors.items %}
-                                {% for error in field_errors %}
-                                    <li>
-                                        {% if field_name != '__all__' %}
-                                            <strong>{{ form|find_field_label:field_name }}:</strong>
-                                        {% endif %}
-                                        {{ error|striptags }}
-                                    </li>
+                                {% for field_name, field_errors in form.errors.items %}
+                                    {% for error in field_errors %}
+                                        <li>
+                                            {% if field_name != '__all__' %}
+                                                <strong>{{ form|find_field_label:field_name }}:</strong>
+                                            {% endif %}
+                                            {{ error|striptags }}
+                                        </li>
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
 
-                    <form method="post">
+                    <form method="post" novalidate>
                         {% csrf_token %}
                         {% if CRISPY_ALLOWED_TEMPLATE_PACKS and form %}
                             {{ form|crispy }}
                         {% else %}
                             {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted d-block mt-1">{{ field.help_text|safe }}</small>
-                                {% endif %}
-                                {% if field.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in field.errors %}<span>{{ error|striptags }}</span>{% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted d-block mt-1">{{ field.help_text|safe }}</small>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in field.errors %}
+                                                <span>{{ error|striptags }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
                             {% endfor %}
                         {% endif %}
-                        
+
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn {% if form.instance.pk %}btn-info text-dark{% else %}btn-primary{% endif %} btn-lg">
                                 <i class="fas {% if form.instance.pk %}fa-save{% else %}fa-check-circle{% endif %} me-1"></i>
@@ -68,7 +72,7 @@
                 </div>
                 <div class="card-footer text-center">
                     <a href="{% if form.instance.pk and form.instance.get_absolute_url %}{{ form.instance.get_absolute_url }}{% else %}{% url 'tasks:task_list' %}{% endif %}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> 
+                        <i class="fas fa-arrow-left me-1"></i>
                         {% if form.instance.pk %}العودة إلى تفاصيل المهمة{% else %}العودة إلى قائمة المهام{% endif %}
                     </a>
                 </div>
@@ -87,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {% if not CRISPY_ALLOWED_TEMPLATE_PACKS or not form %}
             form.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select').forEach(function(el) {
                 if (!el.classList.contains('form-check-input') && !el.classList.contains('form-range')) {
-                     if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+                    if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
                         if (el.tagName === 'SELECT') {
                             el.classList.add('form-select');
                         } else {

@@ -90,9 +90,9 @@
             
             <div class="d-grid gap-2 mt-4">
                 <a href="{{ file_obj.file_url }}" 
-                    target="_blank" 
+                    
                     class="btn btn-success btn-lg"
-                    {% if file_obj.file_extension == '.pdf' %} download="{{ file_obj.title }}.pdf" {% endif %}>
+                    {% if file_obj.file_extension = '.pdf' %} download="{{ file_obj.title }}.pdf" {% endif %}>
                     <i class="fas fa-download me-2"></i>
                     {% if file_obj.file_extension == '.pdf' %}تنزيل PDF{% else %}تنزيل / معاينة الملف الأصلي{% endif %}
                 </a>

@@ -156,9 +156,9 @@
                     </div>
                     <div class="card-footer bg-light text-center py-2">
                         <a href="{{ file_item.file_url }}"
-                           target="_blank"
+            
                            class="btn btn-sm btn-success w-100"
-                           {% if file_item.file_extension == '.pdf' %} download="{{ file_item.title }}.pdf" {% endif %}>
+                            download="{{ file_item.title }}.pdf">
                             <i class="fas fa-download"></i>
                             {% if file_item.file_extension == '.pdf' %}تنزيل PDF{% else %}تنزيل / معاينة{% endif %}
                             {% if file_item.current_user_marked_as_read %}
