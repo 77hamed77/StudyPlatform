@@ -1,10 +1,13 @@
 import os
 import dj_database_url
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _ # <--- أضف هذا السطر
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')
@@ -15,7 +18,9 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000').split(',')
 
+
 # Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,11 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third-party apps
+    # تطبيقات الطرف الثالث
     'crispy_forms',
     'crispy_bootstrap5',
     'widget_tweaks',
-    # Local apps
+    
+    # تطبيقاتي
     'accounts',
     'files_manager',
     'homepage',
@@ -66,8 +72,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'study_platform.wsgi.application'
 
+
 # Database
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
@@ -81,21 +89,34 @@ else:
     }
     print("WARNING: DATABASE_URL environment variable not set. Using SQLite for local development.")
 
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
+
 
 # Internationalization
 LANGUAGE_CODE = 'ar'
+
 TIME_ZONE = 'UTC'
+
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# قائمة اللغات المدعومة
 LANGUAGES = [
     ('en', _('English')),
     ('ar', _('Arabic')),
@@ -105,8 +126,9 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
@@ -128,13 +150,3 @@ LOGIN_REDIRECT_URL = 'homepage:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 X_FRAME_OPTIONS = 'ALLOWALL'
-
-# === تحسينات إضافية عند إزالة Cloudinary ===
-# - لم يعد هناك حاجة لأي إعدادات تخص cloudinary أو cloudinary_storage.
-# - تأكد أن جميع نماذج FileField وImageField في مشروعك لا تستخدم storage=MediaCloudinaryStorage().
-# - لا تنس إزالة أي متغيرات بيئة متعلقة بـ cloudinary من .env.
-
-# === نصيحة نشر مهمة ===
-# عند رفع المشروع على سيرفر production تأكد من:
-# - وضع DATABASE_URL وSECRET_KEY وDJANGO_DEBUG وALLOWED_HOSTS في متغيرات بيئة الاستضافة.
-# - ضبط MEDIA_ROOT وSTATIC_ROOT بشكل صحيح وتهيئة الخادم لجلب هذه الملفات.
