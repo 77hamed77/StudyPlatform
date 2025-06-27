@@ -7,178 +7,138 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-    .file-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        border-left: 4px solid var(--bs-success);
-    }
-    .file-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    body.dark-mode .file-card {
-        border-left-color: var(--bs-success-dark);
-    }
-    .file-card .card-title a {
-        color: inherit;
-        text-decoration: none;
-    }
-    .file-card .card-title a:hover {
-        color: var(--bs-primary);
-        text-decoration: underline;
-    }
-    body.dark-mode .file-card .card-title a:hover {
-        color: var(--link-color-dark);
-    }
-    .file-icon {
-        font-size: 1.5em;
-        margin-right: 0.5rem;
-    }
-    .filter-form .form-select,
-    .filter-form .form-control {
-        font-size: 0.9rem;
-    }
-    .file-read-toggle.read { color: green; border-color: green; }
-    .file-read-toggle.read:hover { background-color: #e6ffe6; }
-    .file-read-toggle.unread:hover { background-color: #f8f9fa; }
-    body.dark-mode .file-read-toggle.read { color: var(--bs-success-dark); border-color: var(--bs-success-dark); }
-    body.dark-mode .file-read-toggle.read:hover { background-color: rgba(var(--bs-success-dark-rgb), 0.2); }
-    body.dark-mode .file-read-toggle.unread:hover { background-color: var(--card-header-bg-dark); }
+    .file-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border-left: 4px solid var(--bs-success);
+    }
+    .file-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    body.dark-mode .file-card {
+        border-left-color: var(--bs-success-dark);
+    }
+    .file-card .card-title a {
+        color: inherit; text-decoration: none;
+    }
+    .file-card .card-title a:hover {
+        color: var(--bs-primary); text-decoration: underline;
+    }
+    body.dark-mode .file-card .card-title a:hover {
+        color: var(--link-color-dark);
+    }
+    .file-icon {
+        font-size: 1.5em;
+        margin-right: 0.5rem;
+    }
+    .filter-form .form-select, .filter-form .form-control {
+        font-size: 0.9rem;
+    }
+    .file-read-toggle.read { color: green; border-color: green; }
+    .file-read-toggle.read:hover { background-color: #e6ffe6; }
+    .file-read-toggle.unread:hover { background-color: #f8f9fa; }
+    body.dark-mode .file-read-toggle.read { color: var(--bs-success-dark); border-color: var(--bs-success-dark); }
+    body.dark-mode .file-read-toggle.read:hover { background-color: rgba(var(--bs-success-dark-rgb), 0.2); }
+    body.dark-mode .file-read-toggle.unread:hover { background-color: var(--card-header-bg-dark); }
 
-    /* أنماط جديدة للمعاينات */
-    .file-card-img-container {
-        height: 180px;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid rgba(0,0,0,.125);
-    }
-    body.dark-mode .file-card-img-container {
-        background-color: var(--bs-gray-dark);
-    }
-    .file-card-img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-    .file-card-placeholder-icon {
-        font-size: 4em;
-        color: #6c757d;
-    }
-    body.dark-mode .file-card-placeholder-icon {
-        color: var(--bs-gray);
-    }
+    /* تم إزالة الأنماط الخاصة بمعاينة الصور/PDF حيث لم تعد هناك معاينات مرئية */
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h2 class="mb-0"><i class="fas fa-folder-open me-2"></i>الملفات والمصادر الرئيسية</h2>
-        {% if perms.files_manager.add_mainfile %}
-        <a href="{% url 'admin:files_manager_mainfile_add' %}" class="btn btn-primary" target="_blank">
-            <i class="fas fa-upload me-1"></i> رفع ملف جديد (Admin)
-        </a>
-        {% endif %}
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="mb-0"><i class="fas fa-folder-open me-2"></i>الملفات والمصادر الرئيسية</h2>
+        {% if perms.files_manager.add_mainfile %}
+        <a href="{% url 'admin:files_manager_mainfile_add' %}" class="btn btn-primary" target="_blank">
+            <i class="fas fa-upload me-1"></i> رفع ملف جديد (Admin)
+        </a>
+        {% endif %}
+    </div>
 
-    {% if filter_form %}
-    <div class="card shadow-sm mb-4 filter-form">
-        <div class="card-body">
-            <form method="get" class="row gx-2 gy-2 align-items-center">
-                {{ filter_form|crispy }}
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-filter"></i> تطبيق الفلتر
-                    </button>
-                    <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary ms-1">
-                        <i class="fas fa-times"></i> مسح الفلتر
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% endif %}
+    {% if filter_form %}
+    <div class="card shadow-sm mb-4 filter-form">
+        <div class="card-body">
+            <form method="get" class="row gx-2 gy-2 align-items-center">
+                {{ filter_form|crispy }}
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-filter"></i> تطبيق الفلتر
+                    </button>
+                    <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary ms-1">
+                        <i class="fas fa-times"></i> مسح الفلتر
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 
-    {% if files %}
-        <div class="row">
-            {% for file_item in files %}
-            <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
-                <div class="card h-100 shadow-sm file-card" id="file-item-{{ file_item.pk }}">
-                    <div class="file-card-img-container">
-                        {% if file_item.file_extension == '.pdf' and file_item.pdf_preview_image_url %}
-                            <img src="{{ file_item.pdf_preview_image_url }}" class="file-card-img" alt="معاينة PDF للصفحة الأولى">
-                        {% elif file_item.file_extension in '.jpg.jpeg.png.gif' %}
-                            <img src="{{ file_item.file_url }}" class="file-card-img" alt="{{ file_item.title }}">
-                        {% else %}
-                            <i class="fas fa-file file-card-placeholder-icon"></i>
-                        {% endif %}
-                    </div>
+    {% if files %}
+        <div class="row">
+            {% for file_item in files %}
+            <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
+                <div class="card h-100 shadow-sm file-card" id="file-item-{{ file_item.pk }}">
+                    {# تم إزالة الحاوية file-card-img-container ومنطق عرض المعاينة #}
                     <div class="card-body d-flex flex-column pb-0">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0 flex-grow-1">
-                                <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}"
-                                   {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل/معاينة مباشرة" target="_blank" {% endif %}>
-                                    {{ file_item.title }}
-                                </a>
-                            </h5>
-                            <button type="button"
-                                class="btn btn-sm p-0 file-read-toggle flex-shrink-0 ms-2 {% if file_item.current_user_marked_as_read %}read btn-outline-success{% else %}unread btn-outline-secondary{% endif %}"
-                                data-file-id="{{ file_item.pk }}"
-                                title="{% if file_item.current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
-                                <i class="fa{% if file_item.current_user_marked_as_read %}s{% else %}r{% endif %} fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <p class="card-text small text-muted flex-grow-1">
-                            {% if file_item.description %}
-                                {{ file_item.description|truncatewords_html:15 }}
-                            {% else %}
-                                لا يوجد وصف متاح.
-                            {% endif %}
-                        </p>
-                        <div class="mt-auto">
-                            <hr class="my-2">
-                            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
-                                <span>
-                                    {% if file_item.subject %}
-                                        <i class="fas fa-book me-1"></i>{{ file_item.subject.name }}
-                                    {% endif %}
-                                    {% if file_item.file_type %}
-                                        <span class="badge bg-secondary ms-1">{{ file_item.file_type.name }}</span>
-                                    {% endif %}
-                                </span>
-                                <span>
-                                    <i class="far fa-clock me-1"></i>{{ file_item.uploaded_at|timesince }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-light text-center py-2">
-                        <a href="{{ file_item.file_url }}"
-            
-                           class="btn btn-sm btn-success w-100"
-                            download="{{ file_item.title }}.pdf">
-                            <i class="fas fa-download"></i>
-                            {% if file_item.file_extension == '.pdf' %}تنزيل PDF{% else %}تنزيل / معاينة{% endif %}
-                            {% if file_item.current_user_marked_as_read %}
-                                <i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>
-                            {% endif %}
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% if is_paginated %}
-            {% include "partials/_pagination.html" %}
-        {% endif %}
-    {% else %}
-        <div class="alert alert-info text-center shadow-sm">
-            <h4 class="alert-heading"><i class="fas fa-info-circle"></i> لا توجد ملفات!</h4>
-            <p>لا توجد ملفات أو مصادر رئيسية متاحة حالياً.</p>
-        </div>
-    {% endif %}
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0 flex-grow-1">
+                                <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}"
+                                   {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل مباشر" target="_blank" {% endif %}>
+                                    {{ file_item.title }}
+                                </a>
+                            </h5>
+                            <button type="button"
+                                class="btn btn-sm p-0 file-read-toggle flex-shrink-0 ms-2 {% if file_item.current_user_marked_as_read %}read btn-outline-success{% else %}unread btn-outline-secondary{% endif %}"
+                                data-file-id="{{ file_item.pk }}"
+                                title="{% if file_item.current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
+                                <i class="fa{% if file_item.current_user_marked_as_read %}s{% else %}r{% endif %} fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <p class="card-text small text-muted flex-grow-1">
+                            {% if file_item.description %}
+                                {{ file_item.description|truncatewords_html:15 }}
+                            {% else %}
+                                لا يوجد وصف متاح.
+                            {% endif %}
+                        </p>
+                        <div class="mt-auto">
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+                                <span>
+                                    {% if file_item.subject %}<i class="fas fa-book me-1"></i>{{ file_item.subject.name }}{% endif %}
+                                    {% if file_item.file_type %}<span class="badge bg-secondary ms-1">{{ file_item.file_type.name }}</span>{% endif %}
+                                </span>
+                                <span>
+                                    <i class="far fa-clock me-1"></i>{{ file_item.uploaded_at|timesince }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-center py-2">
+                        <a href="{{ file_item.file_url }}" 
+                            target="_blank" 
+                            class="btn btn-sm btn-success w-100"
+                            download="{{ file_item.title }}{{ file_item.file_extension }}"> {# خاصية download لفرض التنزيل #}
+                            <i class="fas fa-download"></i> تنزيل الملف
+                            {% if file_item.current_user_marked_as_read %}
+                                <i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if is_paginated %}
+            {% include "partials/_pagination.html" %}
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center shadow-sm">
+            <h4 class="alert-heading"><i class="fas fa-info-circle"></i> لا توجد ملفات!</h4>
+            <p>لا توجد ملفات أو مصادر رئيسية متاحة حالياً.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock content %}
 
@@ -186,66 +146,67 @@
 {{ block.super }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-    document.querySelectorAll('.file-read-toggle').forEach(button => {
-        button.addEventListener('click', function() {
-            const fileId = this.dataset.fileId;
-            const iconElement = this.querySelector('i');
-            const fileCard = this.closest('.file-card');
-            const downloadButton = fileCard ? fileCard.querySelector('.card-footer a.btn-success') : null;
-            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken
-                },
-                body: `file_id=${fileId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const readIconHtml = '<i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>';
-                    if (data.marked_as_read) {
-                        this.classList.remove('unread', 'btn-outline-secondary');
-                        this.classList.add('read', 'btn-outline-success');
-                        this.title = 'تمييز كغير مقروء';
-                        iconElement.classList.remove('far');
-                        iconElement.classList.add('fas');
-                        if (downloadButton && !downloadButton.querySelector('.fa-check-circle')) {
-                            downloadButton.insertAdjacentHTML('beforeend', readIconHtml);
-                        }
-                    } else {
-                        this.classList.remove('read', 'btn-outline-success');
-                        this.classList.add('unread', 'btn-outline-secondary');
-                        this.title = 'تمييز كمقروء';
-                        iconElement.classList.remove('fas');
-                        iconElement.classList.add('far');
-                        if (downloadButton) {
-                            const existingCheck = downloadButton.querySelector('.fa-check-circle');
-                            if (existingCheck) existingCheck.remove();
-                        }
-                    }
-                } else {
-                    console.error('Error toggling read status:', data.message);
-                }
-            })
-            .catch(error => console.error('Fetch error:', error));
-        });
-    });
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    document.querySelectorAll('.file-read-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            const fileId = this.dataset.fileId;
+            const iconElement = this.querySelector('i');
+            const fileCard = this.closest('.file-card');
+            const downloadButton = fileCard ? fileCard.querySelector('.card-footer a.btn-success') : null;
+
+            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `file_id=${fileId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const readIconHtml = '<i class="fas fa-check-circle text-white ms-1" style="opacity:0.7;" title="مقروء"></i>';
+                    if (data.marked_as_read) {
+                        this.classList.remove('unread', 'btn-outline-secondary');
+                        this.classList.add('read', 'btn-outline-success');
+                        this.title = 'تمييز كغير مقروء';
+                        iconElement.classList.remove('far');
+                        iconElement.classList.add('fas');
+                        if (downloadButton && !downloadButton.querySelector('.fa-check-circle')) {
+                            downloadButton.insertAdjacentHTML('beforeend', readIconHtml);
+                        }
+                    } else {
+                        this.classList.remove('read', 'btn-outline-success');
+                        this.classList.add('unread', 'btn-outline-secondary');
+                        this.title = 'تمييز كمقروء';
+                        iconElement.classList.remove('fas');
+                        iconElement.classList.add('far');
+                        if (downloadButton) {
+                            const existingCheck = downloadButton.querySelector('.fa-check-circle');
+                            if (existingCheck) existingCheck.remove();
+                        }
+                    }
+                } else {
+                    console.error('Error toggling read status:', data.message);
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+        });
+    });
 });
 </script>
 {% endblock extra_scripts %}
