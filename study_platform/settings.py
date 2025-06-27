@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- إعدادات الأمان الأساسية ---
 # SECRET_KEY: يجب أن تكون سرية جداً، ويفضل أن تُقرأ من متغيرات البيئة في الإنتاج.
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-very-secret-key-replace-me-in-production!') # قم بتغيير هذا في الإنتاج
+SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE') # قم بتغيير هذا في الإنتاج
 
 # DEBUG: يجب أن تكون False في الإنتاج!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 't')
