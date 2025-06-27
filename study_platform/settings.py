@@ -41,6 +41,10 @@ elif DEBUG:
 X_FRAME_OPTIONS = 'ALLOWALL'
 
 # --- تعريف التطبيقات (المهم هنا) ---
+# ملاحظة هامة: لكل تطبيق مدرج هنا مثل 'accounts.apps.AccountsConfig'،
+# يجب أن يكون لديك ملف 'apps.py' داخل مجلد التطبيق (مثال: accounts/apps.py)
+# وهذا الملف يجب أن يحتوي على كلاس AppConfig بالاسم الصحيح (مثال: class AccountsConfig(AppConfig):)
+# إذا كان هذا الملف أو الكلاس مفقوداً/غير صحيحاً، فسيؤدي ذلك إلى ModuleNotFoundError.
 INSTALLED_APPS = [
     # تطبيقات Django الأساسية
     'django.contrib.admin',
@@ -64,7 +68,7 @@ INSTALLED_APPS = [
     'files_manager.apps.FilesManagerConfig',
     'news.apps.NewsConfig',
     'notes.apps.NotesConfig',
-    'tasks.apps.TasksConfig',
+    'tasks.apps.TasksConfig', # تأكد أن هذا السطر يشير إلى apps.py بشكل صحيح إذا كان TasksConfig موجودًا
     # إذا كان لديك تطبيق homepage منفصل عن core، أضفه هنا
     # 'homepage', # إذا كانت homepage تطبيقاً مستقلاً
 ]
