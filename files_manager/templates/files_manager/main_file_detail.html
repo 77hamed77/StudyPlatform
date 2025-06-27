@@ -1,257 +1,184 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ file_obj.title }} - تفاصيل الملف{% endblock %} {# افترض أن الـ context_object_name هو file_obj #}
+{% block title %}{{ file_obj.title }} - تفاصيل الملف{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
 <style>
-    .file-preview-container {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        background-color: #f9f9f9;
-        border-radius: 0.25rem;
-        min-height: 300px; /* ارتفاع أدنى لمنطقة المعاينة */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    body.dark-mode .file-preview-container {
-        background-color: #2a2a2a;
-        border-color: #444;
-    }
-    .file-preview-container iframe {
-        width: 100%;
-        min-height: 500px; /* ارتفاع جيد لمعاينة PDF */
-        border: none;
-    }
-    .file-preview-container img {
-        max-width: 100%;
-        max-height: 500px; /* ارتفاع أقصى للصور الكبيرة */
-        object-fit: contain;
-        border-radius: 0.25rem;
-    }
-    .file-meta-data dd {
-        margin-bottom: 0.75rem;
-    }
+    .file-preview-container {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 0.25rem;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    body.dark-mode .file-preview-container {
+        background-color: #2a2a2a;
+        border-color: #444;
+    }
+    .file-preview-container iframe {
+        width: 100%;
+        min-height: 500px;
+        border: none;
+    }
+    .file-preview-container img {
+        max-width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        border-radius: 0.25rem;
+    }
+    .file-meta-data dd {
+        margin-bottom: 0.75rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'files_manager:main_file_list' %}">الملفات الرئيسية</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ file_obj.title|truncatechars:50 }}</li>
-        </ol>
-    </nav>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'files_manager:main_file_list' %}">الملفات الرئيسية</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ file_obj.title|truncatechars:50 }}</li>
+        </ol>
+    </nav>
 
-    <div class="card shadow-lg">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>{{ file_obj.title }}</h4>
-            <div>
-                <button class="btn btn-sm {% if file_obj.current_user_marked_as_read %}btn-success{% else %}btn-outline-light{% endif %} me-2 file-read-toggle-detail"
-                        data-file-id="{{ file_obj.pk }}"
-                        title="{% if file_obj.current_user_marked_as_read %}تم تمييزه كمقروء{% else %}تمييز كمقروء{% endif %}">
-                    <i class="fas {% if file_obj.current_user_marked_as_read %}fa-bookmark{% else %}fa-bookmark{% endif %}"></i>
-                    <span class="ms-1 d-none d-md-inline">{% if file_obj.current_user_marked_as_read %}مقروء{% else %}تمييز كمقروء{% endif %}</span>
-                </button>
-                <a href="{{ file_obj.file_url }}" class="btn btn-sm btn-primary" target="_blank" download>
-                    <i class="fas fa-download"></i> تنزيل الملف
-                </a>
-            </div>
-        </div>
-        <div class="card-body p-4">
-            <div class="row">
-                <div class="col-lg-8 mb-4 mb-lg-0">
-                    <h5 class="mb-3">معاينة الملف:</h5>
-                    <div class="file-preview-container text-center">
-                        {% if file_obj.file.name|lower|slice:"-4:" == ".pdf" %}
-                            <iframe src="{{ file_obj.file_url }}" title="معاينة PDF لـ {{ file_obj.title }}"></iframe>
-                        {% elif file_obj.file.name|lower|slice:"-4:" == ".jpg" or file_obj.file.name|lower|slice:"-5:" == ".jpeg" or file_obj.file.name|lower|slice:"-4:" == ".png" or file_obj.file.name|lower|slice:"-4:" == ".gif" %}
-                            <img src="{{ file_obj.file_url }}" alt="معاينة صورة لـ {{ file_obj.title }}">
-                        {% else %}
-                            <p class="text-muted my-5">
-                                <i class="fas fa-eye-slash fa-3x mb-2"></i><br>
-                                المعاينة غير متاحة لهذا النوع من الملفات.<br>
-                                يمكنك <a href="{{ file_obj.file_url }}" target="_blank" download>تنزيل الملف</a> لعرضه.
-                            </p>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <h5 class="mb-3">تفاصيل الملف:</h5>
-                    <dl class="row file-meta-data">
-                        <dt class="col-sm-5"><i class="fas fa-book me-1"></i>المادة:</dt>
-                        <dd class="col-sm-7">{{ file_obj.subject.name|default:"غير محددة" }}</dd>
+    <div class="card shadow-lg">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>{{ file_obj.title }}</h4>
+            <div>
+                <button type="button"
+                    class="btn btn-sm {% if file_obj.current_user_marked_as_read %}btn-success{% else %}btn-outline-light{% endif %} me-2 file-read-toggle-detail"
+                    data-file-id="{{ file_obj.pk }}"
+                    title="{% if file_obj.current_user_marked_as_read %}تم تمييزه كمقروء{% else %}تمييز كمقروء{% endif %}">
+                    <i class="fa{% if file_obj.current_user_marked_as_read %}s{% else %}r{% endif %} fa-bookmark"></i>
+                    <span class="ms-1 d-none d-md-inline">{% if file_obj.current_user_marked_as_read %}مقروء{% else %}تمييز كمقروء{% endif %}</span>
+                </button>
+                <a href="{{ file_obj.file_url }}" class="btn btn-sm btn-primary" target="_blank" download>
+                    <i class="fas fa-download"></i> تنزيل الملف
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-lg-8 mb-4 mb-lg-0">
+                    <h5 class="mb-3">معاينة الملف:</h5>
+                    <div class="file-preview-container text-center">
+                        {% with ext=file_obj.file.name|lower|slice:"-4:" %}
+                        {% if ext == ".pdf" %}
+                            <iframe src="{{ file_obj.file_url }}" title="معاينة PDF لـ {{ file_obj.title }}"></iframe>
+                        {% elif ext == ".jpg" or file_obj.file.name|lower|slice:"-5:" == ".jpeg" or ext == ".png" or ext == ".gif" %}
+                            <img src="{{ file_obj.file_url }}" alt="معاينة صورة لـ {{ file_obj.title }}">
+                        {% else %}
+                            <p class="text-muted my-5">
+                                <i class="fas fa-eye-slash fa-3x mb-2"></i><br>
+                                المعاينة غير متاحة لهذا النوع من الملفات.<br>
+                                يمكنك <a href="{{ file_obj.file_url }}" target="_blank" download>تنزيل الملف</a> لعرضه.
+                            </p>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="mb-3">تفاصيل الملف:</h5>
+                    <dl class="row file-meta-data">
+                        <dt class="col-sm-5"><i class="fas fa-book me-1"></i>المادة:</dt>
+                        <dd class="col-sm-7">{{ file_obj.subject.name|default:"غير محددة" }}</dd>
 
-                        <dt class="col-sm-5"><i class="fas fa-chalkboard-teacher me-1"></i>المحاضر:</dt>
-                        <dd class="col-sm-7">{{ file_obj.lecturer.name|default:"غير محدد" }}</dd>
+                        <dt class="col-sm-5"><i class="fas fa-chalkboard-teacher me-1"></i>المحاضر:</dt>
+                        <dd class="col-sm-7">{{ file_obj.lecturer.name|default:"غير محدد" }}</dd>
 
-                        <dt class="col-sm-5"><i class="fas fa-file-code me-1"></i>نوع الملف:</dt>
-                        <dd class="col-sm-7">{{ file_obj.file_type.name|default:"غير محدد" }}</dd>
+                        <dt class="col-sm-5"><i class="fas fa-file-code me-1"></i>نوع الملف:</dt>
+                        <dd class="col-sm-7">{{ file_obj.file_type.name|default:"غير محدد" }}</dd>
 
-                        <dt class="col-sm-5"><i class="fas fa-calendar-alt me-1"></i>تاريخ الرفع:</dt>
-                        <dd class="col-sm-7">{{ file_obj.uploaded_at|date:"l, d F Y, P" }}</dd>
+                        <dt class="col-sm-5"><i class="fas fa-calendar-alt me-1"></i>تاريخ الرفع:</dt>
+                        <dd class="col-sm-7">{{ file_obj.uploaded_at|date:"l, d F Y, P" }}</dd>
 
-                        {% if file_obj.uploaded_by %}
-                        <dt class="col-sm-5"><i class="fas fa-user-tie me-1"></i>رُفع بواسطة:</dt>
-                        <dd class="col-sm-7">{{ file_obj.uploaded_by.username }}</dd>
-                        {% endif %}
+                        {% if file_obj.uploaded_by %}
+                        <dt class="col-sm-5"><i class="fas fa-user-tie me-1"></i>رُفع بواسطة:</dt>
+                        <dd class="col-sm-7">{{ file_obj.uploaded_by.username }}</dd>
+                        {% endif %}
 
-                        {% if file_obj.description %}
-                        <dt class="col-sm-12 mt-2"><i class="fas fa-info-circle me-1"></i>الوصف:</dt>
-                        <dd class="col-sm-12">{{ file_obj.description|linebreaksbr }}</dd>
-                        {% endif %}
-                    </dl>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer text-center">
-            <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الملفات
-            </a>
-        </div>
-    </div>
+                        {% if file_obj.description %}
+                        <dt class="col-sm-12 mt-2"><i class="fas fa-info-circle me-1"></i>الوصف:</dt>
+                        <dd class="col-sm-12">{{ file_obj.description|linebreaksbr }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الملفات
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 {{ block.super }}
 <script>
-// كود مشابه لـ file-read-toggle من قائمة الملفات، ولكن يستهدف زرًا مختلفًا
 document.addEventListener('DOMContentLoaded', function() {
-    const csrftoken = getCookie('csrftoken'); // تأكد أن هذه الدالة موجودة
-    const toggleButtonDetail = document.querySelector('.file-read-toggle-detail');
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    const toggleButtonDetail = document.querySelector('.file-read-toggle-detail');
 
-    if (toggleButtonDetail) {
-        toggleButtonDetail.addEventListener('click', function() {
-            const fileId = this.dataset.fileId;
-            const iconElement = this.querySelector('i');
-            const buttonTextSpan = this.querySelector('span');
+    if (toggleButtonDetail) {
+        toggleButtonDetail.addEventListener('click', function() {
+            const fileId = this.dataset.fileId;
+            const iconElement = this.querySelector('i');
+            const buttonTextSpan = this.querySelector('span');
 
-            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken
-                },
-                body: `file_id=${fileId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.marked_as_read) {
-                        this.classList.remove('btn-outline-light');
-                        this.classList.add('btn-success');
-                        this.title = 'تم تمييزه كمقروء';
-                        if (buttonTextSpan) buttonTextSpan.textContent = 'مقروء';
-                        iconElement.classList.remove('far'); // إذا كنت تستخدم أيقونة فارغة
-                        iconElement.classList.add('fas');
-                    } else {
-                        this.classList.remove('btn-success');
-                        this.classList.add('btn-outline-light');
-                        this.title = 'تمييز كمقروء';
-                        if (buttonTextSpan) buttonTextSpan.textContent = 'تمييز كمقروء';
-                        iconElement.classList.remove('fas');
-                        iconElement.classList.add('far'); // أو الأيقونة الفارغة المناسبة
-                    }
-                } else {
-                    console.error('Error toggling read status:', data.message);
-                }
-            })
-            .catch(error => console.error('Fetch error:', error));
-        });
-    }
-    // دالة getCookie
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+            fetch("{% url 'files_manager:toggle_file_read_status' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `file_id=${fileId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.marked_as_read) {
+                        this.classList.remove('btn-outline-light');
+                        this.classList.add('btn-success');
+                        this.title = 'تم تمييزه كمقروء';
+                        if (buttonTextSpan) buttonTextSpan.textContent = 'مقروء';
+                        iconElement.classList.remove('far');
+                        iconElement.classList.add('fas');
+                    } else {
+                        this.classList.remove('btn-success');
+                        this.classList.add('btn-outline-light');
+                        this.title = 'تمييز كمقروء';
+                        if (buttonTextSpan) buttonTextSpan.textContent = 'تمييز كمقروء';
+                        iconElement.classList.remove('fas');
+                        iconElement.classList.add('far');
+                    }
+                } else {
+                    console.error('Error toggling read status:', data.message);
+                }
+            })
+            .catch(error => console.error('Fetch error:', error));
+        });
+    }
 });
 </script>
-{% endblock %}
-my_student_summaries_list.html
-{% extends "base.html" %}
-
-{% block title %}ملخصاتي المرفوعة - {{ block.super }}{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h2 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>ملخصاتي المرفوعة</h2>
-        <a href="{% url 'files_manager:student_summary_upload' %}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-1"></i> رفع ملخص جديد
-        </a>
-    </div>
-
-    {% if my_summaries %} {# افترض أن الـ context_object_name هو my_summaries #}
-        <div class="table-responsive shadow-sm rounded">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">العنوان</th>
-                        <th scope="col">المادة</th>
-                        <th scope="col">تاريخ الرفع</th>
-                        <th scope="col" class="text-center">الحالة</th>
-                        <th scope="col">ملاحظات المشرف</th>
-                        {# <th scope="col" class="text-center">الإجراءات</th> #}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for summary in my_summaries %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>
-                            <a href="{{ summary.file_url }}" target="_blank" title="تنزيل/معاينة {{ summary.title }}">
-                                {{ summary.title|truncatechars:40 }}
-                            </a>
-                        </td>
-                        <td>{{ summary.subject.name }}</td>
-                        <td>{{ summary.uploaded_at|date:"d M Y, P" }}</td>
-                        <td class="text-center">
-                            {% if summary.status == 'pending' %}
-                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fas fa-hourglass-half me-1"></i>{{ summary.get_status_display }}</span>
-                            {% elif summary.status == 'approved' %}
-                                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fas fa-check-circle me-1"></i>{{ summary.get_status_display }}</span>
-                            {% elif summary.status == 'rejected' %}
-                                <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fas fa-times-circle me-1"></i>{{ summary.get_status_display }}</span>
-                            {% else %}
-                                <span class="badge bg-secondary rounded-pill px-3 py-2">{{ summary.get_status_display }}</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ summary.admin_notes|default_if_none:"-" }}</td>
-                        {# <td class="text-center">
-                            {% if summary.status == 'pending' %}
-                                <button class="btn btn-sm btn-outline-danger" disabled title="لا يمكن الحذف حالياً"><i class="fas fa-trash-alt"></i></button>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td> #}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% if is_paginated %}
-            {% include "partials/_pagination.html" %}
-        {% endif %}
-    {% else %}
-         <div class="alert alert-info text-center shadow-sm">
-            <h4 class="alert-heading"><i class="fas fa-info-circle"></i> لا توجد ملخصات!</h4>
-            <p>لا توجد ملخصات معتمدة من الطلاب متاحة حالياً. كن أول من <a href="{% url 'files_manager:student_summary_upload' %}" class="alert-link">يساهم بملخص!</a></p>
-        </div>
-    {% endif %}
-</div>
 {% endblock %}
