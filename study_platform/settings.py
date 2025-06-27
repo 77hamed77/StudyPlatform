@@ -1,6 +1,7 @@
 import os
 import dj_database_url
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _ # <--- أضف هذا السطر
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'default-django-secret-key-for-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
@@ -29,10 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # تطبيقات الطرف الثالث
     'crispy_forms',
-    'crispy_bootstrap5', # تأكد من أنك تستخدم هذا أو crispy_bootstrap4 بناءً على البوتستراب لديك
-    'widget_tweaks', # لإدارة الـ widgets في القوالب
-    # 'cloudinary', # <--- تم إزالة هذا
-    # 'cloudinary_storage', # <--- تم إزالة هذا
+    'crispy_bootstrap5',
+    'widget_tweaks',
     
     # تطبيقاتي
     'accounts',
@@ -42,9 +41,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # لتخديم الملفات الثابتة في الإنتاج
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', # لتفعيل الترجمة
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -57,7 +56,7 @@ ROOT_URLCONF = 'study_platform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # مجلد القوالب الرئيسي للمشروع
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,7 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media', # مهم للوصول إلى MEDIA_URL في القوالب
+                'django.template.context_processors.media',
             ],
         },
     }
@@ -75,8 +74,6 @@ WSGI_APPLICATION = 'study_platform.wsgi.application'
 
 
 # Database
-# إذا كان متغير البيئة DATABASE_URL موجوداً، استخدمه (للنشر مثلاً)
-# وإلا، استخدم SQLite لقاعدة البيانات المحلية للتطوير
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
@@ -84,7 +81,6 @@ if DATABASE_URL:
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # إعدادات SQLite للتطوير المحلي إذا لم يتم تحديد DATABASE_URL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -95,8 +91,6 @@ else:
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -114,15 +108,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
-LANGUAGE_CODE = 'ar' # تعيين اللغة الافتراضية إلى العربية
+LANGUAGE_CODE = 'ar'
 
 TIME_ZONE = 'UTC'
 
-USE_I18N = True # تفعيل الترجمة
-USE_L10N = True # تفعيل التوطين (الخاص بالتواريخ والأرقام)
-USE_TZ = True # تفعيل دعم المناطق الزمنية
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
 
 # قائمة اللغات المدعومة
 LANGUAGES = [
@@ -131,25 +123,20 @@ LANGUAGES = [
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale', # مسار ملفات الترجمة
+    BASE_DIR / 'locale',
 ]
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static', # مجلد الملفات الثابتة في جذر المشروع
+    BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles' # المجلد الذي سيجمع فيه collectstatic الملفات
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (user uploaded files)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media' # المجلد الذي ستُخزن فيه الملفات المرفوعة
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -162,47 +149,4 @@ LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'homepage:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
-# Cloudinary configuration (REMOVE THESE)
-# CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
-# CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
-# CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
-#
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' # <--- تم إزالة هذا
-
-# Configure Django's built-in file storage for media files
-# This line is IMPORTANT for local storage if not using Cloudinary or other cloud storage
-# If DEFAULT_FILE_STORAGE is not defined, Django defaults to FileSystemStorage (local)
-# So, we simply ensure it's not pointing to Cloudinary.
-# If you wanted to explicitly set it to local storage, you would use:
-# DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage' 
-# However, this is the default, so removing the Cloudinary line is often enough.
-
-
-# Set X_FRAME_OPTIONS to ALLOWALL for iframe embedding
 X_FRAME_OPTIONS = 'ALLOWALL'
-
-# CORS Headers (if needed for API calls from different origins)
-# CORS_ALLOWED_ORIGINS = [
-#     "https://your-frontend-domain.com",
-#     "http://localhost:3000",
-# ]
-# CORS_ALLOW_METHODS = [
-#     "DELETE",
-#     "GET",
-#     "OPTIONS",
-#     "POST",
-#     "PUT",
-# ]
-# CORS_ALLOW_HEADERS = [
-#     "accept",
-#     "accept-encoding",
-#     "authorization",
-#     "content-type",
-#     "dnt",
-#     "origin",
-#     "user-agent",
-#     "x-csrftoken",
-#     "x-requested-with",
-# ]
-# CORS_ALLOW_CREDENTIALS = True
-
