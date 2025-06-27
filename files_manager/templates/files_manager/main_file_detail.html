@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %} {# تأكد من تحميل static لصور placeholder #}
+{% load static %}
 
 {% block title %}{{ file_obj.title }} - {{ block.super }}{% endblock %}
 
@@ -78,8 +78,13 @@
             </div>
             
             <div class="d-grid gap-2 mt-4">
-                <a href="{{ file_obj.file_url }}" target="_blank" class="btn btn-success btn-lg">
-                    <i class="fas fa-download me-2"></i> تنزيل / معاينة الملف الأصلي
+                <a href="{{ file_obj.file_url }}" 
+                    target="_blank" 
+                    class="btn btn-success btn-lg"
+                    {# أضف خاصية download هنا إذا كان الملف PDF لفرض التنزيل #}
+                    {% if file_obj.file_extension == '.pdf' %} download="{{ file_obj.title }}.pdf" {% endif %}>
+                    <i class="fas fa-download me-2"></i>
+                    {% if file_obj.file_extension == '.pdf' %}تنزيل PDF{% else %}تنزيل / معاينة الملف الأصلي{% endif %}
                 </a>
                 <button type="button" id="toggleReadStatusBtn" 
                         class="btn btn-outline-info mt-2 {% if current_user_marked_as_read %}active{% endif %}"
@@ -123,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const csrftoken = getCookie('csrftoken');
         toggleReadStatusBtn.addEventListener('click', function() {
             const fileId = this.dataset.fileId;
-            const button = this; // الإشارة إلى الزر نفسه
+            const button = this;
 
             fetch("{% url 'files_manager:toggle_file_read_status' %}", {
                 method: 'POST',
@@ -139,11 +144,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.marked_as_read) {
                         button.classList.add('active');
                         button.classList.remove('btn-outline-info');
-                        button.classList.add('btn-info'); // أو أي فئة لونية مناسبة
+                        button.classList.add('btn-info');
                         button.querySelector('i').classList.remove('far');
                         button.querySelector('i').classList.add('fas');
                         button.title = 'تمييز كغير مقروء';
-                        button.lastChild.textContent = 'مقروء'; // تحديث نص الزر
+                        button.lastChild.textContent = 'مقروء';
                     } else {
                         button.classList.remove('active');
                         button.classList.remove('btn-info');
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         button.querySelector('i').classList.remove('fas');
                         button.querySelector('i').classList.add('far');
                         button.title = 'تمييز كمقروء';
-                        button.lastChild.textContent = 'تمييز كمقروء'; // تحديث نص الزر
+                        button.lastChild.textContent = 'تمييز كمقروء';
                     }
                 } else {
                     console.error('Error toggling read status:', data.message);
