@@ -130,7 +130,7 @@
         </div>
     {% endif %}
 </div>
-{% endblock %}
+{% endblock content %} {# <--- تأكد أن هذا هو المكان الوحيد لـ endblock content #}
 
 {% block extra_scripts %}
 {{ block.super }}
@@ -206,3 +206,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+{% endblock extra_scripts %}
