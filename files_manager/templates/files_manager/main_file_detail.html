@@ -6,13 +6,11 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-    /* أضف أي أنماط إضافية هنا لصفحة التفاصيل */
     .file-detail-container {
         max-width: 900px;
         margin: 0 auto;
         padding: 20px;
     }
-    /* تم إزالة الأنماط الخاصة بمعاينة الصور/PDF حيث لم تعد هناك معاينات مرئية */
 </style>
 {% endblock %}
 
@@ -23,22 +21,36 @@
             <h3 class="mb-0">{{ file_obj.title }}</h3>
         </div>
         <div class="card-body p-4">
-            {# تم إزالة الحاوية file-detail-img-viewer ومنطق عرض المعاينة #}
-
             <p class="lead">{{ file_obj.description|default:"لا يوجد وصف لهذا الملف." }}</p>
             <hr>
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <p><strong><i class="fas fa-book me-1"></i>المادة:</strong> {% if file_obj.subject %}{{ file_obj.subject.name }}{% else %}غير محددة{% endif %}</p>
+                    <p>
+                        <strong><i class="fas fa-book me-1"></i>المادة:</strong>
+                        {% if file_obj.subject %}{{ file_obj.subject.name }}{% else %}غير محددة{% endif %}
+                    </p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong><i class="fas fa-file-alt me-1"></i>نوع الملف:</strong> {% if file_obj.file_type %}{{ file_obj.file_type.name }}{% else %}غير محدد{% endif %}</p>
+                    <p>
+                        <strong><i class="fas fa-file-alt me-1"></i>نوع الملف:</strong>
+                        {% if file_obj.file_type %}{{ file_obj.file_type.name }}{% else %}غير محدد{% endif %}
+                    </p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong><i class="fas fa-user-tie me-1"></i>المحاضر/الرافع:</strong> {{ file_obj.uploaded_by.get_full_name|default:file_obj.uploaded_by.username }}</p>
+                    <p>
+                        <strong><i class="fas fa-user-tie me-1"></i>المحاضر/الرافع:</strong>
+                        {% if file_obj.uploaded_by %}
+                            {{ file_obj.uploaded_by.get_full_name|default:file_obj.uploaded_by.username }}
+                        {% else %}
+                            غير محدد
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong><i class="far fa-calendar-alt me-1"></i>تاريخ الرفع:</strong> {{ file_obj.uploaded_at|date:"Y-m-d H:i" }}</p>
+                    <p>
+                        <strong><i class="far fa-calendar-alt me-1"></i>تاريخ الرفع:</strong>
+                        {{ file_obj.uploaded_at|date:"Y-m-d H:i" }}
+                    </p>
                 </div>
             </div>
             
@@ -46,15 +58,15 @@
                 <a href="{{ file_obj.file_url }}" 
                     target="_blank" 
                     class="btn btn-success btn-lg"
-                    download="{{ file_obj.title }}{{ file_obj.file_extension }}"> {# خاصية download لفرض التنزيل #}
+                    download="{{ file_obj.title }}{{ file_obj.file_extension }}">
                     <i class="fas fa-download me-2"></i> تنزيل الملف الأصلي
                 </a>
-                <button type="button" id="toggleReadStatusBtn" 
-                        class="btn btn-outline-info mt-2 {% if current_user_marked_as_read %}active{% endif %}"
+                <button type="button" id="toggleReadStatusBtn"
+                        class="btn btn-outline-info mt-2 {% if current_user_marked_as_read %}active btn-info{% endif %}"
                         data-file-id="{{ file_obj.pk }}"
                         title="{% if current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
                     <i class="fa{% if current_user_marked_as_read %}s{% else %}r{% endif %} fa-bookmark me-1"></i>
-                    {% if current_user_marked_as_read %}مقروء{% else %}تمييز كمقروء{% endif %}
+                    <span class="read-btn-text">{% if current_user_marked_as_read %}مقروء{% else %}تمييز كمقروء{% endif %}</span>
                 </button>
             </div>
         </div>
@@ -92,6 +104,8 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleReadStatusBtn.addEventListener('click', function() {
             const fileId = this.dataset.fileId;
             const button = this;
+            const icon = button.querySelector('i');
+            const btnText = button.querySelector('.read-btn-text');
 
             fetch("{% url 'files_manager:toggle_file_read_status' %}", {
                 method: 'POST',
@@ -105,21 +119,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.status === 'success') {
                     if (data.marked_as_read) {
-                        button.classList.add('active');
+                        button.classList.add('active', 'btn-info');
                         button.classList.remove('btn-outline-info');
-                        button.classList.add('btn-info');
-                        button.querySelector('i').classList.remove('far');
-                        button.querySelector('i').classList.add('fas');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
                         button.title = 'تمييز كغير مقروء';
-                        button.lastChild.textContent = 'مقروء';
+                        if (btnText) btnText.textContent = 'مقروء';
                     } else {
-                        button.classList.remove('active');
-                        button.classList.remove('btn-info');
+                        button.classList.remove('active', 'btn-info');
                         button.classList.add('btn-outline-info');
-                        button.querySelector('i').classList.remove('fas');
-                        button.querySelector('i').classList.add('far');
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
                         button.title = 'تمييز كمقروء';
-                        button.lastChild.textContent = 'تمييز كمقروء';
+                        if (btnText) btnText.textContent = 'تمييز كمقروء';
                     }
                 } else {
                     console.error('Error toggling read status:', data.message);
