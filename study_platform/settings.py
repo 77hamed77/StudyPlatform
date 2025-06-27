@@ -40,11 +40,8 @@ elif DEBUG:
 # X_FRAME_OPTIONS: لإصلاح مشكلة iframe في بيئة Canvas/Koyeb
 X_FRAME_OPTIONS = 'ALLOWALL'
 
-# --- تعريف التطبيقات (المهم هنا) ---
-# ملاحظة هامة: لكل تطبيق مدرج هنا مثل 'accounts.apps.AccountsConfig'،
-# يجب أن يكون لديك ملف 'apps.py' داخل مجلد التطبيق (مثال: accounts/apps.py)
-# وهذا الملف يجب أن يحتوي على كلاس AppConfig بالاسم الصحيح (مثال: class AccountsConfig(AppConfig):)
-# إذا كان هذا الملف أو الكلاس مفقوداً/غير صحيحاً، فسيؤدي ذلك إلى ModuleNotFoundError.
+# --- تعريف التطبيقات (الآن بناءً على هيكلية مشروعك) ---
+# تأكد أن هذه التطبيقات موجودة فعلاً في مشروعك ولديها ملف apps.py صحيح.
 INSTALLED_APPS = [
     # تطبيقات Django الأساسية
     'django.contrib.admin',
@@ -58,24 +55,22 @@ INSTALLED_APPS = [
     # تطبيقات الطرف الثالث
     'crispy_forms',
     'crispy_bootstrap5',
-    'widget_tweaks', # تم التأكد من وجوده في requirements.txt
+    'widget_tweaks',
 
     # تطبيقاتك الخاصة (الآن مسارات صحيحة بناءً على هيكلية مشروعك)
-    'accounts.apps.AccountsConfig', # افتراض أن accounts لديها ملف apps.py
+    # 'accounts.apps.AccountsConfig', # <--- تم إزالة هذا السطر لأن التطبيق غير موجود
     'achievements.apps.AchievementsConfig',
     'core.apps.CoreConfig',
     'exam_prep.apps.ExamPrepConfig',
     'files_manager.apps.FilesManagerConfig',
     'news.apps.NewsConfig',
     'notes.apps.NotesConfig',
-    'tasks.apps.TasksConfig', # تأكد أن هذا السطر يشير إلى apps.py بشكل صحيح إذا كان TasksConfig موجودًا
-    # إذا كان لديك تطبيق homepage منفصل عن core، أضفه هنا
-    # 'homepage', # إذا كانت homepage تطبيقاً مستقلاً
+    'tasks.apps.TasksConfig',
 ]
 
 # --- إعدادات Crispy Forms ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5" # تم تغيير crispy_default_template_pack إلى crispy_template_pack
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # --- Middleware (طبقات الوسيط) ---
 MIDDLEWARE = [
@@ -146,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # --- الترجمة والعولمة (Internationalization) ---
-LANGUAGE_CODE = 'ar' # تعيين اللغة الافتراضية إلى العربية (تم إصلاح خطأ الاسم هنا)
+LANGUAGE_CODE = 'ar' # تعيين اللغة الافتراضية إلى العربية
 TIME_ZONE = 'Asia/Riyadh' # تعيين المنطقة الزمنية الخاصة بك
 
 USE_I18N = True # تفعيل الترجمة
@@ -181,9 +176,12 @@ MEDIA_ROOT = BASE_DIR / 'media' # المجلد الذي ستُخزن فيه ال
 
 
 # --- إعدادات المصادقة (Authentication) ---
-LOGIN_URL = 'accounts:login' # مسار صفحة تسجيل الدخول
-LOGIN_REDIRECT_URL = 'homepage:home' # المسار بعد تسجيل الدخول بنجاح (افترضت homepage هنا)
-LOGOUT_REDIRECT_URL = 'accounts:login' # المسار بعد تسجيل الخروج
+# إذا لم يكن لديك تطبيق accounts، فأين يتم التعامل مع تسجيل الدخول/الخروج؟
+# سأفترض أن هذه المسارات يتم التعامل معها بواسطة تطبيق core أو مباشرة في study_platform/urls.py
+# الرجاء التأكد من هذه المسارات بناءً على كيفية التعامل مع المصادقة لديك.
+LOGIN_URL = 'login' # عادةً 'accounts:login' ولكن نغيرها إذا لا يوجد تطبيق accounts
+LOGIN_REDIRECT_URL = 'home' # المسار بعد تسجيل الدخول بنجاح
+LOGOUT_REDIRECT_URL = 'login' # المسار بعد تسجيل الخروج
 
 # --- إعدادات المفتاح الأساسي الافتراضي (Default Primary Key Field) ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
