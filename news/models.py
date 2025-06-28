@@ -1,13 +1,11 @@
-# news/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
-import os # لاستخدامه في validate_file_extension
+import os
 
-# --- دالات التحقق من الملفات (إذا لم تكن موجودة بالفعل) ---
 def validate_file_extension(value):
     ext = os.path.splitext(value.name)[1]
     valid_extensions = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.txt', '.zip', '.rar', '.jpg', '.jpeg', '.png', '.gif']
@@ -18,7 +16,6 @@ def validate_file_size(value):
     limit = 10 * 1024 * 1024  # 10MB
     if value.size > limit:
         raise models.ValidationError(_(f"حجم الملف كبير جدًا. الحد الأقصى المسموح به هو {limit / (1024*1024):.0f}MB."))
-
 
 class NewsCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("اسم التصنيف"))
@@ -35,15 +32,15 @@ class NewsItem(models.Model):
     title = models.CharField(max_length=200, verbose_name=_("عنوان الخبر"))
     slug = models.SlugField(
         max_length=220,
-        unique=True, # هذا هو القيد الذي نريد تطبيقه
-        blank=True, # اسمح بأن يكون فارغًا ليتم إنشاؤه تلقائيًا
+        unique=True,
+        blank=True,
         verbose_name=_("الاسم اللطيف (Slug) للـ URL"),
         help_text=_("يُستخدم في الـ URL، عادةً ما يتم إنشاؤه تلقائيًا من العنوان إذا تُرك فارغًا.")
     )
     content = models.TextField(verbose_name=_("محتوى الخبر"))
     excerpt = models.TextField(blank=True, verbose_name=_("مقتطف (اختياري)"), help_text=_("مقدمة قصيرة..."))
     category = models.ForeignKey(NewsCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='news_items', verbose_name=_("التصنيف"))
-    image = models.ImageField(upload_to='news_images/%Y/%m/', blank=True, null=True, verbose_name=_("صورة الخبر (اختياري)"), validators=[validate_file_size]) # إضافة مدقق الحجم
+    image = models.ImageField(upload_to='news_images/%Y/%m/', blank=True, null=True, verbose_name=_("صورة الخبر (اختياري)"), validators=[validate_file_size])
     publication_date = models.DateTimeField(default=timezone.now, verbose_name=_("تاريخ النشر"), db_index=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='authored_news', verbose_name=_("الناشر"))
     is_important = models.BooleanField(default=False, verbose_name=_("خبر مهم (مثبت)؟"), db_index=True, help_text=_("الأخبار الهامة..."))
@@ -57,27 +54,20 @@ class NewsItem(models.Model):
         return reverse('news:news_detail', kwargs={'year': self.publication_date.year, 'month': self.publication_date.month, 'day': self.publication_date.day, 'slug': self.slug})
 
     def save(self, *args, **kwargs):
-        if not self.slug and self.title: # تأكد أن العنوان موجود لإنشاء slug منه
+        if not self.slug and self.title:
             self.slug = slugify(self.title, allow_unicode=True)
-            
-            # منطق ضمان التفرد (يجب أن يكون هذا قبل super().save())
-            # إذا كان قيد unique=True موجودًا بالفعل في قاعدة البيانات، فإن هذا المنطق قد لا يكون ضروريًا هنا
-            # لأن قاعدة البيانات سترفع خطأ، ولكن من الجيد وجوده إذا لم يكن القيد موجودًا بعد.
-            # ومع ذلك، الـ data migration هو الذي يجب أن يعتني بالبيانات الموجودة.
-            # هذا المنطق هنا هو للكائنات الجديدة أو المحدثة.
-            
             original_slug_for_uniqueness_check = self.slug
             counter = 1
-            # إنشاء queryset لاستخدامه في التحقق
             queryset = NewsItem.objects.all()
-            if self.pk: # إذا كان الكائن موجودًا بالفعل (تعديل)
+            if self.pk:
                 queryset = queryset.exclude(pk=self.pk)
-            
             while queryset.filter(slug=self.slug).exists():
                 self.slug = f"{original_slug_for_uniqueness_check}-{counter}"
                 counter += 1
-        
         if not self.excerpt and self.content:
             from django.utils.html import strip_tags
             self.excerpt = strip_tags(self.content)[:150] + "..."
+        # إضافة هذا السطر لحل مشكلة النشر إذا تُرك الحقل فارغًا
+        if not self.publication_date:
+            self.publication_date = timezone.now()
         super().save(*args, **kwargs)

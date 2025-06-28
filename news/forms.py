@@ -1,6 +1,5 @@
-# news/forms.py
 from django import forms
-from .models import NewsItem, NewsCategory # استيراد الموديلات
+from .models import NewsItem, NewsCategory
 from django.utils.translation import gettext_lazy as _
 
 class NewsItemForm(forms.ModelForm):
@@ -11,9 +10,9 @@ class NewsItemForm(forms.ModelForm):
             'placeholder': _('أدخل عنوانًا جذابًا للخبر')
         })
     )
-    slug = forms.SlugField( # حقل الـ Slug
+    slug = forms.SlugField(
         label=_("الاسم اللطيف (Slug) للـ URL"),
-        required=False, # جعله غير إلزامي ليتم إنشاؤه تلقائيًا من الموديل
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': _('اتركه فارغًا ليتم إنشاؤه تلقائيًا، أو أدخل اسمًا فريدًا (حروف إنجليزية، أرقام، شرطات)')
@@ -24,10 +23,9 @@ class NewsItemForm(forms.ModelForm):
         label=_("محتوى الخبر الكامل"),
         widget=forms.Textarea(attrs={
             'class': 'form-control',
-            'rows': 12, # زيادة عدد الأسطر
+            'rows': 12,
             'placeholder': _('اكتب محتوى الخبر هنا بالتفصيل...')
         })
-        # يمكنك إضافة widget لمحرر نصوص متقدم هنا (مثل CKEditorWidget أو TinyMCEWidget)
     )
     excerpt = forms.CharField(
         label=_("مقتطف قصير (اختياري)"),
@@ -42,20 +40,20 @@ class NewsItemForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=NewsCategory.objects.all().order_by('name'),
         label=_("تصنيف الخبر"),
-        required=False, # جعل التصنيف اختياريًا
+        required=False,
         widget=forms.Select(attrs={'class': 'form-select'}),
         empty_label=_("--- اختر تصنيفًا (اختياري) ---")
     )
     image = forms.ImageField(
         label=_("صورة الخبر (اختياري)"),
         required=False,
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'}) # استخدام ClearableFileInput
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
     )
     publication_date = forms.DateTimeField(
         label=_("تاريخ ووقت النشر"),
         widget=forms.DateTimeInput(
             attrs={'class': 'form-control', 'type': 'datetime-local'},
-            format='%Y-%m-%dT%H:%M' # التنسيق المتوقع من datetime-local
+            format='%Y-%m-%dT%H:%M'
         ),
         required=False,
         help_text=_("إذا تُرك فارغًا، سيتم استخدام التاريخ والوقت الحاليين عند النشر الفعلي.")
@@ -67,7 +65,7 @@ class NewsItemForm(forms.ModelForm):
     )
     is_published = forms.BooleanField(
         label=_("نشر هذا الخبر على الموقع؟"),
-        required=False, # القيمة الافتراضية في الموديل هي True
+        required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         help_text=_("إلغاء التحديد لإبقاء الخبر كمسودة.")
     )
@@ -76,7 +74,7 @@ class NewsItemForm(forms.ModelForm):
         model = NewsItem
         fields = [
             'title',
-            'slug', # تضمين slug في الحقول
+            'slug',
             'content',
             'excerpt',
             'category',
@@ -85,23 +83,12 @@ class NewsItemForm(forms.ModelForm):
             'is_important',
             'is_published',
         ]
-        # labels و help_texts و widgets تم تعريفها للحقول أعلاه مباشرة
 
     def __init__(self, *args, **kwargs):
-        # يمكنك تمرير المستخدم للنموذج إذا كنت ستحتاجه لأي منطق خاص
-        # self.user = kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
-        
-        # إذا كان النموذج لتعديل كائن موجود وكان لديه صورة، يمكنك عرضها
         if self.instance and self.instance.pk and self.instance.image:
-            # هذا يتم التعامل معه عادة في القالب لعرض الصورة الحالية
             pass
-
-        # إذا لم يتم توفير تاريخ نشر، يمكنك تعيينه افتراضيًا للوقت الحالي
-        # (الموديل يعتني بهذا إذا كان required=False و default=timezone.now)
-        # if not self.initial.get('publication_date') and not (self.instance and self.instance.pk):
-        #     from django.utils import timezone
-        #     self.initial['publication_date'] = timezone.now()
+        # لا حاجة لتغيير قيمة initial هنا، الموديل سيعالجها
 
 class NewsCategoryForm(forms.ModelForm):
     name = forms.CharField(
@@ -113,7 +100,7 @@ class NewsCategoryForm(forms.ModelForm):
     )
     slug = forms.SlugField(
         label=_("الاسم اللطيف (Slug) للـ URL"),
-        required=False, # جعله غير إلزامي
+        required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': _('اتركه فارغًا ليتم إنشاؤه تلقائيًا')
