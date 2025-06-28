@@ -175,12 +175,10 @@ MEDIA_ROOT = BASE_DIR / 'media' # المجلد الذي ستُخزن فيه ال
 
 
 # --- إعدادات المصادقة (Authentication) ---
-# إذا لم يكن لديك تطبيق accounts، فأين يتم التعامل مع تسجيل الدخول/الخروج؟
-# سأفترض أن هذه المسارات يتم التعامل معها بواسطة تطبيق core أو مباشرة في study_platform/urls.py
-# الرجاء التأكد من هذه المسارات بناءً على كيفية التعامل مع المصادقة لديك.
-LOGIN_URL = 'login' # عادةً 'accounts:login' ولكن نغيرها إذا لا يوجد تطبيق accounts
-LOGIN_REDIRECT_URL = 'home' # المسار بعد تسجيل الدخول بنجاح
-LOGOUT_REDIRECT_URL = 'login' # المسار بعد تسجيل الخروج
+# الآن نستخدم المسار الصحيح بناءً على core/urls.py
+LOGIN_URL = 'login' # هذا يشير إلى URL باسم 'login' (إذا كان موجوداً)
+LOGIN_REDIRECT_URL = 'core:home' # <--- تم تحديث هذا ليتطابق مع core/urls.py
+LOGOUT_REDIRECT_URL = 'login' # بعد تسجيل الخروج، يعود إلى صفحة تسجيل الدخول
 
 # --- إعدادات المفتاح الأساسي الافتراضي (Default Primary Key Field) ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
