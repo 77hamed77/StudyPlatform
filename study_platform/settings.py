@@ -2,9 +2,9 @@ from pathlib import Path
 import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv # لاستخدام ملف .env محلياً
+from dotenv import load_dotenv  # لاستخدام ملف .env محلياً
 
-# NEW: استيراد gettext_lazy للترجمة في هذا الملف
+# استيراد gettext_lazy للترجمة
 from django.utils.translation import gettext_lazy as _
 
 # تحميل متغيرات البيئة من ملف .env للاختبار المحلي (إذا كان موجوداً)
@@ -14,34 +14,26 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- إعدادات الأمان الأساسية ---
-# SECRET_KEY: يجب أن تكون سرية جداً، ويفضل أن تُقرأ من متغيرات البيئة في الإنتاج.
-SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE') # قم بتغيير هذا في الإنتاج
+SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')  # يجب تغيير هذا في الإنتاج
 
-# DEBUG: يجب أن تكون False في الإنتاج!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 't')
 
-# ALLOWED_HOSTS: أسماء النطاقات التي يمكن لتطبيقك الاستجابة لها.
 ALLOWED_HOSTS = []
 KOYEB_PUBLIC_HOST = os.environ.get('DJANGO_ALLOWED_HOST')
 if KOYEB_PUBLIC_HOST:
     ALLOWED_HOSTS.append(KOYEB_PUBLIC_HOST)
-# أضف localhost و 127.0.0.1 للتطوير المحلي فقط
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
-# CSRF_TRUSTED_ORIGINS (مهم جداً في الإنتاج لمنع هجمات CSRF)
-# يجب أن تتطابق مع البروتوكول والنطاق الذي يصل منه المستخدمون.
 CSRF_TRUSTED_ORIGINS = []
 if not DEBUG and KOYEB_PUBLIC_HOST:
     CSRF_TRUSTED_ORIGINS.append(f'https://{KOYEB_PUBLIC_HOST}')
 elif DEBUG:
     CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
 
-# X_FRAME_OPTIONS: لإصلاح مشكلة iframe في بيئة Canvas/Koyeb
 X_FRAME_OPTIONS = 'ALLOWALL'
 
-# --- تعريف التطبيقات (الآن بناءً على هيكلية مشروعك) ---
-# تأكد أن هذه التطبيقات موجودة فعلاً في مشروعك ولديها ملف apps.py صحيح.
+# --- تعريف التطبيقات ---
 INSTALLED_APPS = [
     # تطبيقات Django الأساسية
     'django.contrib.admin',
@@ -49,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # يستخدم لتخديم الملفات الثابتة محلياً أثناء التطوير مع Whitenoise
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 
     # تطبيقات الطرف الثالث
@@ -57,7 +49,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'widget_tweaks',
 
-    # تطبيقاتك الخاصة (الآن مسارات صحيحة بناءً على هيكلية مشروعك)
+    # تطبيقاتك الخاصة
     'achievements.apps.AchievementsConfig',
     'core.apps.CoreConfig',
     'exam_prep.apps.ExamPrepConfig',
@@ -65,18 +57,21 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
+
+    # إضافة storages لدعم التخزين عبر Supabase
+    'storages',
 ]
 
 # --- إعدادات Crispy Forms ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# --- Middleware (طبقات الوسيط) ---
+# --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # لتخديم الملفات الثابتة في الإنتاج
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', # لتفعيل الترجمة
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -84,29 +79,27 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# --- إعدادات URL الرئيسية ---
 ROOT_URLCONF = 'study_platform.urls'
 
-# --- إعدادات القوالب (Templates) ---
+# --- إعدادات القوالب ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], # مجلد القوالب الرئيسي للمشروع
-        'APP_DIRS': True, # للبحث عن القوالب داخل مجلدات 'templates' في كل تطبيق
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media', # مهم للوصول إلى MEDIA_URL في القوالب
-                # 'core.context_processors.common_context', # إذا كان لديك هذا في core
+                'django.template.context_processors.media',
+                # 'core.context_processors.common_context', # إذا كنت تستخدمه
             ],
         },
     },
 ]
 
-# --- إعدادات WSGI (للإنتاج) ---
 WSGI_APPLICATION = 'study_platform.wsgi.application'
 
 # --- إعدادات قاعدة البيانات ---
@@ -126,12 +119,31 @@ else:
     }
     print("WARNING: DATABASE_URL environment variable not set. Using SQLite for local development.")
 
-# تأكيد وجود قاعدة بيانات افتراضية (يجب أن يعمل هذا الآن مع منطق SQLite أعلاه)
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
 
-# --- مصادقة كلمات المرور (Password Validation) ---
+##############################################
+# إعدادات ربط Django مع Supabase Storage (سعة تخزين خارجية للملفات)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA'  # Supabase service_role key
+AWS_SECRET_ACCESS_KEY = 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA'  # نفس المفتاح في الخانتين
+AWS_STORAGE_BUCKET_NAME = 'documents'  # اسم البكت الذي أنشأته في Supabase
+AWS_S3_ENDPOINT_URL = 'https://lnbxhoxjsvraumwckcsn.supabase.co/storage/v1/s3'
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+    'ACL': 'public-read',  # اجعل الملفات عامة للعرض المباشر
+}
+##############################################
+
+# --- مصادقة كلمات المرور ---
 AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
@@ -139,58 +151,48 @@ AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-# --- الترجمة والعولمة (Internationalization) ---
-LANGUAGE_CODE = 'ar' # تعيين اللغة الافتراضية إلى العربية
-TIME_ZONE = 'Asia/Riyadh' # تعيين المنطقة الزمنية الخاصة بك
+# --- الترجمة والعولمة ---
+LANGUAGE_CODE = 'ar'
+TIME_ZONE = 'Asia/Riyadh'
 
-USE_I18N = True # تفعيل الترجمة
-USE_TZ = True # تفعيل دعم المناطق الزمنية
+USE_I18N = True
+USE_TZ = True
 
-# قائمة اللغات المدعومة
 LANGUAGES = [
     ('en', _('English')),
     ('ar', _('Arabic')),
 ]
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale', # مسار ملفات الترجمة
+    BASE_DIR / 'locale',
 ]
 
 # --- الملفات الثابتة (Static Files) ---
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles_collected' # المجلد الذي سيجمع فيه collectstatic الملفات
+STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static', # مجلد الملفات الثابتة في جذر المشروع
+    BASE_DIR / 'static',
 ]
-# يستخدم Whitenoise لخدمة الملفات الثابتة بشكل فعال في الإنتاج
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 # --- ملفات الوسائط (Media Files - المرفوعة من المستخدمين) ---
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media' # المجلد الذي ستُخزن فيه الملفات المرفوعة محلياً
+# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Supabase فقط
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
 
-# هذا السطر مهم جداً: تأكد أنه غير موجود أو معلق عليه إذا كنت لا تستخدم Cloudinary
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# --- إعدادات المصادقة ---
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'core:home'
+LOGOUT_REDIRECT_URL = 'login'
 
-
-# --- إعدادات المصادقة (Authentication) ---
-# الآن نستخدم المسار الصحيح بناءً على core/urls.py
-LOGIN_URL = 'login' # هذا يشير إلى URL باسم 'login' (إذا كان موجوداً)
-LOGIN_REDIRECT_URL = 'core:home' # <--- تم تحديث هذا ليتطابق مع core/urls.py
-LOGOUT_REDIRECT_URL = 'login' # بعد تسجيل الخروج، يعود إلى صفحة تسجيل الدخول
-
-# --- إعدادات المفتاح الأساسي الافتراضي (Default Primary Key Field) ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- فرض HTTPS في الإنتاج (إذا كان DEBUG=False) ---
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-# --- إعدادات التسجيل (Logging) ---
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -202,10 +204,10 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO', # يمكنك تغييرها إلى 'DEBUG' إذا كنت تريد المزيد من التفاصيل
+            'level': 'INFO',
             'propagate': True,
         },
-        '': { # لـ loggers التطبيق الأخرى (مثل تطبيقاتك الخاصة)
+        '': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
