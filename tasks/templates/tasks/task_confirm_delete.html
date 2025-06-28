@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="mb-4 text-danger">{% trans "تأكيد حذف المهمة" %}</h2>
+            <p class="lead">{% trans "هل أنت متأكد أنك تريد حذف هذه المهمة؟ لا يمكن التراجع عن هذا الإجراء." %}</p>
+            <div class="my-4">
+                <strong class="text-primary">{{ object.title }}</strong>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg me-2">
+                    {% trans "نعم، احذف المهمة" %}
+                </button>
+                <a href="{% url 'tasks:list' %}" class="btn btn-secondary btn-lg">
+                    {% trans "إلغاء" %}
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
