@@ -2,8 +2,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv  # لاستخدام ملف .env محلياً
-
+from dotenv import load_dotenv
 from django.utils.translation import gettext_lazy as _
 
 # تحميل متغيرات البيئة من ملف .env للاختبار المحلي (إذا كان موجوداً)
@@ -12,8 +11,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- إعدادات الأمان الأساسية ---
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')  # يفضل جعله في متغير بيئة
-
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'CHANGE_THIS_SECRET_KEY')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = []
@@ -56,7 +54,7 @@ INSTALLED_APPS = [
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
 
-    # دعم التخزين عبر Supabase
+    # دعم التخزين عبر Supabase/S3
     'storages',
 ]
 
@@ -117,14 +115,12 @@ else:
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
-##############################################
-# إعدادات ربط Django مع Supabase Storage (سعة تخزين خارجية للملفات)
+# --- إعدادات التخزين عبر Supabase/S3 (فقط للملفات الجديدة) ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA')  # Supabase service_role key
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'documents')
-AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://lnbxhoxjsvraumwckcsn.supabase.co/storage/v1/s3')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
@@ -135,7 +131,17 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
     'ACL': 'public-read',
 }
-##############################################
+
+# --- الملفات الثابتة (Static Files) ---
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# --- ملفات الوسائط (Media Files - المرفوعة من المستخدمين) ---
+# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Supabase/S3 فقط
 
 # --- مصادقة كلمات المرور ---
 AUTH_PASSWORD_VALIDATORS = [
@@ -160,19 +166,6 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
-
-# --- الملفات الثابتة (Static Files) ---
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# --- ملفات الوسائط (Media Files - المرفوعة من المستخدمين) ---
-# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Supabase فقط
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
 
 # --- إعدادات المصادقة ---
 LOGIN_URL = 'login'
