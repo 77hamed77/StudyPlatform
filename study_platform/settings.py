@@ -58,7 +58,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     # تطبيقاتك الخاصة (الآن مسارات صحيحة بناءً على هيكلية مشروعك)
-    # 'accounts.apps.AccountsConfig', # <--- تم إزالة هذا السطر لأن التطبيق غير موجود
     'achievements.apps.AchievementsConfig',
     'core.apps.CoreConfig',
     'exam_prep.apps.ExamPrepConfig',
