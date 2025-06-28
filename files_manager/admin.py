@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Subject, Lecturer, FileType, MainFile, StudentSummary, UserFileInteraction
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
 import os # تأكد من استيراد os إذا كنت تستخدم os.path.basename أو ما شابه
 
 @admin.register(Subject)
@@ -38,11 +39,12 @@ class FileTypeAdmin(admin.ModelAdmin):
 
 @admin.register(MainFile)
 class MainFileAdmin(admin.ModelAdmin):
-    list_display = ('title', 'subject', 'file_type', 'lecturer', 'uploaded_by_username', 'uploaded_at', 'file_size_display')
+    list_display = ('title', 'subject', 'file_type', 'lecturer', 'uploaded_by_username', 'uploaded_at', 'file_size_display', 'get_file_link')
     list_filter = ('subject', 'file_type', 'lecturer', 'uploaded_at', 'uploaded_by')
     search_fields = ('title', 'description', 'subject__name', 'lecturer__name', 'uploaded_by__username')
-    readonly_fields = ('uploaded_at', 'updated_at', 'uploaded_by') # جعل uploaded_by للقراءة فقط بعد الإنشاء
-    autocomplete_fields = ['subject', 'lecturer', 'file_type', 'uploaded_by']
+    # file_extension أضف إلى readonly_fields لأنه يتم تعيينه تلقائياً
+    readonly_fields = ('uploaded_at', 'updated_at', 'uploaded_by', 'file_extension')
+    autocomplete_fields = ['subject', 'lecturer', 'file_type'] # أزل 'uploaded_by' من هنا
     fieldsets = (
         (None, {
             'fields': ('title', 'description', 'file')
@@ -51,7 +53,7 @@ class MainFileAdmin(admin.ModelAdmin):
             'fields': ('subject', 'lecturer', 'file_type')
         }),
         (_('معلومات الرفع'), {
-            'fields': ('uploaded_by', 'uploaded_at', 'updated_at'),
+            'fields': ('uploaded_by', 'uploaded_at', 'updated_at', 'file_extension'), # أضف file_extension هنا
             'classes': ('collapse',)
         }),
     )
@@ -62,23 +64,29 @@ class MainFileAdmin(admin.ModelAdmin):
 
     @admin.display(description=_('حجم الملف'))
     def file_size_display(self, obj):
-        # هذا هو التعديل الذي يجب أن يكون مطبقاً
-        if obj.file and obj.file.size is not None:
-            size_bytes = obj.file.size
-            if size_bytes >= (1024 * 1024 * 1024): # GB
-                size_value = size_bytes / (1024 * 1024 * 1024)
-                unit = "GB"
-            elif size_bytes >= (1024 * 1024): # MB
-                size_value = size_bytes / (1024 * 1024)
-                unit = "MB"
-            elif size_bytes >= 1024: # KB
-                size_value = size_bytes / 1024
-                unit = "KB"
-            else:
-                size_value = size_bytes
-                unit = "Bytes"
-            return f"{size_value:.2f} {unit}"
-        return "-"
+        if obj.file and obj.file.name: # تأكد أن obj.file.name موجود
+            try:
+                size_in_bytes = obj.file.size
+                if size_in_bytes < 1024:
+                    return f"{size_in_bytes} Bytes"
+                elif size_in_bytes < 1024 * 1024:
+                    return f"{size_in_bytes / 1024:.2f} KB"
+                elif size_in_bytes < 1024 * 1024 * 1024:
+                    return f"{size_in_bytes / (1024 * 1024):.2f} MB"
+                else:
+                    return f"{size_in_bytes / (1024 * 1024 * 1024):.2f} GB"
+            except FileNotFoundError:
+                return _("ملف غير موجود") # رسالة واضحة للملفات المفقودة
+            except Exception as e: # للتعامل مع أي أخطاء أخرى غير متوقعة
+                return _(f"خطأ في الحجم ({e})")
+        return "-" # إذا لم يكن هناك ملف
+
+    @admin.display(description=_('رابط الملف'))
+    def get_file_link(self, obj):
+        if obj.file:
+            return format_html('<a href="{}" download="{}{}">تنزيل الملف</a>', obj.file.url, obj.title, obj.file_extension)
+        return _("لا يوجد ملف")
+    get_file_link.short_description = _("الملف") # لتغيير اسم العمود في قائمة الأدمن
 
     def save_model(self, request, obj, form, change):
         if not change: # عند الإنشاء فقط
@@ -91,13 +99,13 @@ class MainFileAdmin(admin.ModelAdmin):
 
 @admin.register(StudentSummary)
 class StudentSummaryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'subject', 'uploaded_by_username', 'status', 'uploaded_at_display', 'file_link')
+    list_display = ('title', 'subject', 'uploaded_by_username', 'status', 'uploaded_at_display', 'file_link', 'file_size_display')
     list_filter = ('status', 'subject', 'uploaded_by', 'uploaded_at')
     search_fields = ('title', 'subject__name', 'uploaded_by__username', 'admin_notes')
     list_editable = ('status',) # السماح بتعديل الحالة مباشرة
-    readonly_fields = ('uploaded_by', 'uploaded_at')
+    readonly_fields = ('uploaded_by', 'uploaded_at', 'file_extension') # أضف file_extension
     actions = ['approve_summaries', 'reject_summaries_with_note'] # تحسين اسم الإجراء
-    autocomplete_fields = ['subject', 'uploaded_by']
+    autocomplete_fields = ['subject'] # أزل 'uploaded_by' من هنا
     fieldsets = (
         (None, {
             'fields': ('title', 'file', 'subject')
@@ -106,7 +114,7 @@ class StudentSummaryAdmin(admin.ModelAdmin):
             'fields': ('status', 'admin_notes')
         }),
         (_('معلومات الرفع'), {
-            'fields': ('uploaded_by', 'uploaded_at'),
+            'fields': ('uploaded_by', 'uploaded_at', 'file_extension'), # أضف file_extension هنا
             'classes': ('collapse',)
         }),
     )
@@ -121,11 +129,29 @@ class StudentSummaryAdmin(admin.ModelAdmin):
 
     @admin.display(description=_('الملف'))
     def file_link(self, obj):
-        from django.utils.html import format_html
         if obj.file:
-            # obj.file.url سيعيد URL Cloudinary الصحيح
+            # obj.file.url سيعيد URL الصحيح سواء كان محلياً أو Cloudinary
             # os.path.basename(obj.file.name) لا يزال مفيدًا للحصول على اسم الملف فقط
             return format_html("<a href='{url}' target='_blank'>{name}</a>", url=obj.file.url, name=os.path.basename(obj.file.name))
+        return _("لا يوجد ملف")
+
+    @admin.display(description=_('حجم الملف'))
+    def file_size_display(self, obj):
+        if obj.file and obj.file.name:
+            try:
+                size_in_bytes = obj.file.size
+                if size_in_bytes < 1024:
+                    return f"{size_in_bytes} Bytes"
+                elif size_in_bytes < 1024 * 1024:
+                    return f"{size_in_bytes / 1024:.2f} KB"
+                elif size_in_bytes < 1024 * 1024 * 1024:
+                    return f"{size_in_bytes / (1024 * 1024):.2f} MB"
+                else:
+                    return f"{size_in_bytes / (1024 * 1024 * 1024):.2f} GB"
+            except FileNotFoundError:
+                return _("ملف غير موجود")
+            except Exception as e:
+                return _(f"خطأ في الحجم ({e})")
         return "-"
 
     def approve_summaries(self, request, queryset):
