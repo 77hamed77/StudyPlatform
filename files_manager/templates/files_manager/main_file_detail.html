@@ -6,63 +6,110 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-    .file-detail-container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+.file-detail-container {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 0;
+}
+.file-detail-card {
+    border-radius: 18px;
+    background: var(--table-bg, #fff);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1.5px 0 rgba(0,0,0,0.03);
+    overflow: hidden;
+    border: none;
+}
+.file-detail-header {
+    background: var(--table-header-bg, #f7f9fc);
+    color: var(--table-header-color, #274160);
+    padding: 2.2rem 1rem 1.1rem;
+}
+body.dark-mode .file-detail-header {
+    background: #20304a;
+    color: #e8ecf1;
+}
+.file-detail-meta {
+    background: transparent;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+.file-detail-meta .row > div {
+    margin-bottom: 0.75rem;
+}
+.file-detail-label {
+    color: #888;
+    font-size: .99rem;
+    font-weight: 500;
+}
+body.dark-mode .file-detail-label { color: #b1bdd1; }
+.file-detail-value {
+    font-size: 1.08rem;
+    font-weight: bold;
+    color: #273a54;
+}
+body.dark-mode .file-detail-value { color: #fff; }
+.file-download-btn {
+    font-size: 1.06rem;
+    padding: .85rem 1.2rem;
+}
+.btn-mark-read {
+    font-size: 1.04rem;
+    border-radius: 8px;
+    min-width: 160px;
+}
+body.dark-mode .file-detail-card { background: #1d2c3b; color: #e8ecf1; }
+body.dark-mode .file-detail-meta { background: transparent; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 file-detail-container">
-    <div class="card shadow-lg mb-4">
-        <div class="card-header bg-primary text-white text-center">
-            <h3 class="mb-0">{{ file_obj.title }}</h3>
+<div class="container my-5 file-detail-container">
+    <div class="card file-detail-card shadow-lg mb-4">
+        <div class="file-detail-header text-center">
+            <h2 class="mb-0">{{ file_obj.title }}</h2>
         </div>
         <div class="card-body p-4">
-            <p class="lead">{{ file_obj.description|default:"لا يوجد وصف لهذا الملف." }}</p>
-            <hr>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <p>
-                        <strong><i class="fas fa-book me-1"></i>المادة:</strong>
-                        {% if file_obj.subject %}{{ file_obj.subject.name }}{% else %}غير محددة{% endif %}
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <p>
-                        <strong><i class="fas fa-file-alt me-1"></i>نوع الملف:</strong>
-                        {% if file_obj.file_type %}{{ file_obj.file_type.name }}{% else %}غير محدد{% endif %}
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <p>
-                        <strong><i class="fas fa-user-tie me-1"></i>المحاضر/الرافع:</strong>
-                        {% if file_obj.uploaded_by %}
-                            {{ file_obj.uploaded_by.get_full_name|default:file_obj.uploaded_by.username }}
-                        {% else %}
-                            غير محدد
-                        {% endif %}
-                    </p>
-                </div>
-                <div class="col-md-6">
-                    <p>
-                        <strong><i class="far fa-calendar-alt me-1"></i>تاريخ الرفع:</strong>
-                        {{ file_obj.uploaded_at|date:"Y-m-d H:i" }}
-                    </p>
+            <p class="lead text-center mb-4">{{ file_obj.description|default:"لا يوجد وصف لهذا الملف." }}</p>
+            <div class="file-detail-meta mb-4">
+                <div class="row gx-3 gy-1">
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="fas fa-book me-1"></i>المادة:</span>
+                        <span class="file-detail-value ms-1">
+                            {% if file_obj.subject %}{{ file_obj.subject.name }}{% else %}غير محددة{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="fas fa-file-alt me-1"></i>نوع الملف:</span>
+                        <span class="file-detail-value ms-1">
+                            {% if file_obj.file_type %}{{ file_obj.file_type.name }}{% else %}غير محدد{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="fas fa-user-tie me-1"></i>المحاضر/الرافع:</span>
+                        <span class="file-detail-value ms-1">
+                            {% if file_obj.uploaded_by %}
+                                {{ file_obj.uploaded_by.get_full_name|default:file_obj.uploaded_by.username }}
+                            {% else %}
+                                غير محدد
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="far fa-calendar-alt me-1"></i>تاريخ الرفع:</span>
+                        <span class="file-detail-value ms-1">
+                            {{ file_obj.uploaded_at|date:"Y-m-d" }} <span class="text-muted">({{ file_obj.uploaded_at|time:"H:i" }})</span>
+                        </span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="d-grid gap-2 mt-4">
+            <div class="d-grid gap-3 mt-4">
                 <a href="{{ file_obj.file_url }}" 
                     target="_blank" 
-                    class="btn btn-success btn-lg"
+                    class="btn btn-success btn-lg file-download-btn"
                     download="{{ file_obj.title }}{{ file_obj.file_extension }}">
                     <i class="fas fa-download me-2"></i> تنزيل الملف الأصلي
                 </a>
                 <button type="button" id="toggleReadStatusBtn"
-                        class="btn btn-outline-info mt-2 {% if current_user_marked_as_read %}active btn-info{% endif %}"
+                        class="btn btn-mark-read {% if current_user_marked_as_read %}active btn-info{% else %}btn-outline-info{% endif %}"
                         data-file-id="{{ file_obj.pk }}"
                         title="{% if current_user_marked_as_read %}تمييز كغير مقروء{% else %}تمييز كمقروء{% endif %}">
                     <i class="fa{% if current_user_marked_as_read %}s{% else %}r{% endif %} fa-bookmark me-1"></i>
@@ -70,7 +117,7 @@
                 </button>
             </div>
         </div>
-        <div class="card-footer text-center">
+        <div class="card-footer text-center bg-white-50 border-0">
             <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> العودة إلى قائمة الملفات
             </a>

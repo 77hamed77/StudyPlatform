@@ -1,73 +1,122 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}ملخصاتي المرفوعة - {{ block.super }}{% endblock %}
 
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .summaries-table {
+        background: var(--table-bg, #fff);
+        border-radius: 14px;
+        box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .summaries-table th, .summaries-table td {
+        vertical-align: middle;
+        text-align: center;
+        font-size: 1rem;
+        border-bottom: 1px solid var(--table-border, #e3e6f0);
+        padding: 0.9rem 0.5rem;
+    }
+    .summaries-table th {
+        background: var(--table-header-bg, #f7f9fc);
+        color: var(--table-header-color, #274160);
+        font-weight: 600;
+    }
+    .summaries-table tr:last-child td {
+        border-bottom: none;
+    }
+    .summaries-table tbody tr:hover {
+        background: var(--table-row-hover, #f0f4fa);
+    }
+    body.dark-mode .summaries-table {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    body.dark-mode .summaries-table th {
+        background: #20304a;
+        color: #e8ecf1;
+    }
+    body.dark-mode .summaries-table td {
+        border-bottom: 1px solid #293b54;
+    }
+    body.dark-mode .summaries-table tbody tr:hover {
+        background: #18202b;
+    }
+    .summaries-table .badge {
+        font-size: 0.90em;
+        padding: 0.4em 0.9em;
+        border-radius: 10px;
+        letter-spacing: 0.02em;
+    }
+    .summaries-table .table-light {
+        background: var(--table-header-bg, #f7f9fc) !important;
+    }
+    body.dark-mode .summaries-table .table-light {
+        background: #20304a !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h2 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>ملخصاتي المرفوعة</h2>
-        <a href="{% url 'files_manager:student_summary_upload' %}" class="btn btn-primary">
-            <i class="fas fa-plus-circle me-1"></i> رفع ملخص جديد
-        </a>
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>ملخصاتي المرفوعة</h2>
+        <a href="{% url 'files_manager:student_summary_upload' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> رفع ملخص جديد
+        </a>
+    </div>
 
-    {% if my_summaries %} {# افترض أن الـ context_object_name هو my_summaries #}
-        <div class="table-responsive shadow-sm rounded">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">العنوان</th>
-                        <th scope="col">المادة</th>
-                        <th scope="col">تاريخ الرفع</th>
-                        <th scope="col" class="text-center">الحالة</th>
-                        <th scope="col">ملاحظات المشرف</th>
-                        {# <th scope="col" class="text-center">الإجراءات</th> #}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for summary in my_summaries %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>
-                            <a href="{{ summary.file_url }}" target="_blank" title="تنزيل/معاينة {{ summary.title }}">
-                                {{ summary.title|truncatechars:40 }}
-                            </a>
-                        </td>
-                        <td>{{ summary.subject.name }}</td>
-                        <td>{{ summary.uploaded_at|date:"d M Y, P" }}</td>
-                        <td class="text-center">
-                            {% if summary.status == 'pending' %}
-                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fas fa-hourglass-half me-1"></i>{{ summary.get_status_display }}</span>
-                            {% elif summary.status == 'approved' %}
-                                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fas fa-check-circle me-1"></i>{{ summary.get_status_display }}</span>
-                            {% elif summary.status == 'rejected' %}
-                                <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fas fa-times-circle me-1"></i>{{ summary.get_status_display }}</span>
-                            {% else %}
-                                <span class="badge bg-secondary rounded-pill px-3 py-2">{{ summary.get_status_display }}</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ summary.admin_notes|default_if_none:"-" }}</td>
-                        {# <td class="text-center">
-                            {% if summary.status == 'pending' %}
-                                <button class="btn btn-sm btn-outline-danger" disabled title="لا يمكن الحذف حالياً"><i class="fas fa-trash-alt"></i></button>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td> #}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% if is_paginated %}
-            {% include "partials/_pagination.html" %}
-        {% endif %}
-    {% else %}
-         <div class="alert alert-info text-center shadow-sm">
-            <h4 class="alert-heading"><i class="fas fa-folder-minus"></i> لا توجد ملخصات!</h4>
-            <p>لم تقم برفع أي ملخصات بعد. <a href="{% url 'files_manager:student_summary_upload' %}" class="alert-link">ابدأ الآن وشارك معرفتك!</a></p>
-        </div>
-    {% endif %}
+    {% if my_summaries %}
+        <div class="table-responsive shadow-sm rounded summaries-table">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">العنوان</th>
+                        <th scope="col">المادة</th>
+                        <th scope="col">تاريخ الرفع</th>
+                        <th scope="col" class="text-center">الحالة</th>
+                        <th scope="col">ملاحظات المشرف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for summary in my_summaries %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>
+                            <a href="{{ summary.file_url }}" target="_blank" title="تنزيل/معاينة {{ summary.title }}">
+                                {{ summary.title|truncatechars:40 }}
+                            </a>
+                        </td>
+                        <td>{{ summary.subject.name }}</td>
+                        <td>{{ summary.uploaded_at|date:"d M Y, P" }}</td>
+                        <td class="text-center">
+                            {% if summary.status == 'pending' %}
+                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fas fa-hourglass-half me-1"></i>{{ summary.get_status_display }}</span>
+                            {% elif summary.status == 'approved' %}
+                                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fas fa-check-circle me-1"></i>{{ summary.get_status_display }}</span>
+                            {% elif summary.status == 'rejected' %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fas fa-times-circle me-1"></i>{{ summary.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary rounded-pill px-3 py-2">{{ summary.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ summary.admin_notes|default_if_none:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if is_paginated %}
+            {% include "partials/_pagination.html" %}
+        {% endif %}
+    {% else %}
+         <div class="alert alert-info text-center shadow-sm">
+            <h4 class="alert-heading"><i class="fas fa-folder-minus"></i> لا توجد ملخصات!</h4>
+            <p>لم تقم برفع أي ملخصات بعد. <a href="{% url 'files_manager:student_summary_upload' %}" class="alert-link">ابدأ الآن وشارك معرفتك!</a></p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
