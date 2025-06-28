@@ -4,17 +4,15 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv  # لاستخدام ملف .env محلياً
 
-# استيراد gettext_lazy للترجمة
 from django.utils.translation import gettext_lazy as _
 
 # تحميل متغيرات البيئة من ملف .env للاختبار المحلي (إذا كان موجوداً)
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- إعدادات الأمان الأساسية ---
-SECRET_KEY = os.environ.get('SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')  # يجب تغيير هذا في الإنتاج
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '0nPNq5cbMmsK2MQRSW3aO27GB-pMw5pe8m5d7hLcEVNbRriYx-nG4-sQZPpy8rU-kwE')  # يفضل جعله في متغير بيئة
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 't')
 
@@ -58,7 +56,7 @@ INSTALLED_APPS = [
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
 
-    # إضافة storages لدعم التخزين عبر Supabase
+    # دعم التخزين عبر Supabase
     'storages',
 ]
 
@@ -94,7 +92,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                # 'core.context_processors.common_context', # إذا كنت تستخدمه
             ],
         },
     },
@@ -104,13 +101,11 @@ WSGI_APPLICATION = 'study_platform.wsgi.application'
 
 # --- إعدادات قاعدة البيانات ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
-
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    # إعدادات SQLite للتطوير المحلي إذا لم يتم تحديد DATABASE_URL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -122,15 +117,14 @@ else:
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
-
 ##############################################
 # إعدادات ربط Django مع Supabase Storage (سعة تخزين خارجية للملفات)
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA'  # Supabase service_role key
-AWS_SECRET_ACCESS_KEY = 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA'  # نفس المفتاح في الخانتين
-AWS_STORAGE_BUCKET_NAME = 'documents'  # اسم البكت الذي أنشأته في Supabase
-AWS_S3_ENDPOINT_URL = 'https://lnbxhoxjsvraumwckcsn.supabase.co/storage/v1/s3'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA')  # Supabase service_role key
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', 'KAoqixDi56KNMn9LXgz3tHrEGaRLivd6AEwxib4YMTA')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'documents')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://lnbxhoxjsvraumwckcsn.supabase.co/storage/v1/s3')
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
@@ -139,7 +133,7 @@ AWS_QUERYSTRING_AUTH = False
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
-    'ACL': 'public-read',  # اجعل الملفات عامة للعرض المباشر
+    'ACL': 'public-read',
 }
 ##############################################
 
