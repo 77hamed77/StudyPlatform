@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% load tasks.task_extras %}
-
+{% load task_extras %}
 {% block title %}
     {% if form.instance.pk %}تعديل المهمة{% else %}إنشاء مهمة جديدة{% endif %} - {{ block.super }}
 {% endblock %}
