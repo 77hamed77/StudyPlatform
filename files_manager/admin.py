@@ -4,6 +4,19 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 import os # تأكد من استيراد os إذا كنت تستخدم os.path.basename أو ما شابه
 
+# دالة مساعدة لتنسيق حجم الملف، يمكن استخدامها في أي مكان
+def _format_file_size(size_bytes):
+    if size_bytes is None:
+        return "-"
+    if size_bytes < 1024:
+        return f"{size_bytes} Bytes"
+    elif size_bytes < 1024 * 1024:
+        return f"{size_bytes / 1024:.2f} KB"
+    elif size_bytes < 1024 * 1024 * 1024:
+        return f"{size_bytes / (1024 * 1024):.2f} MB"
+    else:
+        return f"{size_bytes / (1024 * 1024 * 1024):.2f} GB"
+
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'main_files_count', 'student_summaries_count')
@@ -42,8 +55,8 @@ class MainFileAdmin(admin.ModelAdmin):
     list_display = ('title', 'subject', 'file_type', 'lecturer', 'uploaded_by_username', 'uploaded_at', 'file_size_display', 'get_file_link')
     list_filter = ('subject', 'file_type', 'lecturer', 'uploaded_at', 'uploaded_by')
     search_fields = ('title', 'description', 'subject__name', 'lecturer__name', 'uploaded_by__username')
-    # file_extension أضف إلى readonly_fields لأنه يتم تعيينه تلقائياً
-    readonly_fields = ('uploaded_at', 'updated_at', 'uploaded_by', 'file_extension')
+    # تم استخدام 'display_file_extension' كدالة لتمكينها كحقل للقراءة فقط في لوحة التحكم
+    readonly_fields = ('uploaded_at', 'updated_at', 'uploaded_by', 'display_file_extension')
     autocomplete_fields = ['subject', 'lecturer', 'file_type'] # أزل 'uploaded_by' من هنا
     fieldsets = (
         (None, {
@@ -53,7 +66,7 @@ class MainFileAdmin(admin.ModelAdmin):
             'fields': ('subject', 'lecturer', 'file_type')
         }),
         (_('معلومات الرفع'), {
-            'fields': ('uploaded_by', 'uploaded_at', 'updated_at', 'file_extension'), # أضف file_extension هنا
+            'fields': ('uploaded_by', 'uploaded_at', 'updated_at', 'display_file_extension'), # استخدم الدالة هنا
             'classes': ('collapse',)
         }),
     )
@@ -64,27 +77,26 @@ class MainFileAdmin(admin.ModelAdmin):
 
     @admin.display(description=_('حجم الملف'))
     def file_size_display(self, obj):
-        if obj.file and obj.file.name: # تأكد أن obj.file.name موجود
+        if obj.file and obj.file.name:
             try:
-                size_in_bytes = obj.file.size
-                if size_in_bytes < 1024:
-                    return f"{size_in_bytes} Bytes"
-                elif size_in_bytes < 1024 * 1024:
-                    return f"{size_in_bytes / 1024:.2f} KB"
-                elif size_in_bytes < 1024 * 1024 * 1024:
-                    return f"{size_in_bytes / (1024 * 1024):.2f} MB"
-                else:
-                    return f"{size_in_bytes / (1024 * 1024 * 1024):.2f} GB"
+                return _format_file_size(obj.file.size)
             except FileNotFoundError:
                 return _("ملف غير موجود") # رسالة واضحة للملفات المفقودة
             except Exception as e: # للتعامل مع أي أخطاء أخرى غير متوقعة
                 return _(f"خطأ في الحجم ({e})")
-        return "-" # إذا لم يكن هناك ملف
+        return "-"
+
+    @admin.display(description=_('امتداد الملف'), ordering='file_extension')
+    def display_file_extension(self, obj):
+        """يعرض امتداد الملف ويستخدم للقراءة فقط في لوحة التحكم."""
+        return obj.file_extension if obj.file_extension else "-"
+
 
     @admin.display(description=_('رابط الملف'))
     def get_file_link(self, obj):
         if obj.file:
-            return format_html('<a href="{}" download="{}{}">تنزيل الملف</a>', obj.file.url, obj.title, obj.file_extension)
+            # os.path.basename للحصول على اسم الملف فقط بدون المسار
+            return format_html('<a href="{}" download="{}{}">تنزيل الملف</a>', obj.file.url, os.path.basename(obj.file.name), obj.file_extension)
         return _("لا يوجد ملف")
     get_file_link.short_description = _("الملف") # لتغيير اسم العمود في قائمة الأدمن
 
@@ -102,9 +114,10 @@ class StudentSummaryAdmin(admin.ModelAdmin):
     list_display = ('title', 'subject', 'uploaded_by_username', 'status', 'uploaded_at_display', 'file_link', 'file_size_display')
     list_filter = ('status', 'subject', 'uploaded_by', 'uploaded_at')
     search_fields = ('title', 'subject__name', 'uploaded_by__username', 'admin_notes')
-    list_editable = ('status',) # السماح بتعديل الحالة مباشرة
-    readonly_fields = ('uploaded_by', 'uploaded_at', 'file_extension') # أضف file_extension
-    actions = ['approve_summaries', 'reject_summaries_with_note'] # تحسين اسم الإجراء
+    list_editable = ('status',)
+    # تم استخدام 'display_file_extension' كدالة لتمكينها كحقل للقراءة فقط في لوحة التحكم
+    readonly_fields = ('uploaded_by', 'uploaded_at', 'display_file_extension')
+    actions = ['approve_summaries', 'reject_summaries_with_note']
     autocomplete_fields = ['subject'] # أزل 'uploaded_by' من هنا
     fieldsets = (
         (None, {
@@ -114,7 +127,7 @@ class StudentSummaryAdmin(admin.ModelAdmin):
             'fields': ('status', 'admin_notes')
         }),
         (_('معلومات الرفع'), {
-            'fields': ('uploaded_by', 'uploaded_at', 'file_extension'), # أضف file_extension هنا
+            'fields': ('uploaded_by', 'uploaded_at', 'display_file_extension'), # استخدم الدالة هنا
             'classes': ('collapse',)
         }),
     )
@@ -130,8 +143,6 @@ class StudentSummaryAdmin(admin.ModelAdmin):
     @admin.display(description=_('الملف'))
     def file_link(self, obj):
         if obj.file:
-            # obj.file.url سيعيد URL الصحيح سواء كان محلياً أو Cloudinary
-            # os.path.basename(obj.file.name) لا يزال مفيدًا للحصول على اسم الملف فقط
             return format_html("<a href='{url}' target='_blank'>{name}</a>", url=obj.file.url, name=os.path.basename(obj.file.name))
         return _("لا يوجد ملف")
 
@@ -139,35 +150,28 @@ class StudentSummaryAdmin(admin.ModelAdmin):
     def file_size_display(self, obj):
         if obj.file and obj.file.name:
             try:
-                size_in_bytes = obj.file.size
-                if size_in_bytes < 1024:
-                    return f"{size_in_bytes} Bytes"
-                elif size_in_bytes < 1024 * 1024:
-                    return f"{size_in_bytes / 1024:.2f} KB"
-                elif size_in_bytes < 1024 * 1024 * 1024:
-                    return f"{size_in_bytes / (1024 * 1024):.2f} MB"
-                else:
-                    return f"{size_in_bytes / (1024 * 1024 * 1024):.2f} GB"
+                return _format_file_size(obj.file.size)
             except FileNotFoundError:
                 return _("ملف غير موجود")
             except Exception as e:
                 return _(f"خطأ في الحجم ({e})")
         return "-"
 
+    @admin.display(description=_('امتداد الملف'), ordering='file_extension')
+    def display_file_extension(self, obj):
+        """يعرض امتداد الملف ويستخدم للقراءة فقط في لوحة التحكم."""
+        return obj.file_extension if obj.file_extension else "-"
+
     def approve_summaries(self, request, queryset):
         updated_count = queryset.update(status='approved', admin_notes=_("تمت الموافقة."))
         self.message_user(request, _(f"{updated_count} ملخص/ملخصات تم اعتمادها بنجاح."))
-        # يمكنك إرسال إشعار للمستخدم هنا
 
     approve_summaries.short_description = _("الموافقة على الملخصات المحددة")
 
     def reject_summaries_with_note(self, request, queryset):
-        # يمكنك هنا تطوير هذا الإجراء ليسمح بإدخال ملاحظة مخصصة لكل ملخص مرفوض
-        # للتبسيط، سنستخدم ملاحظة عامة
         note = _("تم الرفض من قبل الإدارة. يرجى مراجعة معايير الملخصات.")
         updated_count = queryset.update(status='rejected', admin_notes=note)
         self.message_user(request, _(f"{updated_count} ملخص/ملخصات تم رفضها."))
-        # يمكنك إرسال إشعار للمستخدم هنا
 
     reject_summaries_with_note.short_description = _("رفض الملخصات المحددة (مع ملاحظة عامة)")
 
@@ -175,7 +179,7 @@ class StudentSummaryAdmin(admin.ModelAdmin):
 @admin.register(UserFileInteraction)
 class UserFileInteractionAdmin(admin.ModelAdmin):
     list_display = ('user', 'main_file_title', 'marked_as_read', 'marked_at')
-    list_filter = ('marked_as_read', 'user', 'main_file__subject') # فلترة حسب مادة الملف الرئيسي
+    list_filter = ('marked_as_read', 'user', 'main_file__subject')
     search_fields = ('user__username', 'main_file__title')
     autocomplete_fields = ['user', 'main_file']
     readonly_fields = ('marked_at',)
