@@ -37,6 +37,7 @@ ENV CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY_BUILD
 ENV CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET_BUILD
 
 # Collect static files
+ENV DJANGO_COLLECTSTATIC=1
 RUN python manage.py collectstatic --noinput
 
 # Apply database migrations (crucial for production!)

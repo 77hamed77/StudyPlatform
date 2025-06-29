@@ -133,10 +133,10 @@ AWS_S3_OBJECT_PARAMETERS = {
     'ACL': 'public-read',
 }
 
-# تأكيد وجود متغيرات البيئة الهامة للتخزين
-if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]):
-    raise ImproperlyConfigured("Missing one or more AWS S3 environment variables!")
-
+if not os.environ.get('DJANGO_COLLECTSTATIC'):
+    if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]):
+        raise ImproperlyConfigured("Missing one or more AWS S3 environment variables!")
+        
 # --- الملفات الثابتة (Static Files) ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
