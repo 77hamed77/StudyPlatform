@@ -124,8 +124,10 @@ class MainFile(models.Model):
 
     @property
     def file_extension(self):
-        _, extension = os.path.splitext(self.file.name)
-        return extension.lower()
+        if self.file and self.file.name:
+            _, extension = os.path.splitext(self.file.name)
+            return extension.lower()
+        return ""
 
     @property
     def file_url(self):
@@ -182,11 +184,20 @@ class StudentSummary(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} - (بواسطة: {self.uploaded_by.username})"
+        # حماية في حال لم يكن uploaded_by مرتبط بعد (مثلاً عند الإنشاء اليدوي)
+        username = self.uploaded_by.username if self.uploaded_by else "-"
+        return f"{self.title} - (بواسطة: {username})"
 
     @property
     def is_approved(self):
         return self.status == self.STATUS_APPROVED
+
+    @property
+    def file_extension(self):
+        if self.file and self.file.name:
+            _, extension = os.path.splitext(self.file.name)
+            return extension.lower()
+        return ""
 
     @property
     def file_url(self):
@@ -208,4 +219,6 @@ class UserFileInteraction(models.Model):
         ordering = ['-marked_at']
 
     def __str__(self):
-        return f"{self.user.username} - {self.main_file.title} (مقروء: {self.marked_as_read})"
+        username = self.user.username if self.user else "-"
+        file_title = self.main_file.title if self.main_file else "-"
+        return f"{username} - {file_title} (مقروء: {self.marked_as_read})"

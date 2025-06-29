@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
 
-    # دعم التخزين عبر Supabase/S3
+    # دعم التخزين عبر S3/Backblaze B2
     'storages',
 ]
 
@@ -115,28 +115,29 @@ else:
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
-# --- إعدادات التخزين عبر Supabase/S3 (فقط للملفات الجديدة) ---
+# --- إعدادات التخزين في Backblaze B2 (S3-compatible) ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-003')
 AWS_S3_SIGNATURE_VERSION = os.environ.get('AWS_S3_SIGNATURE_VERSION', 's3v4')
 AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', 'False') == 'True'
-AWS_DEFAULT_ACL = None
-AWS_QUERYSTRING_AUTH = os.environ.get('AWS_QUERYSTRING_AUTH', 'False') == 'True'
-AWS_S3_USE_SSL = os.environ.get('AWS_S3_USE_SSL', 'True') == 'True'  # أضفنا هذا السطر
+AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'private')
+AWS_QUERYSTRING_AUTH = os.environ.get('AWS_QUERYSTRING_AUTH', 'True') == 'True'
+AWS_S3_USE_SSL = os.environ.get('AWS_S3_USE_SSL', 'True') == 'True'
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
-    'ACL': 'public-read',
 }
 
+# تأكد من وجود جميع متغيرات البيئة اللازمة
 if not os.environ.get('DJANGO_COLLECTSTATIC'):
-    if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]):
+    required_s3_vars = [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]
+    if not all(required_s3_vars):
         raise ImproperlyConfigured("Missing one or more AWS S3 environment variables!")
-        
+
 # --- الملفات الثابتة (Static Files) ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
@@ -146,7 +147,7 @@ STATICFILES_DIRS = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # --- ملفات الوسائط (Media Files - المرفوعة من المستخدمين) ---
-# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Supabase/S3 فقط
+# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Backblaze/S3 فقط
 
 # --- مصادقة كلمات المرور ---
 AUTH_PASSWORD_VALIDATORS = [
