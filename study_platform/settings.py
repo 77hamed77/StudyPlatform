@@ -115,7 +115,6 @@ else:
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
-
 # --- إعدادات التخزين عبر Supabase/S3 (فقط للملفات الجديدة) ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
@@ -127,12 +126,16 @@ AWS_S3_SIGNATURE_VERSION = os.environ.get('AWS_S3_SIGNATURE_VERSION', 's3v4')
 AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', 'False') == 'True'
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = os.environ.get('AWS_QUERYSTRING_AUTH', 'False') == 'True'
+AWS_S3_USE_SSL = os.environ.get('AWS_S3_USE_SSL', 'True') == 'True'  # أضفنا هذا السطر
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
     'ACL': 'public-read',
 }
 
+# تأكيد وجود متغيرات البيئة الهامة للتخزين
+if not all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]):
+    raise ImproperlyConfigured("Missing one or more AWS S3 environment variables!")
 
 # --- الملفات الثابتة (Static Files) ---
 STATIC_URL = '/static/'
