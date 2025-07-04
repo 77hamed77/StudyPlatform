@@ -97,12 +97,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'study_platform.wsgi.application'
-
+# استبدل قسم DATABASES بهذا الكود المحسن:
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
+    # إضافة إعدادات إضافية لـ PostgreSQL
+    DATABASES['default'].update({
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+        'CONN_MAX_AGE': 600,
+    })
 else:
     DATABASES = {
         'default': {
@@ -228,3 +235,16 @@ LOGGING = {
         },
     },
 }
+# إضافة في نهاية settings.py
+if not DEBUG:
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        logger.info("Database connection successful!")
+    except Exception as e:
+        logger.error(f"Database connection failed: {e}")
