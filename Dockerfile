@@ -1,5 +1,5 @@
-# Use an official Python base image
-FROM python:3.11-slim-buster
+# Use an official Python base image with a newer Debian version (e.g., bookworm for Debian 12)
+FROM python:3.11-slim-bookworm
 
 # Update package lists and install essential build dependencies
 RUN apt-get update && \
