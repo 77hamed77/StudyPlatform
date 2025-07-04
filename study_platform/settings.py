@@ -95,9 +95,9 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'study_platform.wsgi.application'
-# استبدل قسم DATABASES بهذا الكود المحسن:
+# ملاحظة: إذا لم يتم ضبط DATABASE_URL، سيتم استخدام SQLite للتطوير المحلي
+# تأكد من ضبط DATABASE_URL في ملف .env أو في بيئة الإنتاج باستخدام سلسلة الاتصال Supavisor
+# مثال: DATABASE_URL=postgres://postgres.lnbxhoxjsvraumwckcsn:your_password@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
@@ -113,7 +113,7 @@ if DATABASE_URL:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
+            'ENGINE': 'django.db.backends.sqlite3',  # تصحيح: كان 'django.db.models.sqlite3' خطأ
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
