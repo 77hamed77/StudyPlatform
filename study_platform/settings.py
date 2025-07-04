@@ -3,35 +3,43 @@ import os
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
+
 from django.utils.translation import gettext_lazy as _
 
-# تحميل متغيرات البيئة من ملف .env للاختبار المحلي (إذا كان موجوداً)
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- إعدادات الأمان الأساسية ---
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'CHANGE_THIS_SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'CHANGE_THIS_SECRET_KEY') # تأكد من تغيير هذا في الإنتاج
+
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = []
+# دعم Render (RENDER_EXTERNAL_HOSTNAME) و Koyeb (DJANGO_ALLOWED_HOST)
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 KOYEB_PUBLIC_HOST = os.environ.get('DJANGO_ALLOWED_HOST')
+
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 if KOYEB_PUBLIC_HOST:
     ALLOWED_HOSTS.append(KOYEB_PUBLIC_HOST)
+
 if DEBUG:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 CSRF_TRUSTED_ORIGINS = []
-if not DEBUG and KOYEB_PUBLIC_HOST:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{KOYEB_PUBLIC_HOST}')
+if not DEBUG:
+    if RENDER_EXTERNAL_HOSTNAME:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+    if KOYEB_PUBLIC_HOST:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{KOYEB_PUBLIC_HOST}')
 elif DEBUG:
     CSRF_TRUSTED_ORIGINS.extend(['http://localhost:8000', 'http://127.0.0.1:8000'])
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 
-# --- تعريف التطبيقات ---
 INSTALLED_APPS = [
-    # تطبيقات Django الأساسية
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,12 +48,11 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
 
-    # تطبيقات الطرف الثالث
     'crispy_forms',
     'crispy_bootstrap5',
     'widget_tweaks',
-
-    # تطبيقاتك الخاصة
+    'storages', # لتفعيل django-storages
+    
     'achievements.apps.AchievementsConfig',
     'core.apps.CoreConfig',
     'exam_prep.apps.ExamPrepConfig',
@@ -53,16 +60,11 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
-
-    # دعم التخزين عبر S3/Backblaze B2
-    'storages',
 ]
 
-# --- إعدادات Crispy Forms ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -77,7 +79,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'study_platform.urls'
 
-# --- إعدادات القوالب ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,7 +90,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media',
+                'django.template.context_processors.media', # مهم لـ MEDIA_URL
             ],
         },
     },
@@ -97,7 +98,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'study_platform.wsgi.application'
 
-# --- إعدادات قاعدة البيانات ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
@@ -115,30 +115,57 @@ else:
 if 'default' not in DATABASES or 'ENGINE' not in DATABASES['default']:
     raise ImproperlyConfigured("DATABASE_URL environment variable is not set or improperly configured. Please provide a valid PostgreSQL URL or ensure local SQLite setup is correct.")
 
-# --- إعدادات التخزين في Backblaze B2 (S3-compatible) ---
+# --- إعدادات Supabase Storage (متوافق مع S3) ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-003')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1') # استخدام eu-central-1 كافتراضي
 AWS_S3_SIGNATURE_VERSION = os.environ.get('AWS_S3_SIGNATURE_VERSION', 's3v4')
-AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', 'False') == 'True'
-AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'private')
-AWS_QUERYSTRING_AUTH = os.environ.get('AWS_QUERYSTRING_AUTH', 'True') == 'True'
-AWS_S3_USE_SSL = os.environ.get('AWS_S3_USE_SSL', 'True') == 'True'
+AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', 'False').lower() == 'true'
+AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'public-read') # استخدام public-read كافتراضي
+AWS_QUERYSTRING_AUTH = os.environ.get('AWS_QUERYSTRING_AUTH', 'False').lower() == 'true' # استخدام False كافتراضي
+AWS_S3_USE_SSL = os.environ.get('AWS_S3_USE_SSL', 'True').lower() == 'true'
+AWS_LOCATION = os.environ.get('AWS_LOCATION', '') # المسار الأساسي داخل الباكت (مثال: 'uploads')
+AWS_QUERYSTRING_EXPIRE = int(os.environ.get('AWS_QUERYSTRING_EXPIRE', 3600))
 
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 
-# تأكد من وجود جميع متغيرات البيئة اللازمة
-if not os.environ.get('DJANGO_COLLECTSTATIC'):
+# بناء MEDIA_URL بشكل صحيح لـ Supabase Storage
+# هذا هو الجزء الأكثر أهمية لحل مشكلة "Not Found"
+if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
+    # Supabase Public URL عادة ما يكون بهذا الشكل:
+    # https://[project-ref].supabase.co/storage/v1/object/public/[bucket_name]/
+    # سنقوم ببناء هذا المسار ديناميكياً
+    _supabase_base_url = AWS_S3_ENDPOINT_URL.replace('/s3', '/object/public/')
+    _bucket_url_part = f"{_supabase_base_url}{AWS_STORAGE_BUCKET_NAME}/"
+
+    # إذا كان هناك AWS_LOCATION، أضفه إلى المسار
+    if AWS_LOCATION:
+        MEDIA_URL = f"{_bucket_url_part}{AWS_LOCATION}/"
+    else:
+        MEDIA_URL = _bucket_url_part
+    print(f"INFO: Using Supabase Storage. MEDIA_URL set to: {MEDIA_URL}")
+else:
+    # Fallback للتخزين المحلي إذا لم يتم تكوين Supabase Storage بشكل كامل
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    print("WARNING: Supabase Storage environment variables not fully set. Using local file storage for media.")
+
+
+# تحقق من متغيرات S3 الضرورية (للتشغيل وليس لـ collectstatic)
+# هذا الشرط يمنع التطبيق من البدء إذا كانت متغيرات S3 الحرجة مفقودة في وضع الإنتاج
+if not DEBUG and DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
     required_s3_vars = [AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_URL]
     if not all(required_s3_vars):
-        raise ImproperlyConfigured("Missing one or more AWS S3 environment variables!")
+        raise ImproperlyConfigured("Missing one or more AWS S3 environment variables required for Supabase Storage in production!")
 
-# --- الملفات الثابتة (Static Files) ---
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
 STATICFILES_DIRS = [
@@ -146,10 +173,6 @@ STATICFILES_DIRS = [
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# --- ملفات الوسائط (Media Files - المرفوعة من المستخدمين) ---
-# تم تعطيل MEDIA_ROOT و MEDIA_URL لأن التخزين الآن على Backblaze/S3 فقط
-
-# --- مصادقة كلمات المرور ---
 AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
@@ -157,7 +180,6 @@ AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-# --- الترجمة والعولمة ---
 LANGUAGE_CODE = 'ar'
 TIME_ZONE = 'Asia/Riyadh'
 
@@ -173,7 +195,6 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
-# --- إعدادات المصادقة ---
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'login'
