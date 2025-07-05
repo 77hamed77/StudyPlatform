@@ -1,7 +1,10 @@
 from django import forms
+from django.contrib.auth import get_user_model  # استيراد User
 from .models import StudentSummary, Subject
 from django.utils.translation import gettext_lazy as _
 from .models import validate_file_extension, validate_file_size
+
+User = get_user_model()  # تعيين User كموديل المستخدم الحالي
 
 class StudentSummaryUploadForm(forms.ModelForm):
     title = forms.CharField(
