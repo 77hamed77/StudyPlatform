@@ -16,13 +16,21 @@ urlpatterns = [
     path('exam-prep/', include('exam_prep.urls', namespace='exam_prep')),
 ]
 
-# لا تضف أبداً media/static أثناء التطوير لتقديم ملفات media من السيرفر المحلي
-# لأنك تعتمد على التخزين السحابي فقط (S3/Supabase)
-# إذا كنت تريد تقديم ملفات static فقط أثناء التطوير (وليس media) يمكنك إبقاء السطر التالي
+# هذا الجزء مخصص لخدمة الملفات الثابتة (STATIC) وملفات الوسائط (MEDIA)
+# في وضع التطوير (DEBUG=True) فقط.
+# في وضع الإنتاج، يتم التعامل مع STATIC بواسطة Whitenoise و MEDIA بواسطة Supabase Storage.
 if settings.DEBUG:
-    if hasattr(settings, 'STATIC_URL') and hasattr(settings, 'STATIC_ROOT'):
-        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-        
-urlpatterns = [
-    path('files/', include('files_manager.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # لخدمة الملفات الثابتة محلياً
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    
+    # لخدمة ملفات الوسائط (المرفوعة من المستخدمين) محلياً
+    # هذا الشرط مهم: لا تخدم MEDIA محلياً إذا كنت تستخدم تخزيناً سحابياً (مثل Supabase)
+    # إلا إذا كان لديك منطق احتياطي للتخزين المحلي في settings.py
+    # بما أنك تستخدم Supabase Storage، فإن MEDIA_URL في settings.py سيشير إلى Supabase.
+    # لذلك، هذا السطر قد لا يكون ضرورياً أو قد يتعارض في بعض الحالات.
+    # ومع ذلك، إذا كان لديك fallback للتخزين المحلي في settings.py، فقد تحتاج إليه.
+    # سأبقيه هنا مع ملاحظة، ولكن في الإنتاج لن يكون له تأثير.
+    if hasattr(settings, 'MEDIA_URL') and hasattr(settings, 'MEDIA_ROOT') and \
+       settings.DEFAULT_FILE_STORAGE == 'django.core.files.storage.FileSystemStorage':
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
