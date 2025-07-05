@@ -25,7 +25,6 @@ class StudentSummaryUploadForm(forms.ModelForm):
         widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif'}),
         validators=[validate_file_extension, validate_file_size],
         help_text=_("الملفات المسموح بها: PDF, DOC, DOCX, PPT, PPTX, إلخ. (حجم أقصى: 10MB)"),
-        max_size=10 * 1024 * 1024,  # 10MB
     )
     description = forms.CharField(
         label=_("الوصف (اختياري)"),
@@ -40,7 +39,7 @@ class StudentSummaryUploadForm(forms.ModelForm):
     is_public = forms.BooleanField(
         label=_("مشاركة الملخص مع الجميع"),
         required=False,
-        initial=False,  # تغيير الافتراضي إلى False لأمان أكبر
+        initial=False,
         help_text=_("إذا تم تحديده، سيكون الملخص متاحًا للجميع بعد الموافقة."),
     )
     is_anonymous = forms.BooleanField(
@@ -50,7 +49,7 @@ class StudentSummaryUploadForm(forms.ModelForm):
         help_text=_("إذا تم تحديده، سيتم إخفاء اسم المستخدم."),
     )
     uploaded_by = forms.ModelChoiceField(
-        queryset=None,  # سيتم تعيينه في العرض
+        queryset=None,
         widget=forms.HiddenInput(),
         required=False,
     )
