@@ -37,7 +37,7 @@ body.dark-mode .file-detail-header {
 }
 .file-detail-label {
     color: #888;
-    font-size: .99rem;
+    font-size: 0.99rem;
     font-weight: 500;
 }
 body.dark-mode .file-detail-label { color: #b1bdd1; }
@@ -49,15 +49,21 @@ body.dark-mode .file-detail-label { color: #b1bdd1; }
 body.dark-mode .file-detail-value { color: #fff; }
 .file-download-btn {
     font-size: 1.06rem;
-    padding: .85rem 1.2rem;
+    padding: 0.85rem 1.2rem;
+    width: 100%;
+    max-width: 250px;
 }
 .btn-mark-read {
     font-size: 1.04rem;
     border-radius: 8px;
     min-width: 160px;
+    width: 100%;
+    max-width: 250px;
 }
 body.dark-mode .file-detail-card { background: #1d2c3b; color: #e8ecf1; }
 body.dark-mode .file-detail-meta { background: transparent; }
+.read-btn-text { transition: color 0.2s; }
+body.dark-mode .read-btn-text { color: #e8ecf1; }
 </style>
 {% endblock %}
 
@@ -102,12 +108,18 @@ body.dark-mode .file-detail-meta { background: transparent; }
                 </div>
             </div>
             <div class="d-grid gap-3 mt-4">
+                {% if file_obj.file_url %}
                 <a href="{{ file_obj.file_url }}" 
-                    target="_blank" 
-                    class="btn btn-success btn-lg file-download-btn"
-                    download="{{ file_obj.title }}{{ file_obj.file_extension }}">
+                   target="_blank" 
+                   class="btn btn-success btn-lg file-download-btn"
+                   download="{{ file_obj.title }}{{ file_obj.file_extension }}">
                     <i class="fas fa-download me-2"></i> تنزيل الملف الأصلي
                 </a>
+                {% else %}
+                <button class="btn btn-success btn-lg file-download-btn" disabled>
+                    <i class="fas fa-exclamation-triangle me-2"></i> ملف غير متاح
+                </button>
+                {% endif %}
                 <button type="button" id="toggleReadStatusBtn"
                         class="btn btn-mark-read {% if current_user_marked_as_read %}active btn-info{% else %}btn-outline-info{% endif %}"
                         data-file-id="{{ file_obj.pk }}"

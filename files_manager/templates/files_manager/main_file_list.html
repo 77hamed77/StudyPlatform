@@ -7,7 +7,6 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-/* جدول شبيه بالجامعة (يدعم النهاري/الليلي) */
 .files-table {
     background: var(--table-bg, #fff);
     border-radius: 12px;
@@ -66,7 +65,10 @@ body.dark-mode .files-table .file-title-link:hover {
 .files-table .btn-download {
     min-width: 120px;
     font-size: 0.97em;
+    padding: 0.4rem 0.8rem;
 }
+.files-table .text-success { color: #28a745; }
+body.dark-mode .text-success { color: #38c172; }
 </style>
 {% endblock %}
 
@@ -102,76 +104,82 @@ body.dark-mode .files-table .file-title-link:hover {
     {% if files %}
     <div class="files-table-wrapper">
         <div class="table-responsive">
-        <table class="table files-table align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>العنوان</th>
-                    <th>الوصف</th>
-                    <th>المادة</th>
-                    <th>النوع</th>
-                    <th>المحاضر</th>
-                    <th>تاريخ الرفع</th>
-                    <th>تحميل</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for file_item in files %}
-                <tr>
-                    <td>
-                        <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}"
-                           class="file-title-link"
-                           {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل مباشر" target="_blank" {% endif %}>
-                            {{ file_item.title }}
-                        </a>
-                        {% if file_item.current_user_marked_as_read %}
-                            <i class="fas fa-check-circle text-success ms-1" title="مقروء"></i>
-                        {% endif %}
-                    </td>
-                    <td class="text-truncate" style="max-width: 180px;">
-                        {% if file_item.description %}
-                            {{ file_item.description|truncatewords:12 }}
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file_item.subject %}
-                            <span class="badge bg-info text-dark">{{ file_item.subject.name }}</span>
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file_item.file_type %}
-                            <span class="badge bg-secondary">{{ file_item.file_type.name }}</span>
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file_item.lecturer %}
-                            <span class="badge bg-light text-dark">{{ file_item.lecturer.name }}</span>
-                        {% else %}
-                            <span class="text-muted">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="small">{{ file_item.uploaded_at|date:"Y-m-d" }}</span>
-                        <br>
-                        <span class="text-muted small">{{ file_item.uploaded_at|time:"H:i" }}</span>
-                    </td>
-                    <td>
-                        <a href="{{ file_item.file_url }}" 
-                           target="_blank" 
-                           class="btn btn-sm btn-success btn-download"
-                           download="{{ file_item.title }}{{ file_item.file_extension }}">
-                            <i class="fas fa-download"></i> تحميل
-                        </a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            <table class="table files-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>العنوان</th>
+                        <th>الوصف</th>
+                        <th>المادة</th>
+                        <th>النوع</th>
+                        <th>المحاضر</th>
+                        <th>تاريخ الرفع</th>
+                        <th>تحميل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for file_item in files %}
+                    <tr>
+                        <td>
+                            <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}"
+                               class="file-title-link"
+                               {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل مباشر" target="_blank" {% endif %}>
+                                {{ file_item.title }}
+                            </a>
+                            {% if file_item.current_user_marked_as_read %}
+                                <i class="fas fa-check-circle text-success ms-1" title="مقروء"></i>
+                            {% endif %}
+                        </td>
+                        <td class="text-truncate" style="max-width: 180px;">
+                            {% if file_item.description %}
+                                {{ file_item.description|truncatewords:12 }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if file_item.subject %}
+                                <span class="badge bg-info text-dark">{{ file_item.subject.name }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if file_item.file_type %}
+                                <span class="badge bg-secondary">{{ file_item.file_type.name }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if file_item.lecturer %}
+                                <span class="badge bg-light text-dark">{{ file_item.lecturer.name }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="small">{{ file_item.uploaded_at|date:"Y-m-d" }}</span>
+                            <br>
+                            <span class="text-muted small">{{ file_item.uploaded_at|time:"H:i" }}</span>
+                        </td>
+                        <td>
+                            {% if file_item.file_url %}
+                            <a href="{{ file_item.file_url }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-success btn-download"
+                               download="{{ file_item.title }}{{ file_item.file_extension }}">
+                                <i class="fas fa-download"></i> تحميل
+                            </a>
+                            {% else %}
+                            <button class="btn btn-sm btn-success btn-download" disabled>
+                                <i class="fas fa-exclamation-triangle"></i> غير متاح
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     {% if is_paginated %}

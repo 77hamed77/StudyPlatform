@@ -1,3 +1,4 @@
+## files_manager/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -5,6 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.core.files.storage import default_storage
 
 from .models import MainFile, StudentSummary, UserFileInteraction, Subject, FileType
 from .forms import StudentSummaryUploadForm
@@ -85,10 +87,25 @@ class StudentSummaryUploadView(LoginRequiredMixin, CreateView):
     template_name = 'files_manager/student_summary_upload.html'
     success_url = reverse_lazy('files_manager:my_summaries_list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         form.instance.uploaded_by = self.request.user
-        messages.success(self.request, _("تم رفع ملخصك بنجاح. سيتم مراجعته من قبل المشرف قريباً."))
+        form.instance.is_public = form.cleaned_data['is_public']
+        form.instance.is_anonymous = form.cleaned_data['is_anonymous']
+        self.object = form.save()
+        if default_storage.exists(self.object.file.name):
+            messages.success(self.request, _("تم رفع ملخصك بنجاح. سيتم مراجعته من قبل المشرف قريباً."))
+        else:
+            messages.error(self.request, _("فشل رفع الملف. تحقق من إعدادات التخزين."))
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _("يوجد أخطاء في النموذج. تحقق من البيانات المدخلة."))
+        return super().form_invalid(form)
 
 # --- Public Student Summaries List ---
 class StudentSummaryListView(LoginRequiredMixin, ListView):
@@ -99,7 +116,8 @@ class StudentSummaryListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return StudentSummary.objects.filter(
-            status='approved'
+            status='approved',
+            is_public=True
         ).select_related('subject', 'uploaded_by').order_by('-uploaded_at')
 
 # --- My Student Summaries List ---

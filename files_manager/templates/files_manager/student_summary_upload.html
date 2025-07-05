@@ -39,6 +39,8 @@
     .upload-summary-card .btn-primary:hover, .upload-summary-card .btn-primary:focus {
         background: #1a237e;
     }
+    .form-check-label { color: var(--bs-body-color, #212529); }
+    body.dark-mode .form-check-label { color: #e8ecf1; }
 </style>
 {% endblock %}
 
@@ -51,6 +53,14 @@
                     <h4 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i>رفع ملخص جديد</h4>
                 </div>
                 <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     {% if form.errors %}
                         <div class="alert alert-danger" role="alert">
                             <strong>خطأ!</strong> يرجى تصحيح الأخطاء الموضحة أدناه.
@@ -75,27 +85,7 @@
 
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {% if CRISPY_ALLOWED_TEMPLATE_PACKS and form %}
-                            {{ form|crispy }}
-                        {% else %}
-                            <div class="mb-3">
-                                <label for="{{ form.title.id_for_label }}" class="form-label fw-bold"><i class="fas fa-heading me-1"></i>{{ form.title.label }}</label>
-                                {{ form.title }}
-                                {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors|striptags }}</div>{% endif %}
-                            </div>
-                            <div class="mb-3">
-                                <label for="{{ form.subject.id_for_label }}" class="form-label fw-bold"><i class="fas fa-book me-1"></i>{{ form.subject.label }}</label>
-                                {{ form.subject }}
-                                {% if form.subject.errors %}<div class="invalid-feedback d-block">{{ form.subject.errors|striptags }}</div>{% endif %}
-                            </div>
-                            <div class="mb-3">
-                                <label for="{{ form.file.id_for_label }}" class="form-label fw-bold"><i class="fas fa-file-pdf me-1"></i>{{ form.file.label }}</label>
-                                {{ form.file }}
-                                <small class="form-text text-muted d-block mt-1">الملفات المسموح بها: PDF, DOC, DOCX, PPT, PPTX (حجم أقصى: 10MB كمثال)</small>
-                                {% if form.file.errors %}<div class="invalid-feedback d-block">{{ form.file.errors|striptags }}</div>{% endif %}
-                            </div>
-                        {% endif %}
-                        
+                        {{ form|crispy }}
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-paper-plane me-1"></i> إرسال الملخص للمراجعة
@@ -120,18 +110,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
         if (form) {
-            {% if not CRISPY_ALLOWED_TEMPLATE_PACKS or not form %}
-                const titleField = document.getElementById('{{ form.title.id_for_label }}');
-                if (titleField) {
-                    titleField.classList.add('form-control');
-                    titleField.placeholder = 'مثال: ملخص شامل للفصل الأول في الكيمياء';
-                }
-                
-                const subjectField = document.getElementById('{{ form.subject.id_for_label }}');
-                if (subjectField && subjectField.tagName === 'SELECT') {
-                    subjectField.classList.add('form-select');
-                }
-            {% endif %}
+            const fileInput = document.getElementById('id_file');
+            if (fileInput) {
+                fileInput.classList.add('form-control');
+                fileInput.setAttribute('accept', '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif');
+            }
         }
     });
     </script>

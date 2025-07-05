@@ -1,4 +1,4 @@
-# جميع الملفات ترفع وتخزن عبر التخزين السحابي المعرف في settings.py (S3/Supabase)
+# files_manager/models.py
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -27,7 +27,7 @@ def validate_file_size(value):
     if value.size > limit:
         raise ValidationError(
             _("حجم الملف كبير جدًا. الحد الأقصى المسموح به هو %(max)sMB."),
-            params={'max': int(limit / (1024*1024))},
+            params={'max': int(limit / (1024 * 1024))},
         )
 
 # --- موديلات أساسية ---
@@ -173,6 +173,16 @@ class StudentSummary(models.Model):
         db_index=True
     )
     admin_notes = models.TextField(blank=True, null=True, verbose_name=_("ملاحظات المشرف (سبب الرفض مثلاً)"))
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name=_("مشاركة الملخص مع الجميع"),
+        help_text=_("إذا تم تحديده، سيكون الملخص متاحًا للجميع بعد الموافقة."),
+    )
+    is_anonymous = models.BooleanField(
+        default=False,
+        verbose_name=_("رفع الملخص بشكل مجهول"),
+        help_text=_("إذا تم تحديده، سيتم إخفاء اسم المستخدم."),
+    )
 
     class Meta:
         verbose_name = _("ملخص طالب")
@@ -180,12 +190,11 @@ class StudentSummary(models.Model):
         ordering = ['-uploaded_at']
         indexes = [
             models.Index(fields=['uploaded_by', 'status']),
-            models.Index(fields=['subject', 'status']),
+            models.Index(fields=['subject', 'status', 'is_public']),
         ]
 
     def __str__(self):
-        # حماية في حال لم يكن uploaded_by مرتبط بعد (مثلاً عند الإنشاء اليدوي)
-        username = self.uploaded_by.username if self.uploaded_by else "-"
+        username = self.uploaded_by.username if self.uploaded_by and not self.is_anonymous else "مجهول"
         return f"{self.title} - (بواسطة: {username})"
 
     @property
@@ -205,7 +214,7 @@ class StudentSummary(models.Model):
             return self.file.url
         return None
 
-# --- موديل تفاعلات المستخدم مع الملفات (لتمييز كمقروء) ---
+# --- موديل تفاعلات المستخدم مع الملفات ---
 class UserFileInteraction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="file_interactions_set")
     main_file = models.ForeignKey(MainFile, on_delete=models.CASCADE, related_name="user_interactions_set")

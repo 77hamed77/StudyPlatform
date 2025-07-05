@@ -56,6 +56,12 @@
     body.dark-mode .summaries-table .table-light {
         background: #20304a !important;
     }
+    .summaries-table .btn-download {
+        min-width: 100px;
+        font-size: 0.95em;
+        padding: 0.3rem 0.6rem;
+    }
+    body.dark-mode .text-muted { color: #b1bdd1 !important; }
 </style>
 {% endblock %}
 
@@ -79,6 +85,7 @@
                         <th scope="col">تاريخ الرفع</th>
                         <th scope="col" class="text-center">الحالة</th>
                         <th scope="col">ملاحظات المشرف</th>
+                        <th scope="col">تحميل</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +93,8 @@
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>
-                            <a href="{{ summary.file_url }}" target="_blank" title="تنزيل/معاينة {{ summary.title }}">
+                            <a href="{{ summary.file_url }}" target="_blank" title="تنزيل/معاينة {{ summary.title }}"
+                               {% if not summary.file_url %}class="text-muted"{% endif %}>
                                 {{ summary.title|truncatechars:40 }}
                             </a>
                         </td>
@@ -104,6 +112,17 @@
                             {% endif %}
                         </td>
                         <td>{{ summary.admin_notes|default_if_none:"-" }}</td>
+                        <td>
+                            {% if summary.file_url %}
+                            <a href="{{ summary.file_url }}" class="btn btn-sm btn-success btn-download" download="{{ summary.title }}{{ summary.file_extension }}">
+                                <i class="fas fa-download"></i> تحميل
+                            </a>
+                            {% else %}
+                            <button class="btn btn-sm btn-success btn-download" disabled>
+                                <i class="fas fa-exclamation-triangle"></i> غير متاح
+                            </button>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

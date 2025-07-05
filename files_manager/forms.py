@@ -1,43 +1,73 @@
 from django import forms
-from .models import StudentSummary, Subject  # استيراد Subject
+from .models import StudentSummary, Subject
 from django.utils.translation import gettext_lazy as _
-from .models import validate_file_extension, validate_file_size  # استيراد المدققات
+from .models import validate_file_extension, validate_file_size
 
 class StudentSummaryUploadForm(forms.ModelForm):
     title = forms.CharField(
         label=_("عنوان الملخص"),
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': _('مثال: ملخص شامل للفصل الأول في الكيمياء')
-        })
+            'placeholder': _('مثال: ملخص شامل للفصل الأول في الكيمياء'),
+            'required': 'required',
+        }),
+        max_length=255,
     )
     subject = forms.ModelChoiceField(
         queryset=Subject.objects.all().order_by('name'),
         label=_("المادة الدراسية"),
         widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label=_("--- اختر المادة ---")
+        empty_label=_("--- اختر المادة ---"),
+        required=True,
     )
     file = forms.FileField(
         label=_("ملف الملخص"),
-        widget=forms.FileInput(attrs={'class': 'form-control'}),
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif'}),
         validators=[validate_file_extension, validate_file_size],
-        help_text=_("الملفات المسموح بها: PDF, DOC, DOCX, PPT, PPTX, إلخ. (حجم أقصى: 10MB)")
+        help_text=_("الملفات المسموح بها: PDF, DOC, DOCX, PPT, PPTX, إلخ. (حجم أقصى: 10MB)"),
+        max_size=10 * 1024 * 1024,  # 10MB
+    )
+    description = forms.CharField(
+        label=_("الوصف (اختياري)"),
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': _('مثال: ملخص شامل للفصل الأول في الكيمياء'),
+        }),
+        required=False,
+        max_length=1000,
+    )
+    is_public = forms.BooleanField(
+        label=_("مشاركة الملخص مع الجميع"),
+        required=False,
+        initial=False,  # تغيير الافتراضي إلى False لأمان أكبر
+        help_text=_("إذا تم تحديده، سيكون الملخص متاحًا للجميع بعد الموافقة."),
+    )
+    is_anonymous = forms.BooleanField(
+        label=_("رفع الملخص بشكل مجهول"),
+        required=False,
+        initial=False,
+        help_text=_("إذا تم تحديده، سيتم إخفاء اسم المستخدم."),
+    )
+    uploaded_by = forms.ModelChoiceField(
+        queryset=None,  # سيتم تعيينه في العرض
+        widget=forms.HiddenInput(),
+        required=False,
     )
 
     class Meta:
         model = StudentSummary
-        fields = ['title', 'subject', 'file']
+        fields = ['title', 'subject', 'file', 'description', 'is_public', 'is_anonymous', 'uploaded_by']
 
-    # تحقق إضافي اختياري (لا حاجة لتعديل لأجل Backblaze/S3)
-    # إذا أردت منع الملفات المكررة بناءً على الاسم أو أي منطق آخر أضفه هنا
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['uploaded_by'].queryset = User.objects.filter(id=user.id)
+            self.fields['uploaded_by'].initial = user
 
-    # مثال: منع رفع ملف بنفس الاسم للمادة نفسها من نفس المستخدم
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     title = cleaned_data.get('title')
-    #     subject = cleaned_data.get('subject')
-    #     file = cleaned_data.get('file')
-    #     user = self.initial.get('user')  # مرر المستخدم عند تهيئة الفورم لو احتجت
-    #     if StudentSummary.objects.filter(title=title, subject=subject, uploaded_by=user).exists():
-    #         raise forms.ValidationError(_("لقد قمت مسبقاً برفع ملخص بهذا العنوان لهذه المادة."))
-    #     return cleaned_data
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('file'):
+            raise forms.ValidationError(_("يجب رفع ملف للملخص."))
+        return cleaned_data
