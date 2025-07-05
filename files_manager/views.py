@@ -1,4 +1,3 @@
-## files_manager/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,17 +25,27 @@ class MainFileListView(LoginRequiredMixin, ListView):
         queryset = MainFile.objects.select_related(
             'subject', 'lecturer', 'file_type', 'uploaded_by'
         ).order_by('-uploaded_at')
+        # البحث حسب العنوان أو الوصف
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                models.Q(title__icontains=q) | models.Q(description__icontains=q)
+            )
+        # التصفية حسب السنة الدراسية
+        academic_year = self.request.GET.get('academic_year')
+        if academic_year:
+            queryset = queryset.filter(academic_year=academic_year)
+        # التصفية حسب الفصل الدراسي
+        semester = self.request.GET.get('semester')
+        if semester:
+            queryset = queryset.filter(semester=semester)
+        # التصفية حسب المادة والنوع (كما هو موجود)
         subject_id = self.request.GET.get('subject')
         file_type_id = self.request.GET.get('type')
-        query = self.request.GET.get('q')
         if subject_id:
             queryset = queryset.filter(subject_id=subject_id)
         if file_type_id:
             queryset = queryset.filter(file_type_id=file_type_id)
-        if query:
-            queryset = queryset.filter(
-                models.Q(title__icontains=query) | models.Q(description__icontains=query)
-            )
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -55,6 +64,11 @@ class MainFileListView(LoginRequiredMixin, ListView):
             for file_obj in files_on_page:
                 file_obj.current_user_marked_as_read = False
 
+        # إضافة قائمة السنوات الدراسية الفريدة
+        context['academic_years'] = MainFile.objects.values_list('academic_year', flat=True).distinct().order_by('academic_year')
+        # إضافة اختيارات الفصول الدراسية
+        context['semesters'] = MainFile.SEMESTER_CHOICES
+        # الاحتفاظ بالموارد الحالية
         context['subjects_for_filter'] = Subject.objects.all().order_by('name')
         context['file_types_for_filter'] = FileType.objects.all().order_by('name')
         return context

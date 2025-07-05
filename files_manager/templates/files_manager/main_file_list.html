@@ -7,68 +7,97 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
-.files-table {
-    background: var(--table-bg, #fff);
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    overflow: hidden;
-}
-.files-table th, .files-table td {
-    vertical-align: middle;
-    text-align: center;
-    font-size: 1rem;
-    border-bottom: 1px solid var(--table-border, #e3e6f0);
-    padding: 0.9rem 0.5rem;
-}
-.files-table th {
-    background: var(--table-header-bg, #f7f9fc);
-    color: var(--table-header-color, #274160);
-    font-weight: 600;
-}
-.files-table tr:last-child td {
-    border-bottom: none;
-}
-.files-table tbody tr:hover {
-    background: var(--table-row-hover, #f0f4fa);
-}
-body.dark-mode .files-table {
-    background: #1d2c3b;
-    color: #e8ecf1;
-}
-body.dark-mode .files-table th {
-    background: #20304a;
-    color: #e8ecf1;
-}
-body.dark-mode .files-table td {
-    border-bottom: 1px solid #293b54;
-}
-body.dark-mode .files-table tbody tr:hover {
-    background: #18202b;
-}
-.files-table .file-title-link {
-    color: inherit;
-    font-weight: 500;
-    transition: color 0.15s;
-}
-.files-table .file-title-link:hover {
-    color: #1a73e8;
-    text-decoration: underline;
-}
-body.dark-mode .files-table .file-title-link:hover {
-    color: #e4c975;
-}
-.files-table .badge {
-    font-size: 0.88em;
-    padding: 0.4em 0.6em;
-    border-radius: 6px;
-}
-.files-table .btn-download {
-    min-width: 120px;
-    font-size: 0.97em;
-    padding: 0.4rem 0.8rem;
-}
-.files-table .text-success { color: #28a745; }
-body.dark-mode .text-success { color: #38c172; }
+    .files-table {
+        background: var(--table-bg, #fff);
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    .files-table th, .files-table td {
+        vertical-align: middle;
+        text-align: center;
+        font-size: 1rem;
+        border-bottom: 1px solid var(--table-border, #e3e6f0);
+        padding: 0.9rem 0.5rem;
+    }
+    .files-table th {
+        background: var(--table-header-bg, #f7f9fc);
+        color: var(--table-header-color, #274160);
+        font-weight: 600;
+    }
+    .files-table tr:last-child td {
+        border-bottom: none;
+    }
+    .files-table tbody tr:hover {
+        background: var(--table-row-hover, #f0f4fa);
+    }
+    body.dark-mode .files-table {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    body.dark-mode .files-table th {
+        background: #20304a;
+        color: #e8ecf1;
+    }
+    body.dark-mode .files-table td {
+        border-bottom: 1px solid #293b54;
+    }
+    body.dark-mode .files-table tbody tr:hover {
+        background: #18202b;
+    }
+    .file-title-link {
+        color: inherit;
+        font-weight: 500;
+        transition: color 0.15s;
+    }
+    .file-title-link:hover {
+        color: #1a73e8;
+        text-decoration: underline;
+    }
+    body.dark-mode .file-title-link:hover {
+        color: #e4c975;
+    }
+    .badge {
+        font-size: 0.88em;
+        padding: 0.4em 0.6em;
+        border-radius: 6px;
+    }
+    .btn-download {
+        min-width: 120px;
+        font-size: 0.97em;
+        padding: 0.4rem 0.8rem;
+    }
+    .text-success { color: #28a745; }
+    body.dark-mode .text-success { color: #38c172; }
+    .filter-section {
+        background: var(--card-bg, #fff);
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-section label {
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    .filter-section select, .filter-section input {
+        margin-right: 1rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--input-border, #e3e6f0);
+    }
+    body.dark-mode .filter-section {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    body.dark-mode .filter-section select, body.dark-mode .filter-section input {
+        background: #20304a;
+        color: #e8ecf1;
+        border-color: #293b54;
+    }
+    .filter-section .btn {
+        margin-right: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -83,23 +112,37 @@ body.dark-mode .text-success { color: #38c172; }
         {% endif %}
     </div>
 
-    {% if filter_form %}
-    <div class="card shadow-sm mb-4 filter-form">
-        <div class="card-body">
-            <form method="get" class="row gx-2 gy-2 align-items-center">
-                {{ filter_form|crispy }}
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-filter"></i> تطبيق الفلتر
-                    </button>
-                    <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-sm btn-outline-secondary ms-1">
-                        <i class="fas fa-times"></i> مسح الفلتر
-                    </a>
-                </div>
-            </form>
-        </div>
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" action="" class="row g-3 align-items-end">
+            <div class="col-auto">
+                <label for="search">البحث:</label>
+                <input type="text" name="q" id="search" class="form-control" value="{{ request.GET.q }}" placeholder="ابحث باسم الملف أو الوصف...">
+            </div>
+            <div class="col-auto">
+                <label for="academic_year">السنة الدراسية:</label>
+                <select name="academic_year" id="academic_year" class="form-select">
+                    <option value="">--- جميع السنوات ---</option>
+                    {% for year in academic_years %}
+                        <option value="{{ year }}" {% if request.GET.academic_year == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="semester">الفصل الدراسي:</label>
+                <select name="semester" id="semester" class="form-select">
+                    <option value="">--- جميع الفصول ---</option>
+                    {% for value, label in semesters %}
+                        <option value="{{ value }}" {% if request.GET.semester == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">تصفية</button>
+                <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-outline-secondary">مسح الفلتر</a>
+            </div>
+        </form>
     </div>
-    {% endif %}
 
     {% if files %}
     <div class="files-table-wrapper">
@@ -112,6 +155,8 @@ body.dark-mode .text-success { color: #38c172; }
                         <th>المادة</th>
                         <th>النوع</th>
                         <th>المحاضر</th>
+                        <th>السنة الدراسية</th>
+                        <th>الفصل الدراسي</th>
                         <th>تاريخ الرفع</th>
                         <th>تحميل</th>
                     </tr>
@@ -120,10 +165,10 @@ body.dark-mode .text-success { color: #38c172; }
                 {% for file_item in files %}
                     <tr>
                         <td>
-                            <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.file_url }}{% endif %}"
+                            <a href="{% if file_item.get_absolute_url %}{{ file_item.get_absolute_url }}{% else %}{{ file_item.get_file_url }}{% endif %}"
                                class="file-title-link"
                                {% if file_item.get_absolute_url %} title="عرض تفاصيل الملف" {% else %} title="تنزيل مباشر" target="_blank" {% endif %}>
-                                {{ file_item.title }}
+                                {{ file_item.title|truncatechars:40 }}
                             </a>
                             {% if file_item.current_user_marked_as_read %}
                                 <i class="fas fa-check-circle text-success ms-1" title="مقروء"></i>
@@ -158,16 +203,32 @@ body.dark-mode .text-success { color: #38c172; }
                             {% endif %}
                         </td>
                         <td>
+                            {% if file_item.academic_year %}
+                                <span class="badge bg-primary">{{ file_item.academic_year }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if file_item.semester %}
+                                <span class="badge bg-warning text-dark">
+                                    {% if file_item.semester == 'first' %}الفصل الأول{% else %}الفصل الثاني{% endif %}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <span class="small">{{ file_item.uploaded_at|date:"Y-m-d" }}</span>
                             <br>
                             <span class="text-muted small">{{ file_item.uploaded_at|time:"H:i" }}</span>
                         </td>
                         <td>
-                            {% if file_item.file_url %}
-                            <a href="{{ file_item.file_url }}" 
+                            {% if file_item.get_file_url %}
+                            <a href="{{ file_item.get_file_url }}" 
                                target="_blank" 
                                class="btn btn-sm btn-success btn-download"
-                               download="{{ file_item.title }}{{ file_item.file_extension }}">
+                               download="{{ file_item.title }}{{ file_item.file_extension|default:'.pdf' }}">
                                 <i class="fas fa-download"></i> تحميل
                             </a>
                             {% else %}

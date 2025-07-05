@@ -1,4 +1,3 @@
-# files_manager/models.py
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -106,6 +105,27 @@ class MainFile(models.Model):
     )
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الرفع"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("آخر تحديث"))
+    # حقل السنة الدراسية (جديد)
+    academic_year = models.CharField(
+        max_length=9,
+        blank=True,
+        null=True,
+        verbose_name=_("السنة الدراسية"),
+        help_text=_("مثال: 2023-2024"),
+    )
+    # حقل الفصل الدراسي (جديد)
+    SEMESTER_CHOICES = [
+        ('first', _('الفصل الأول')),
+        ('second', _('الفصل الثاني')),
+    ]
+    semester = models.CharField(
+        max_length=6,
+        choices=SEMESTER_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name=_("الفصل الدراسي"),
+        help_text=_("اختر الفصل الدراسي."),
+    )
 
     class Meta:
         verbose_name = _("ملف رئيسي")
@@ -114,6 +134,7 @@ class MainFile(models.Model):
         indexes = [
             models.Index(fields=['subject', '-uploaded_at']),
             models.Index(fields=['file_type', '-uploaded_at']),
+            models.Index(fields=['academic_year', 'semester', '-uploaded_at']),  # فهرس جديد
         ]
 
     def __str__(self):
@@ -133,6 +154,12 @@ class MainFile(models.Model):
     def file_url(self):
         if self.file:
             return self.file.url
+        return None
+
+    @property
+    def get_file_url(self):
+        if self.file:
+            return f"https://lnbxhoxjsvraumwckcsn.supabase.co/storage/v1/object/public/platformdocuments/uploads/{self.file.name}"
         return None
 
 # --- موديل ملخصات الطلاب ---

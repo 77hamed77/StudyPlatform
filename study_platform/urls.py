@@ -20,3 +20,7 @@ urlpatterns = [
 if settings.DEBUG:
     if hasattr(settings, 'STATIC_URL') and hasattr(settings, 'STATIC_ROOT'):
         urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+        
+urlpatterns = [
+    path('files/', include('files_manager.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
