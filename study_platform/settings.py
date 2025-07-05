@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'storages', # لتفعيل django-storages
     
     'achievements.apps.AchievementsConfig',
+    'chat_assistant.apps.ChatAssistantConfig',
     'core.apps.CoreConfig',
     'exam_prep.apps.ExamPrepConfig',
     'files_manager.apps.FilesManagerConfig',

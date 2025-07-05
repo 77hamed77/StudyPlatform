@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}مساعد الشات - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-comments me-2"></i>مساعد الشات للطلاب</h2>
+
+    <!-- Filter Section -->
+    <div class="filter-section mb-4">
+        <form method="get" action="" class="row g-3 align-items-end">
+            <div class="col-auto">
+                <label for="search">ابحث عن محاضرة:</label>
+                <input type="text" name="q" id="search" class="form-control" value="{{ request.GET.q }}" placeholder="ابحث باسم المحاضرة...">
+            </div>
+            <div class="col-auto">
+                <label for="academic_year">السنة الدراسية:</label>
+                <select name="academic_year" id="academic_year" class="form-select">
+                    <option value="">--- جميع السنوات ---</option>
+                    {% for year in academic_years %}
+                        <option value="{{ year }}" {% if request.GET.academic_year == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="semester">الفصل الدراسي:</label>
+                <select name="semester" id="semester" class="form-select">
+                    <option value="">--- جميع الفصول ---</option>
+                    {% for value, label in semesters %}
+                        <option value="{{ value }}" {% if request.GET.semester == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">تصفية</button>
+                <a href="{% url 'chat_assistant:chat_assistant' %}" class="btn btn-outline-secondary">مسح الفلتر</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- List of Lectures -->
+    <div class="mb-4">
+        <h4>اختر محاضرة:</h4>
+        <select name="lecture" id="lecture" class="form-select">
+            <option value="">--- اختر محاضرة ---</option>
+            {% for file in files %}
+                <option value="{{ file.id }}">{{ file.title }} ({{ file.academic_year|default:"غير محدد" }}, {{ file.semester|default:"غير محدد" }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Predefined Questions -->
+    <div class="mb-4">
+        <h4>أسئلة جاهزة:</h4>
+        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('ترجم هذه المحاضرة')">ترجم هذه المحاضرة</button>
+        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('لخص لي أهم الأفكار')">لخص لي أهم الأفكار</button>
+        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('ابحث عن عناوين يوتيوب')">ابحث عن عناوين يوتيوب</button>
+    </div>
+
+    <!-- Chat Area -->
+    <div id="chat-area" class="border p-3 rounded" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
+        <p>أدخل سؤالك أو اختر من الأسئلة أعلاه...</p>
+    </div>
+    <textarea id="chat-input" class="form-control mt-2" placeholder="اكتب سؤالك هنا..."></textarea>
+    <button class="btn btn-primary mt-2" onclick="sendQuestion()">إرسال</button>
+    <button class="btn btn-secondary mt-2" onclick="clearChat()">مسح الشات</button>
+    <div id="loading-indicator" class="mt-2 text-primary" style="display: none;">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        جاري معالجة طلبك...
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading-indicator').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-indicator').style.display = 'none';
+        }
+
+        function appendMessage(sender, message) {
+            const chatArea = document.getElementById('chat-area');
+            const messageElement = document.createElement('p');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatArea.appendChild(messageElement);
+            chatArea.scrollTop = chatArea.scrollHeight; // Scroll to bottom
+        }
+
+        function clearChat() {
+            const chatArea = document.getElementById('chat-area');
+            chatArea.innerHTML = '<p>أدخل سؤالك أو اختر من الأسئلة أعلاه...</p>';
+        }
+
+        function askQuestion(question) {
+            document.getElementById('chat-input').value = question;
+            sendQuestion();
+        }
+
+        function sendQuestion() {
+            const input = document.getElementById('chat-input').value.trim();
+            const lectureSelect = document.getElementById('lecture');
+            const lectureId = lectureSelect.value;
+            const lectureTitle = lectureSelect.options[lectureSelect.selectedIndex].text;
+
+            if (!input) {
+                alert('يرجى كتابة سؤال.');
+                return;
+            }
+            if (!lectureId) {
+                alert('يرجى اختيار محاضرة.');
+                return;
+            }
+
+            appendMessage('أنت', `(${lectureTitle}) ${input}`);
+            document.getElementById('chat-input').value = ''; // Clear input
+            showLoading();
+
+            fetch(`/chat/?question=${encodeURIComponent(input)}&lecture_id=${lectureId}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // للإشارة إلى طلب AJAX
+                }
+            })
+            .then(response => {
+                hideLoading();
+                if (!response.ok) {
+                    // إذا كان هناك خطأ في الاستجابة (مثل 404، 500)
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.response || `خطأ في الخادم: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                appendMessage('المساعد', data.response);
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                appendMessage('خطأ', `حدث خطأ: ${error.message || 'فشل الاتصال.'}`);
+            });
+        }
+    </script>
+</div>
+{% endblock %}

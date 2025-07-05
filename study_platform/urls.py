@@ -9,6 +9,8 @@ urlpatterns = [
     path('files/', include('files_manager.urls')),
     path('news/', include('news.urls')),
     path('tasks/', include('tasks.urls')),
+    path('chat/', include('chat_assistant.urls')),  # روابط تطبيق المساعد الذكي للدردشة
+    path('achievements/', include('achievements.urls')),  # روابط تطبيق الإنجازات
     path('accounts/', include('django.contrib.auth.urls')),  # تسجيل الدخول/الخروج وتغيير كلمة المرور
     path('notes/', include('notes.urls', namespace='notes')),
     path('exam-prep/', include('exam_prep.urls', namespace='exam_prep')),
