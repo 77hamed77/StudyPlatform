@@ -99,6 +99,22 @@ body.dark-mode .read-btn-text { color: #e8ecf1; }
                             {% endif %}
                         </span>
                     </div>
+                    
+                    {# --- حقول السنة والفصل الدراسي الجديدة --- #}
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="fas fa-calendar-alt me-1"></i>السنة الدراسية:</span>
+                        <span class="file-detail-value ms-1">
+                            {% if file_obj.academic_year %}{{ file_obj.academic_year }}{% else %}غير محدد{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <span class="file-detail-label"><i class="fas fa-graduation-cap me-1"></i>الفصل الدراسي:</span>
+                        <span class="file-detail-value ms-1">
+                            {% if file_obj.semester %}{{ file_obj.get_semester_display }}{% else %}غير محدد{% endif %}
+                        </span>
+                    </div>
+                    {# --- نهاية حقول السنة والفصل الدراسي الجديدة --- #}
+
                     <div class="col-md-6 col-lg-4">
                         <span class="file-detail-label"><i class="far fa-calendar-alt me-1"></i>تاريخ الرفع:</span>
                         <span class="file-detail-value ms-1">
@@ -177,7 +193,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    if (data.marked_as_read) {
+                    const isMarked = data.marked_as_read;
+                    if (isMarked) {
                         button.classList.add('active', 'btn-info');
                         button.classList.remove('btn-outline-info');
                         icon.classList.remove('far');

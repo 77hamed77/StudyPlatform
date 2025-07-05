@@ -51,12 +51,18 @@ class FileTypeAdmin(admin.ModelAdmin):
 @admin.register(MainFile)
 class MainFileAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'subject', 'file_type', 'lecturer', 'uploaded_by_username',
-        'uploaded_at', 'file_size_display', 'get_file_link'
+        'title', 'subject', 'file_type', 'lecturer',
+        'academic_year', 'semester_display', # <--- أضف الحقول الجديدة هنا
+        'uploaded_by_username', 'uploaded_at', 'file_size_display', 'get_file_link'
     )
-    list_filter = ('subject', 'file_type', 'lecturer', 'uploaded_at', 'uploaded_by')
+    list_filter = (
+        'subject', 'file_type', 'lecturer',
+        'academic_year', 'semester', # <--- أضف الحقول الجديدة هنا للتصفية
+        'uploaded_at', 'uploaded_by'
+    )
     search_fields = (
-        'title', 'description', 'subject__name', 'lecturer__name', 'uploaded_by__username'
+        'title', 'description', 'subject__name', 'lecturer__name', 'uploaded_by__username',
+        'academic_year' # يمكن إضافة البحث عن السنة أيضاً
     )
     readonly_fields = ('uploaded_at', 'updated_at', 'uploaded_by', 'display_file_extension')
     autocomplete_fields = ['subject', 'lecturer', 'file_type']
@@ -65,13 +71,18 @@ class MainFileAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'file')
         }),
         (_('التصنيف والمعلومات الإضافية'), {
-            'fields': ('subject', 'lecturer', 'file_type')
+            'fields': ('subject', 'lecturer', 'file_type', 'academic_year', 'semester') # <--- أضف الحقول الجديدة هنا
         }),
         (_('معلومات الرفع'), {
             'fields': ('uploaded_by', 'uploaded_at', 'updated_at', 'display_file_extension'),
             'classes': ('collapse',)
         }),
     )
+
+    @admin.display(description=_('الفصل الدراسي'), ordering='semester')
+    def semester_display(self, obj):
+        """يعرض القيمة المعروضة للفصل الدراسي بدلاً من القيمة الخام."""
+        return obj.get_semester_display()
 
     @admin.display(description=_('اسم الرافع'), ordering='uploaded_by__username')
     def uploaded_by_username(self, obj):
@@ -93,7 +104,6 @@ class MainFileAdmin(admin.ModelAdmin):
     @admin.display(description=_('رابط الملف'))
     def get_file_link(self, obj):
         if obj.file:
-            # عند استخدام Backblaze/S3 سيكون obj.file.url رابط صالح للتحميل حتى لو كان الملف خاص بشرط استخدام Signed URLs بالعرض للمستخدم النهائي فقط.
             return format_html(
                 '<a href="{}" download="{}{}">تنزيل الملف</a>',
                 obj.file.url,
@@ -193,3 +203,4 @@ class UserFileInteractionAdmin(admin.ModelAdmin):
     @admin.display(description=_('عنوان الملف'), ordering='main_file__title')
     def main_file_title(self, obj):
         return obj.main_file.title if obj.main_file else "-"
+

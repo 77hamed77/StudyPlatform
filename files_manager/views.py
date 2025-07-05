@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.core.files.storage import default_storage
 
-from .models import MainFile, StudentSummary, UserFileInteraction, Subject, FileType
+from .models import MainFile, StudentSummary, UserFileInteraction, Subject, FileType # تأكد من استيراد SemesterChoices
 from .forms import StudentSummaryUploadForm
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -25,20 +25,24 @@ class MainFileListView(LoginRequiredMixin, ListView):
         queryset = MainFile.objects.select_related(
             'subject', 'lecturer', 'file_type', 'uploaded_by'
         ).order_by('-uploaded_at')
+        
         # البحث حسب العنوان أو الوصف
         q = self.request.GET.get('q')
         if q:
             queryset = queryset.filter(
                 models.Q(title__icontains=q) | models.Q(description__icontains=q)
             )
+        
         # التصفية حسب السنة الدراسية
         academic_year = self.request.GET.get('academic_year')
         if academic_year:
             queryset = queryset.filter(academic_year=academic_year)
+        
         # التصفية حسب الفصل الدراسي
         semester = self.request.GET.get('semester')
         if semester:
             queryset = queryset.filter(semester=semester)
+        
         # التصفية حسب المادة والنوع (كما هو موجود)
         subject_id = self.request.GET.get('subject')
         file_type_id = self.request.GET.get('type')
@@ -46,6 +50,7 @@ class MainFileListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(subject_id=subject_id)
         if file_type_id:
             queryset = queryset.filter(file_type_id=file_type_id)
+        
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -67,10 +72,12 @@ class MainFileListView(LoginRequiredMixin, ListView):
         # إضافة قائمة السنوات الدراسية الفريدة
         context['academic_years'] = MainFile.objects.values_list('academic_year', flat=True).distinct().order_by('academic_year')
         # إضافة اختيارات الفصول الدراسية
-        context['semesters'] = MainFile.SEMESTER_CHOICES
+        context['semesters'] = MainFile.SEMESTER_CHOICES # استخدام SEMESTER_CHOICES من MainFile
+        
         # الاحتفاظ بالموارد الحالية
         context['subjects_for_filter'] = Subject.objects.all().order_by('name')
         context['file_types_for_filter'] = FileType.objects.all().order_by('name')
+        
         return context
 
 # --- Main File Detail ---
@@ -176,3 +183,4 @@ def toggle_file_read_status(request):
         'marked_as_read': interaction.marked_as_read,
         'file_id': main_file.pk
     })
+

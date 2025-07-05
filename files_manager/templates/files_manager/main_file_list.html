@@ -124,7 +124,7 @@
                 <select name="academic_year" id="academic_year" class="form-select">
                     <option value="">--- جميع السنوات ---</option>
                     {% for year in academic_years %}
-                        <option value="{{ year }}" {% if request.GET.academic_year == year %}selected{% endif %}>{{ year }}</option>
+                        <option value="{{ year }}" {% if request.GET.academic_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -212,7 +212,7 @@
                         <td>
                             {% if file_item.semester %}
                                 <span class="badge bg-warning text-dark">
-                                    {% if file_item.semester == 'first' %}الفصل الأول{% else %}الفصل الثاني{% endif %}
+                                    {{ file_item.get_semester_display }} {# <--- تم التعديل هنا #}
                                 </span>
                             {% else %}
                                 <span class="text-muted">—</span>

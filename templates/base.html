@@ -51,6 +51,12 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.app_name == 'exam_prep' %}active{% endif %}" href="{% url 'exam_prep:exam_resources' %}">ركن الامتحانات</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.app_name == 'chat_assistant' %}active{% endif %}" href="{% url 'chat_assistant:chat_assistant' %}">مساعد الشات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.app_name == 'achievements' %}active{% endif %}" href="{% url 'achievements:all_badges' %}">الإنجازات</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
