@@ -158,7 +158,7 @@ CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Riyadh'
+CELERY_TIMEZONE = 'Asia/Riyadh' # <--- تم تغيير هذا بالفعل في المحادثة السابقة
 
 # إعدادات الثابتة
 STATIC_URL = '/static/'
@@ -175,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'ar'
-TIME_ZONE = 'Asia/Damascus'
+TIME_ZONE = 'Asia/Damascus' # <--- هذا تم تغييره بالفعل
 USE_I18N = True
 USE_TZ = True
 LANGUAGES = [('en', _('English')), ('ar', _('Arabic'))]
@@ -214,3 +214,10 @@ if not DEBUG:
         logger.info("Database connection successful!")
     except Exception as e:
         logger.error(f"Database connection failed: {e}")
+
+# --- إعدادات أوقات الصلاة (جديد) ---
+# إحداثيات المدينة الافتراضية (دمشق، سوريا)
+DEFAULT_PRAYER_TIMES_LATITUDE = os.environ.get('DEFAULT_PRAYER_TIMES_LATITUDE', '33.5104') # خط عرض دمشق
+DEFAULT_PRAYER_TIMES_LONGITUDE = os.environ.get('DEFAULT_PRAYER_TIMES_LONGITUDE', '36.2784') # خط طول دمشق
+DEFAULT_PRAYER_TIMES_METHOD = os.environ.get('DEFAULT_PRAYER_TIMES_METHOD', '4') # 4 = Umm Al-Qura University, Makkah
+# ALADHAN_API_BASE_URL = os.environ.get('ALADHAN_API_BASE_URL', 'http://api.aladhan.com/v1') # هذا موجود بالفعل
