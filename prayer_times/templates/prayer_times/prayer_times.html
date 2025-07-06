@@ -1,55 +1,484 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}أوقات الصلاة - {{ block.super }}{% endblock %}
+{% block title %}{% translate "أوقات الصلاة" %} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    /* أنماط عامة للحاوية */
+    .prayer-times-container {
+        max-width: 750px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff); /* متغيرات CSS من base.html أو style.css */
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    /* الوضع الليلي */
+    body.dark-mode .prayer-times-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    /* رأس القسم */
+    .prayer-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .prayer-header h2 i {
+        margin-left: 10px;
+        font-size: 2.2rem;
+    }
+    body.dark-mode .prayer-header h2 {
+        color: #e4c975; /* لون ذهبي/أصفر للوضع الليلي */
+    }
+    .prayer-header p {
+        font-size: 1.1rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 25px;
+    }
+    body.dark-mode .prayer-header p {
+        color: #b1bdd1;
+    }
+
+    /* التنقل بين التواريخ */
+    .date-navigation {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        gap: 15px; /* مسافة بين العناصر */
+    }
+    .date-navigation a {
+        font-size: 1.1rem;
+        color: var(--primary-color, #007bff);
+        text-decoration: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        border: 1px solid var(--primary-color, #007bff);
+        background-color: transparent;
+    }
+    body.dark-mode .date-navigation a {
+        color: #e4c975;
+        border-color: #e4c975;
+    }
+    .date-navigation a:hover {
+        background-color: var(--primary-color, #007bff);
+        color: #fff;
+    }
+    body.dark-mode .date-navigation a:hover {
+        background-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .date-display {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0 15px;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .date-display {
+        color: #e8ecf1;
+    }
+
+    /* قائمة أوقات الصلاة */
+    .prayer-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 12px;
+        overflow: hidden; /* لضمان تطبيق border-radius على العناصر الداخلية */
+    }
+    body.dark-mode .prayer-list {
+        border: 1px solid #293b54;
+    }
+    .prayer-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color, #eee);
+        font-size: 1.2rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body.dark-mode .prayer-item {
+        border-bottom: 1px solid #293b54;
+    }
+    .prayer-item:last-child {
+        border-bottom: none;
+    }
+    /* تمييز الصلاة القادمة */
+    .prayer-item.next-prayer {
+        background-color: var(--highlight-bg, #e6f7ff); /* لون خلفية للتمييز */
+        font-weight: bold;
+        color: var(--highlight-text, #0056b3); /* لون نص للتمييز */
+        border-radius: 0; /* لأنها داخل قائمة ذات border-radius */
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* ظل داخلي خفيف */
+    }
+    body.dark-mode .prayer-item.next-prayer {
+        background-color: #2a3d52;
+        color: #e4c975;
+    }
+    .prayer-name {
+        display: flex;
+        align-items: center;
+    }
+    .prayer-name i {
+        margin-left: 10px;
+        color: var(--icon-color, #007bff);
+        font-size: 1.5rem;
+    }
+    body.dark-mode .prayer-name i {
+        color: #e4c975;
+    }
+    .prayer-time {
+        font-size: 1.3rem;
+        color: var(--time-color, #0056b3);
+    }
+    body.dark-mode .prayer-time {
+        color: #e4c975;
+    }
+
+    /* العد التنازلي */
+    #next-prayer-countdown {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary-color, #007bff);
+        margin-top: 20px;
+    }
+    body.dark-mode #next-prayer-countdown {
+        color: #e4c975;
+    }
+
+    /* رسائل التنبيه/الخطأ */
+    .alert-message {
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-size: 1.1rem;
+        background-color: var(--alert-bg, #d4edda);
+        color: var(--alert-text, #155724);
+        border: 1px solid var(--alert-border, #c3e6cb);
+    }
+    body.dark-mode .alert-message {
+        background-color: #283d2a;
+        color: #d4edda;
+        border-color: #384d3a;
+    }
+
+    /* قسم إعداد التذكير */
+    .reminder-settings-section {
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 25px;
+        margin-top: 40px;
+        text-align: left;
+    }
+    body.dark-mode .reminder-settings-section {
+        background: #20304a;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .reminder-settings-section h4 {
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    body.dark-mode .reminder-settings-section h4 {
+        color: #e4c975;
+    }
+    .reminder-settings-section h4 i {
+        margin-left: 10px;
+        font-size: 1.3rem;
+    }
+    .reminder-settings-section .form-label {
+        font-weight: 500;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .reminder-settings-section .form-label {
+        color: #e8ecf1;
+    }
+    .reminder-settings-section .form-control {
+        border-radius: 8px;
+        border: 1px solid var(--input-border, #ced4da);
+        background-color: var(--input-bg, #fff);
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .reminder-settings-section .form-control {
+        background-color: #1d2c3b;
+        border-color: #293b54;
+        color: #e8ecf1;
+    }
+    body.dark-mode .reminder-settings-section .btn-primary {
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.dark-mode .reminder-settings-section .btn-primary {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    body.dark-mode .reminder-settings-section .btn-primary:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+    .reminder-settings-section .text-muted {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2><i class="fas fa-pray me-2"></i>أوقات الصلاة</h2>
+<div class="prayer-times-container">
+    <div class="prayer-header">
+        <h2><i class="fas fa-mosque"></i> {% translate "أوقات الصلاة" %}</h2>
+        <p>{% translate "لـ" %} {{ location.name }} - {% translate "المنطقة الزمنية" %}: {{ location.timezone }}</p>
+    </div>
 
-    {% if not prayer_times.exists %}
-        <div class="alert alert-info text-center">
-            <p>لا توجد أوقات صلاة متاحة حالياً. سيتم التحديث تلقائياً.</p>
-        </div>
+    <div class="date-navigation">
+        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ prev_day|date:'Y-m-d' }}" class="btn btn-outline-primary">{% translate "اليوم السابق" %}</a>
+        <span class="date-display">{{ current_date|date:"l, d F Y" }}</span>
+        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ next_day|date:'Y-m-d' }}" class="btn btn-outline-primary">{% translate "اليوم التالي" %}</a>
+    </div>
+
+    {% if prayer_times %}
+    <ul class="prayer-list">
+        {% for prayer_item in prayer_times %}
+            {# لا تعرض منتصف الليل والإمساك في القائمة الرئيسية إذا لم تكن ضرورية #}
+            {% if prayer_item.prayer_type != 'midnight' and prayer_item.prayer_type != 'imsak' %} 
+            <li class="prayer-item" data-prayer-name="{{ prayer_item.prayer_type }}" data-prayer-time="{{ prayer_item.time|time:'H:i' }}">
+                <span class="prayer-name">
+                    {# أيقونات لكل صلاة #}
+                    <i class="fas {% if prayer_item.prayer_type == 'fajr' %}fa-cloud-moon{% elif prayer_item.prayer_type == 'sunrise' %}fa-sun{% elif prayer_item.prayer_type == 'dhuhr' %}fa-sun{% elif prayer_item.prayer_type == 'asr' %}fa-cloud-sun{% elif prayer_item.prayer_type == 'maghrib' %}fa-sunset{% elif prayer_item.prayer_type == 'isha' %}fa-moon{% else %}fa-clock{% endif %}"></i>
+                    {{ prayer_item.get_prayer_type_display }}
+                </span>
+                <span class="prayer-time">{{ prayer_item.time|time:"H:i" }}</span>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <p id="next-prayer-countdown">{% translate "جاري حساب الصلاة التالية..." %}</p>
     {% else %}
-        <div class="table-responsive">
-            <table class="table files-table align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>نوع الصلاة</th>
-                        <th>الوقت</th>
-                        <th>تم التذكير</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for prayer in prayer_times %}
-                    <tr>
-                        <td>{{ prayer.get_prayer_type_display }}</td>
-                        <td>{{ prayer.time|time:"H:i" }}</td>
-                        <td>{% if prayer.is_notified %}<span class="text-success">نعم</span>{% else %}<span class="text-danger">لا</span>{% endif %}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="alert-message">
+        <p>{% translate "تعذر جلب أوقات الصلاة لهذا التاريخ والموقع." %}</p>
+        <p>{% translate "يرجى التأكد من اتصالك بالإنترنت أو محاولة تحديث الصفحة." %}</p>
+    </div>
     {% endif %}
 
     <!-- إعداد التذكير -->
-    <div class="filter-section mt-4">
-        <h4>إعداد التذكير</h4>
-        <form method="post" action="">
+    <div class="reminder-settings-section">
+        <h4><i class="fas fa-bell"></i> {% translate "إعداد التذكير بالصلاة" %}</h4>
+        <form method="post" action="{% url 'prayer_times:prayer_times_list' %}{% if request.GET.date %}?date={{ request.GET.date }}{% endif %}">
             {% csrf_token %}
             <div class="row g-3 align-items-end">
-                <div class="col-auto">
-                    <label for="notification_time_before">التذكير قبل الصلاة (بالدقائق):</label>
-                    <input type="number" name="notification_time_before" id="notification_time_before" class="form-control" value="{{ reminder.notification_time_before|default:'5' }}" min="1">
+                <div class="col-md-6">
+                    <label for="notification_time_before" class="form-label">{% translate "التذكير قبل الصلاة (بالدقائق):" %}</label>
+                    <input type="number" name="notification_time_before" id="notification_time_before" class="form-control" value="{{ reminder_setting.notification_time_before|default:'5' }}" min="0" max="60" step="1">
+                    <div class="form-text text-muted">{% translate "كم دقيقة قبل وقت الصلاة ترغب في تلقي التذكير؟ (0 لعدم التذكير المسبق)." %}</div>
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">حفظ</button>
+                <div class="col-md-6">
+                    <label for="enable_notifications" class="form-label">{% translate "تفعيل/تعطيل التذكيرات الصوتية:" %}</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enable_notifications" name="enable_notifications" {% if reminder_setting.enabled %}checked{% endif %}>
+                        <label class="form-check-label" for="enable_notifications">{% translate "تفعيل التذكيرات" %}</label>
+                    </div>
+                    <div class="form-text text-muted">{% translate "تفعيل هذا الخيار سيسمح بتشغيل صوت الأذان عند وقت الصلاة." %}</div>
+                </div>
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary">{% translate "حفظ إعدادات التذكير" %}</button>
                 </div>
             </div>
         </form>
-        <p class="mt-2 text-muted">ملاحظة: التذكيرات معطلة حاليًا بسبب تعطيل الجدولة. سيتم التحقق يدويًا عند تحميل الصفحة.</p>
+        <p class="mt-3 text-muted text-center">
+            {% translate "ملاحظة: التذكيرات الصوتية تعمل فقط عندما تكون هذه الصفحة مفتوحة في المتصفح." %}
+            {% translate "قد تحتاج إلى منح إذن للمتصفح لتشغيل الصوت." %}
+        </p>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Collect prayer times from the HTML data attributes
+    const prayerTimesData = {};
+    document.querySelectorAll('.prayer-item').forEach(item => {
+        const prayerName = item.dataset.prayerName;
+        const prayerTime = item.dataset.prayerTime;
+        prayerTimesData[prayerName] = prayerTime;
+    });
+
+    // Get Arabic prayer names from a hidden element or directly in JS if not passed
+    // For now, hardcode if not passed explicitly, or ensure it's in context
+    const prayerNamesArabic = {
+        'fajr': '{% translate "الفجر" %}',
+        'sunrise': '{% translate "الشروق" %}',
+        'dhuhr': '{% translate "الظهر" %}',
+        'asr': '{% translate "العصر" %}',
+        'maghrib': '{% translate "المغرب" %}',
+        'isha': '{% translate "العشاء" %}',
+        'imsak': '{% translate "الإمساك" %}',
+        'midnight': '{% translate "منتصف الليل" %}',
+    };
+
+    const locationTimezone = "{{ location.timezone }}";
+    const currentDisplayDate = "{{ current_date|date:'Y-m-d' }}"; 
+
+    const nextPrayerCountdownElement = document.getElementById('next-prayer-countdown');
+    const prayerItems = document.querySelectorAll('.prayer-item');
+    const enableNotificationsCheckbox = document.getElementById('enable_notifications');
+    const minutesBeforePrayerInput = document.getElementById('notification_time_before');
+
+    const adhanAudio = new Audio("{% static 'audio/adhan.mp3' %}");
+    adhanAudio.volume = 0.7;
+
+    let countdownInterval;
+    let adhanTimeout;
+    let prePrayerReminderTimeout;
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Function to update reminder settings via form submission (handled by Django POST)
+    // The form is already set up to POST to the same URL, so no explicit AJAX here for saving.
+    // The alert is just for immediate user feedback.
+
+    function updatePrayerTimesDisplay() {
+        const now = new Date();
+        const [currentYear, currentMonth, currentDay] = currentDisplayDate.split('-').map(Number);
+        
+        let nextPrayer = null;
+        let nextPrayerTime = null;
+        let nextPrayerNameArabic = '';
+        let nextPrayerElement = null;
+
+        const prayersOrder = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha']; // Order for finding next prayer
+
+        prayerItems.forEach(item => item.classList.remove('next-prayer')); // Clear existing highlights
+
+        for (const prayerType of prayersOrder) {
+            if (prayerTimesData[prayerType]) {
+                const [hours, minutes] = prayerTimesData[prayerType].split(':').map(Number);
+                const prayerDateTime = new Date(currentYear, currentMonth - 1, currentDay, hours, minutes, 0);
+                
+                if (prayerDateTime > now) {
+                    nextPrayer = prayerType;
+                    nextPrayerTime = prayerDateTime;
+                    nextPrayerNameArabic = prayerNamesArabic[prayerType];
+                    nextPrayerElement = document.querySelector(`.prayer-item[data-prayer-name="${prayerType}"]`);
+                    break;
+                }
+            }
+        }
+
+        if (!nextPrayer) {
+            nextPrayerCountdownElement.textContent = "{% translate 'جميع صلوات هذا اليوم قد انقضت.' %}";
+            if (adhanTimeout) clearTimeout(adhanTimeout);
+            if (prePrayerReminderTimeout) clearTimeout(prePrayerReminderTimeout);
+            return;
+        }
+
+        if (nextPrayerElement) {
+            nextPrayerElement.classList.add('next-prayer');
+        }
+
+        const diff = nextPrayerTime.getTime() - now.getTime(); // Difference in milliseconds
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        nextPrayerCountdownElement.innerHTML = `{% translate "الصلاة القادمة" %}: ${nextPrayerNameArabic} {% translate "في" %} ${nextPrayerTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}<br>{% translate "العد التنازلي" %}: ${hours}h ${minutes}m ${seconds}s`;
+
+        // Set Adhan reminder
+        if (adhanTimeout) clearTimeout(adhanTimeout);
+        if (prePrayerReminderTimeout) clearTimeout(prePrayerReminderTimeout);
+
+        const isNotificationsEnabled = enableNotificationsCheckbox ? enableNotificationsCheckbox.checked : false;
+        const minutesBefore = minutesBeforePrayerInput ? parseInt(minutesBeforePrayerInput.value, 10) : 5;
+
+        if (isNotificationsEnabled) {
+            // Play Adhan exactly at prayer time
+            if (diff > 0) {
+                adhanTimeout = setTimeout(() => {
+                    adhanAudio.play().catch(e => console.error("Error playing Adhan audio:", e));
+                    // Trigger a re-evaluation after Adhan plays to find the *next* prayer
+                    setTimeout(updatePrayerTimesDisplay, 2000); 
+                }, diff);
+            }
+
+            // Set pre-prayer reminder
+            if (!isNaN(minutesBefore) && minutesBefore > 0) {
+                const prePrayerDiff = diff - (minutesBefore * 60 * 1000);
+                if (prePrayerDiff > 0) {
+                    prePrayerReminderTimeout = setTimeout(() => {
+                        console.log(`Reminder: ${minutesBefore} minutes until ${nextPrayerNameArabic}`);
+                        if (Notification.permission === "granted") {
+                            new Notification(`{% translate "تذكير بالصلاة" %}`, {
+                                body: `{% translate "تبقى" %} ${minutesBefore} {% translate "دقيقة على صلاة" %} ${nextPrayerNameArabic}.`,
+                                icon: "{% static 'img/logo.png' %}"
+                            });
+                        } else if (Notification.permission !== "denied") {
+                            Notification.requestPermission().then(permission => {
+                                if (permission === "granted") {
+                                    new Notification(`{% translate "تذكير بالصلاة" %}`, {
+                                        body: `{% translate "تبقى" %} ${minutesBefore} {% translate "دقيقة على صلاة" %} ${nextPrayerNameArabic}.`,
+                                        icon: "{% static 'img/logo.png' %}"
+                                    });
+                                }
+                            });
+                        }
+                    }, prePrayerDiff);
+                }
+            }
+        }
+    }
+
+    // Initial call and set interval for countdown
+    if (prayerItems.length > 0) {
+        countdownInterval = setInterval(updatePrayerTimesDisplay, 1000);
+        updatePrayerTimesDisplay(); // Initial call
+    } else {
+        nextPrayerCountdownElement.textContent = "{% translate 'تعذر جلب أوقات الصلاة.' %}";
+    }
+
+    // Request Notification permission
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        setTimeout(() => { // Delay to avoid immediate prompt on page load
+            Notification.requestPermission();
+        }, 3000);
+    }
+});
+</script>
+{% endblock extra_scripts %}

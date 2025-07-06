@@ -175,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'ar'
-TIME_ZONE = 'Asia/Riyadh'
+TIME_ZONE = 'Asia/Damascus'
 USE_I18N = True
 USE_TZ = True
 LANGUAGES = [('en', _('English')), ('ar', _('Arabic'))]

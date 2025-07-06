@@ -12,8 +12,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='profile', # اسم العلاقة العكسية من User إلى UserProfile
-        primary_key=True, # جعل user هو المفتاح الأساسي يحسن الأداء قليلاً
+        related_name='profile',
+        primary_key=True,
         verbose_name=_("المستخدم")
     )
     dark_mode_enabled = models.BooleanField(
@@ -41,9 +41,15 @@ class UserProfile(models.Model):
         verbose_name=_("عدد جلسات العمل قبل الراحة الطويلة"),
         help_text=_("القيمة الافتراضية هي 4 جلسات. (من 1 إلى 10)")
     )
-    # يمكنك إضافة حقول أخرى هنا مثل السيرة الذاتية، رابط صورة رمزية خارجية، إلخ.
-    # bio = models.TextField(blank=True, verbose_name=_("نبذة شخصية"))
-    # avatar_url = models.URLField(blank=True, verbose_name=_("رابط الصورة الرمزية"))
+    
+    # --- حقول إعدادات التذكير بالصلاة (جديد) ---
+    # لقد قمت بتعريف PrayerReminder كنموذج منفصل، لذا لا حاجة لهذه الحقول هنا.
+    # ولكن إذا كنت تفضل دمجها في UserProfile، فهذا هو المكان المناسب.
+    # بما أنك قدمت PrayerReminder في الـ views، سأفترض أنك تريد الاحتفاظ به منفصلاً.
+    # إذا غيرت رأيك وأردت دمجها، أخبرني.
+    # prayer_reminder_enabled = models.BooleanField(default=True, verbose_name=_("تفعيل تذكيرات الصلاة"))
+    # prayer_reminder_minutes_before = models.IntegerField(default=5, verbose_name=_("التذكير قبل الصلاة (دقائق)"))
+    # -------------------------------------------
 
     class Meta:
         verbose_name = _("الملف الشخصي للمستخدم")
@@ -70,14 +76,14 @@ class Notification(models.Model):
     recipient = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='notifications_received', # اسم مميز للعلاقة العكسية
+        related_name='notifications_received',
         verbose_name=_("المستلم")
     )
     # الفاعل (اختياري)
     actor_content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
-        related_name='actor_notifications_%(app_label)s_%(class)s_related', # اسم مميز لتجنب التعارض
+        related_name='actor_notifications_%(app_label)s_%(class)s_related',
         null=True, blank=True
     )
     actor_object_id = models.PositiveIntegerField(null=True, blank=True)
@@ -89,8 +95,8 @@ class Notification(models.Model):
     # الهدف (الكائن الذي يتعلق به الإشعار)
     target_content_type = models.ForeignKey(
         ContentType,
-        on_delete=models.CASCADE, # أو SET_NULL إذا أردت الاحتفاظ بالإشعار حتى لو حُذف الهدف
-        related_name='target_notifications_%(app_label)s_%(class)s_related', # اسم مميز
+        on_delete=models.CASCADE,
+        related_name='target_notifications_%(app_label)s_%(class)s_related',
         null=True, blank=True
     )
     target_object_id = models.PositiveIntegerField(null=True, blank=True)
@@ -98,8 +104,6 @@ class Notification(models.Model):
 
     unread = models.BooleanField(default=True, db_index=True, verbose_name=_("غير مقروء"))
     timestamp = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("التوقيت"))
-    # يمكنك إضافة حقل لنوع الإشعار إذا أردت تصنيفها
-    # notification_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     class Meta:
         ordering = ('-timestamp',)
@@ -127,10 +131,9 @@ class Notification(models.Model):
             self.save(update_fields=['unread'])
 
     def get_absolute_url(self):
-        # يوجه إلى رابط الهدف إذا كان موجودًا، وإلا إلى قائمة الإشعارات
         if self.target and hasattr(self.target, 'get_absolute_url'):
             return self.target.get_absolute_url()
-        return reverse('core:notifications_list') # افترض أن لديك هذا المسار
+        return reverse('core:notifications_list')
 
 
 class DailyQuote(models.Model):
@@ -143,15 +146,15 @@ class DailyQuote(models.Model):
     )
     is_active = models.BooleanField(
         default=True,
-        db_index=True, # فهرس لتحسين جلب الاقتباسات النشطة
+        db_index=True,
         verbose_name=_("نشط (يمكن عرضه)")
     )
-    # display_date = models.DateField(null=True, blank=True, unique=True, verbose_name=_("تاريخ العرض (اختياري)"))
 
     class Meta:
         verbose_name = _("اقتباس/نصيحة يومية")
         verbose_name_plural = _("اقتباسات/نصائح يومية")
-        ordering = ['-id'] # الأحدث إضافةً يظهر كأولوية إذا لم يتم اختيار عشوائي
+        ordering = ['-id']
 
     def __str__(self):
         return self.quote_text[:70] + "..." if len(self.quote_text) > 70 else self.quote_text
+
