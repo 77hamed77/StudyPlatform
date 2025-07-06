@@ -1,5 +1,6 @@
 import requests
 import os
+import json
 from datetime import datetime, timedelta, time
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -127,6 +128,9 @@ class PrayerTimesView(LoginRequiredMixin, View):
         return redirect(request.path)
 
     def _fetch_prayer_times_from_api(self, location, target_date, method):
+        """
+        يجلب أوقات الصلاة من Aladhan API.
+        """
         api_base_url = settings.ALADHAN_API_BASE_URL
         url = f"{api_base_url}/timings/{target_date.day}-{target_date.month}-{target_date.year}"
 
@@ -134,8 +138,8 @@ class PrayerTimesView(LoginRequiredMixin, View):
             'latitude': str(location.latitude),
             'longitude': str(location.longitude),
             'method': method,
-            'school': '1', 
-            'midnightMode': '0', 
+            'school': '1',
+            'midnightMode': '0',
             'tune': '0,0,0,0,0,0,0,0,0',
         }
 
@@ -151,9 +155,11 @@ class PrayerTimesView(LoginRequiredMixin, View):
                 return None
         except requests.exceptions.RequestException as e:
             print(f"Error connecting to Aladhan API: {e}")
+            messages.error(self.request, _(f"خطأ في الاتصال بـ API أوقات الصلاة: {e}"))
             return None
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
+            messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء جلب أوقات الصلاة: {e}"))
             return None
 
     def _check_and_create_reminders(self, user, prayer_times_qs, reminder_setting):
@@ -174,9 +180,9 @@ class PrayerTimesView(LoginRequiredMixin, View):
                         recipient=user,
                         verb=f'{_("تذكير بصلاة")} {prayer.get_prayer_type_display()}',
                         description=f"{_('حان وقت صلاة')} {prayer.get_prayer_type_display()} {_('في')} {prayer.time.strftime('%H:%M')}.",
+                        timestamp=now,
                         target_content_type=ContentType.objects.get_for_model(prayer),
                         target_object_id=prayer.pk,
-                        timestamp=now
                     )
                     prayer.is_notified = True
                     prayer.save(update_fields=['is_notified'])
@@ -261,7 +267,7 @@ class PrayerTimesView(LoginRequiredMixin, View):
             print(f"Daily reminders reset for {user.username} for date {today_date}")
 
 
-# --- Views الجديدة للقرآن والأذكار والأدعية ---
+# --- Views الجديدة للقرآن والأذكار والأدعية والأحاديث ---
 
 class QuranView(LoginRequiredMixin, TemplateView):
     template_name = 'prayer_times/quran_page.html'
@@ -289,7 +295,6 @@ class QuranView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(self.request, _(f"حدث خطأ غير متوقع: {e}"))
 
-        # قائمة بجميع سور القرآن الكريم الـ 114
         context['surahs_list'] = [
             {'number': 1, 'name': _('الفاتحة')},
             {'number': 2, 'name': _('البقرة')},
@@ -421,38 +426,40 @@ class AdhkarView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # API الجديد للأذكار
-        adhkar_api_base_url = "https://ahegazy.github.io/muslimsazkar/"
-        
-        # قائمة بالملفات JSON للأذكار التي نريد جلبها
+        data_dir = os.path.join(settings.BASE_DIR, 'prayer_times', 'static', 'prayer_times', 'data')
+
         adhkar_files = {
-            _("أذكار الصباح"): "azkar_sabah.json",
-            _("أذكار المساء"): "azkar_masa.json",
-            _("أذكار النوم"): "azkar_elnoom.json",
-            _("أذكار الاستيقاظ"): "azkar_elestkadh.json",
-            _("أذكار الصلاة"): "azkar_elsalah.json",
-            _("أذكار الطعام"): "azkar_elta3am.json",
-            _("أذكار متنوعة"): "azkar_motafareka.json",
+            _("أذكار الصباح"): "morning.json",
+            _("أذكار المساء"): "evening.json",
+            _("أذكار الصلاة"): "athkar_alsalah.json",
+            _("أذكار من القرآن"): "athkar_from_qurain.json",
+            # أضف هنا أي ملفات أخرى للأذكار التي تريد تضمينها
+            # _("أذكار النوم"): "azkar_elnoom.json",
+            # _("أذكار الاستيقاظ"): "azkar_elestkadh.json",
+            # _("أذكار الطعام"): "azkar_elta3am.json",
+            # _("أذكار متنوعة"): "azkar_motafareka.json",
         }
         
         all_adhkar_data = []
         for category_name, file_name in adhkar_files.items():
-            api_url = f"{adhkar_api_base_url}{file_name}"
+            file_path = os.path.join(data_dir, file_name)
             try:
-                response = requests.get(api_url, timeout=10)
-                response.raise_for_status() # يرفع استثناء لأخطاء 4xx/5xx
-                data = response.json()
-                if isinstance(data, list):
-                    # إضافة اسم الفئة لكل ذكر
-                    for dhikr in data:
-                        dhikr['category'] = category_name
-                    all_adhkar_data.extend(data)
+                if os.path.exists(file_path):
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    if isinstance(data, list):
+                        for dhikr in data:
+                            dhikr['text'] = dhikr.get('text', '') 
+                            dhikr['category'] = category_name
+                        all_adhkar_data.extend(data)
+                    else:
+                        messages.warning(self.request, _(f"تحذير: تنسيق بيانات غير متوقع للملف {file_name}. يتوقع قائمة."))
                 else:
-                    print(f"Warning: Unexpected data format for {file_name}. Expected a list.")
-            except requests.exceptions.RequestException as e:
-                messages.error(self.request, _(f"خطأ في الاتصال بـ API الأذكار ({category_name}): {e}"))
+                    messages.warning(self.request, _(f"تحذير: ملف الأذكار {file_name} غير موجود في المسار المحدد: {file_path}"))
+            except json.JSONDecodeError:
+                messages.error(self.request, _(f"خطأ في قراءة ملف JSON للملف {file_name}. تأكد من أنه ملف JSON صالح."))
             except Exception as e:
-                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء جلب {category_name}: {e}"))
+                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء قراءة {category_name}: {e}"))
 
         context['adhkar_data'] = all_adhkar_data
         return context
@@ -463,49 +470,71 @@ class DuasView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # API الجديد للأدعية
-        duas_api_base_url = "https://ahegazy.github.io/muslimsazkar/"
+        data_dir = os.path.join(settings.BASE_DIR, 'prayer_times', 'static', 'prayer_times', 'data')
         
-        # ملفات JSON للأدعية (قد تحتاج إلى تحديدها بدقة من الـ API)
-        # هذا الـ API لا يفصل الأذكار عن الأدعية بشكل صريح في مسارات مختلفة
-        # لذا، سنحاول جلب بعض الملفات التي قد تحتوي على أدعية عامة أو تصفية من "أذكار متنوعة"
-        # أو البحث عن API آخر مخصص للأدعية فقط.
-        # كمثال، سأجلب "أذكار متنوعة" وأفترض أنها تحتوي على بعض الأدعية.
-        # إذا كان هناك ملف JSON محدد للأدعية في هذا الـ API، يرجى تحديثه.
         duas_files = {
-    _("دعاء الركوب"): "azkar_rakoub.json",
-    _("دعاء السفر"): "azkar_safar.json",
-    _("دعاء دخول المنزل"): "azkar_dkhoul_almanzel.json",
-    _("دعاء الخروج من المنزل"): "azkar_khrog_manzel.json",
-    _("دعاء دخول المسجد"): "azkar_dkhoul_masjed.json",
-    _("دعاء الخروج من المسجد"): "azkar_khrog_masjed.json",
-    _("دعاء دخول الخلاء"): "azkar_dkhoul_elkhala.json",
-    _("دعاء الخروج من الخلاء"): "azkar_khrog_elkhala.json",
-    _("الرقية الشرعية"): "roqia.json",
-    _("دعاء الاستخارة"): "istikara.json",
-    _("دعاء الكرب"): "azkar_alkrb.json",
-    _("أدعية من القرآن"): "azkar_elquraan.json",
-    _("أدعية عامة"): "azkar_motafareka.json"
-}
-
+            _("أدعية عامة"): "adiah.json", # <--- تم التعديل ليظهر adiah.json فقط
+        }
 
         all_duas_data = []
         for category_name, file_name in duas_files.items():
-            api_url = f"{duas_api_base_url}{file_name}"
+            file_path = os.path.join(data_dir, file_name)
             try:
-                response = requests.get(api_url, timeout=10)
-                response.raise_for_status()
-                data = response.json()
-                if isinstance(data, list):
-                    for dua in data:
-                        dua['category'] = category_name
-                    all_duas_data.extend(data)
+                if os.path.exists(file_path):
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    if isinstance(data, list):
+                        for dua in data:
+                            dua['text'] = dua.get('text', '') 
+                            dua['category'] = category_name
+                        all_duas_data.extend(data)
+                    else:
+                        messages.warning(self.request, _(f"تحذير: تنسيق بيانات غير متوقع للملف {file_name}. يتوقع قائمة."))
                 else:
-                    print(f"Warning: Unexpected data format for {file_name}. Expected a list.")
-            except requests.exceptions.RequestException as e:
-                messages.error(self.request, _(f"خطأ في الاتصال بـ API الأدعية ({category_name}): {e}"))
+                    messages.warning(self.request, _(f"تحذير: ملف الأدعية {file_name} غير موجود في المسار المحدد: {file_path}"))
+            except json.JSONDecodeError:
+                messages.error(self.request, _(f"خطأ في قراءة ملف JSON للملف {file_name}. تأكد من أنه ملف JSON صالح."))
             except Exception as e:
-                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء جلب {category_name}: {e}"))
+                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء قراءة {category_name}: {e}"))
 
         context['duas_data'] = all_duas_data
         return context
+
+# --- View جديدة لصفحة الأحاديث ---
+class HadithView(LoginRequiredMixin, TemplateView):
+    template_name = 'prayer_times/hadith_page.html' # سيتم إنشاء هذا القالب
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        data_dir = os.path.join(settings.BASE_DIR, 'prayer_times', 'static', 'prayer_times', 'data')
+        
+        hadith_file = "nawawi40.json" # <--- اسم ملف الأحاديث
+        file_path = os.path.join(data_dir, hadith_file)
+
+        hadith_data = []
+        try:
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if isinstance(data, list):
+                    # قد تحتاج لتعديل هذه البنية حسب محتوى ملف nawawi40.json
+                    # افتراضياً، كل عنصر في القائمة هو حديث
+                    for hadith_item in data:
+                        # تأكد من أن الحقول مثل 'arabic' و 'translation' موجودة
+                        hadith_item['arabic'] = hadith_item.get('arabic', '')
+                        hadith_item['translation'] = hadith_item.get('translation', '')
+                        hadith_data.append(hadith_item)
+                else:
+                    messages.warning(self.request, _(f"تحذير: تنسيق بيانات غير متوقع للملف {hadith_file}. يتوقع قائمة من الأحاديث."))
+            else:
+                messages.warning(self.request, _(f"تحذير: ملف الأحاديث {hadith_file} غير موجود في المسار المحدد: {file_path}"))
+        except json.JSONDecodeError:
+            messages.error(self.request, _(f"خطأ في قراءة ملف JSON للملف {hadith_file}. تأكد من أنه ملف JSON صالح."))
+        except Exception as e:
+            messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء قراءة الأحاديث: {e}"))
+
+        context['hadith_data'] = hadith_data
+        context['page_title'] = _("الأربعون النووية") # عنوان للصفحة
+        return context
+

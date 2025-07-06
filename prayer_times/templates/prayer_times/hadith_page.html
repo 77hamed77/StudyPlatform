@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "الأحاديث" %} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .hadith-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .hadith-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .hadith-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+    }
+    body.dark-mode .hadith-header h2 {
+        color: #e4c975;
+    }
+    .hadith-list {
+        margin-top: 30px;
+        text-align: right;
+    }
+    .hadith-item {
+        margin-bottom: 25px;
+        padding: 20px;
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .hadith-item {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .hadith-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 15px;
+        display: block;
+        text-align: center;
+        border-bottom: 2px solid var(--primary-color-dark, #0056b3);
+        padding-bottom: 10px;
+    }
+    body.dark-mode .hadith-number {
+        color: #e4c975;
+        border-color: #e4c975;
+    }
+    .hadith-arabic {
+        font-family: 'Amiri', serif; /* خط عربي جميل */
+        font-size: 1.4rem;
+        line-height: 2;
+        margin-bottom: 15px;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .hadith-arabic {
+        color: #e8ecf1;
+    }
+    .hadith-translation {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: var(--text-muted, #555);
+        border-top: 1px dashed var(--border-color, #ccc);
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    body.dark-mode .hadith-translation {
+        border-color: #3b4d66;
+        color: #b1bdd1;
+    }
+    .hadith-reference {
+        font-size: 0.9rem;
+        color: var(--text-muted, #888);
+        margin-top: 10px;
+        font-style: italic;
+    }
+    body.dark-mode .hadith-reference {
+        color: #b1bdd1;
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    {% include "prayer_times/partials/islamic_resources_nav.html" %}
+
+    <div class="hadith-container">
+        <div class="hadith-header">
+            <h2><i class="fas fa-book me-2"></i> {% translate "الأحاديث النبوية" %}</h2>
+            <p class="text-muted">{% translate "مجموعة من الأحاديث الشريفة." %}</p>
+            {% if page_title %}
+                <h3 class="text-primary mt-3">{{ page_title }}</h3>
+            {% endif %}
+        </div>
+
+        {% if hadith_data %}
+            <div class="hadith-list">
+                {% for hadith in hadith_data %}
+                <div class="hadith-item">
+                    {% if hadith.number %}
+                        <span class="hadith-number">{% translate "الحديث رقم" %} {{ hadith.number }}</span>
+                    {% endif %}
+                    <p class="hadith-arabic">{{ hadith.arabic }}</p>
+                    {% if hadith.translation %}
+                        <p class="hadith-translation">{% translate "المعنى" %}: {{ hadith.translation }}</p>
+                    {% endif %}
+                    {% if hadith.reference %}
+                        <p class="hadith-reference">{% translate "المرجع" %}: {{ hadith.reference }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-4">
+                <p>{% translate "تعذر جلب الأحاديث حالياً." %}</p>
+                <p>{% translate "يرجى التأكد من وجود ملف nawawi40.json في المسار الصحيح." %}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
