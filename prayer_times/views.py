@@ -473,11 +473,6 @@ class DuasView(LoginRequiredMixin, TemplateView):
         # كمثال، سأجلب "أذكار متنوعة" وأفترض أنها تحتوي على بعض الأدعية.
         # إذا كان هناك ملف JSON محدد للأدعية في هذا الـ API، يرجى تحديثه.
         duas_files = {
-    _("أذكار الصباح"): "azkar_sabah.json",
-    _("أذكار المساء"): "azkar_massa.json",
-    _("أذكار بعد الصلاة"): "azkar_baadasalah.json",
-    _("أذكار النوم"): "azkar_noum.json",
-    _("أذكار الاستيقاظ"): "azkar_estikaz.json",
     _("دعاء الركوب"): "azkar_rakoub.json",
     _("دعاء السفر"): "azkar_safar.json",
     _("دعاء دخول المنزل"): "azkar_dkhoul_almanzel.json",
