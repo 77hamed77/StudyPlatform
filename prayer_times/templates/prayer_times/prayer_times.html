@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}أوقات الصلاة - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-pray me-2"></i>أوقات الصلاة</h2>
+
+    {% if not prayer_times.exists %}
+        <div class="alert alert-info text-center">
+            <p>لا توجد أوقات صلاة متاحة حالياً. سيتم التحديث تلقائياً.</p>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table files-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>نوع الصلاة</th>
+                        <th>الوقت</th>
+                        <th>تم التذكير</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for prayer in prayer_times %}
+                    <tr>
+                        <td>{{ prayer.get_prayer_type_display }}</td>
+                        <td>{{ prayer.time|time:"H:i" }}</td>
+                        <td>{% if prayer.is_notified %}<span class="text-success">نعم</span>{% else %}<span class="text-danger">لا</span>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- إعداد التذكير -->
+    <div class="filter-section mt-4">
+        <h4>إعداد التذكير</h4>
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label for="notification_time_before">التذكير قبل الصلاة (بالدقائق):</label>
+                    <input type="number" name="notification_time_before" id="notification_time_before" class="form-control" value="{{ reminder.notification_time_before|default:'5' }}" min="1">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </div>
+        </form>
+        <p class="mt-2 text-muted">ملاحظة: التذكيرات معطلة حاليًا بسبب تعطيل الجدولة. سيتم التحقق يدويًا عند تحميل الصفحة.</p>
+    </div>
+</div>
+{% endblock %}

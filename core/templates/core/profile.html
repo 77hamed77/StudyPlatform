@@ -5,111 +5,34 @@
 
 {% block extra_head %}
 {{ block.super }}
-{# رابط لـ Chart.js (يفضل تحميله محلياً أو استخدام CDN موثوق) #}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script> {# أو أحدث إصدار متوافق #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
-    .profile-header {
-        background-color: var(--bs-light); /* لون Bootstrap الافتراضي أو var(--body-bg) */
-        padding: 2.5rem 0; /* زيادة الحشو */
-        margin-bottom: 2.5rem;
-        border-bottom: 1px solid var(--card-border-color);
-        text-align: center; /* محاذاة كل شيء في المنتصف */
-    }
-    body.dark-mode .profile-header {
-        background-color: var(--card-bg-dark); /* لون أغمق قليلاً من خلفية الجسم */
-        border-bottom-color: var(--card-border-color-dark);
-    }
-    .profile-avatar-icon { /* لاستخدام أيقونة Font Awesome كصورة رمزية */
-        font-size: 6rem; /* حجم الأيقونة */
-        color: var(--bs-secondary); /* لون رمادي افتراضي */
-        margin-bottom: 1rem;
-        border: 4px solid var(--bs-white); /* إطار أبيض حول الأيقونة */
-        background-color: var(--bs-light); /* خلفية فاتحة للأيقونة */
-        border-radius: 50%;
-        width: 130px; /* تحديد عرض وارتفاع ثابتين */
-        height: 130px;
-        display: inline-flex; /* لمحاذاة الأيقونة رأسيًا وأفقيًا */
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
-    }
-    body.dark-mode .profile-avatar-icon {
-        color: var(--text-color-dark);
-        border-color: var(--card-bg-dark);
-        background-color: var(--card-header-bg-dark);
-    }
-
-    .stat-item {
-        text-align: center;
-        padding: 1rem 0.5rem;
-        /* الحدود بين الإحصائيات يمكن إضافتها عبر فئات Bootstrap .border-end */
-    }
-    .stat-item .stat-number {
-        font-size: 2rem; /* تكبير الرقم قليلاً */
-        font-weight: 700;
-        color: var(--bs-primary);
-        display: block;
-        line-height: 1; /* تقليل ارتفاع السطر للرقم */
-    }
+    .profile-header { background-color: var(--bs-light); padding: 2.5rem 0; margin-bottom: 2.5rem; border-bottom: 1px solid var(--card-border-color); text-align: center; }
+    body.dark-mode .profile-header { background-color: var(--card-bg-dark); border-bottom-color: var(--card-border-color-dark); }
+    .profile-avatar-icon { font-size: 6rem; color: var(--bs-secondary); margin-bottom: 1rem; border: 4px solid var(--bs-white); background-color: var(--bs-light); border-radius: 50%; width: 130px; height: 130px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1); }
+    body.dark-mode .profile-avatar-icon { color: var(--text-color-dark); border-color: var(--card-bg-dark); background-color: var(--card-header-bg-dark); }
+    .stat-item { text-align: center; padding: 1rem 0.5rem; }
+    .stat-item .stat-number { font-size: 2rem; font-weight: 700; color: var(--bs-primary); display: block; line-height: 1; }
     body.dark-mode .stat-item .stat-number { color: var(--bs-primary-dark); }
-    .stat-item .stat-label {
-        font-size: 0.85rem; /* تصغير التسمية قليلاً */
-        color: #6c757d;
-        display: block;
-        margin-top: 0.25rem;
-    }
+    .stat-item .stat-label { font-size: 0.85rem; color: #6c757d; display: block; margin-top: 0.25rem; }
     body.dark-mode .stat-item .stat-label { color: #adb5bd; }
-
-    .section-title { /* عنوان للأقسام مثل الشارات والمخططات */
-        font-size: 1.75rem;
-        font-weight: 500;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid var(--bs-primary);
-        display: inline-block; /* لجعل الخط السفلي يمتد فقط تحت النص */
-    }
-    body.dark-mode .section-title {
-        border-bottom-color: var(--bs-primary-dark);
-    }
-
-    .chart-container { position: relative; height:350px; width:100%; } /* ارتفاع ثابت لحاويات المخططات */
-
-    /* أنماط الشارات (من user_badges_list.html) */
-    .badge-card-display {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        text-align: center; /* محاذاة النص في كرت الشارة */
-    }
-    .badge-card-display:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .4rem .8rem rgba(0,0,0,.12)!important;
-    }
-    .badge-card-display .card-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.25rem;
-    }
-    .badge-card-display .display-4 {
-        font-size: 2.8rem !important;
-        margin-bottom: 0.75rem;
-    }
-    .badge-card-display p.small { /* وصف الشارة */
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-bottom: 0.5rem;
-        min-height: 40px; /* ارتفاع أدنى للوصف لتوحيد ارتفاع الكروت */
-    }
+    .section-title { font-size: 1.75rem; font-weight: 500; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--bs-primary); display: inline-block; }
+    body.dark-mode .section-title { border-bottom-color: var(--bs-primary-dark); }
+    .chart-container { position: relative; height: 350px; width: 100%; margin-bottom: 2rem; }
+    .badge-card-display { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-align: center; }
+    .badge-card-display:hover { transform: translateY(-5px); box-shadow: 0 .4rem .8rem rgba(0,0,0,.12)!important; }
+    .badge-card-display .card-title { font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .badge-card-display .display-4 { font-size: 2.8rem !important; margin-bottom: 0.75rem; }
+    .badge-card-display p.small { font-size: 0.8rem; color: #6c757d; margin-bottom: 0.5rem; min-height: 40px; }
     body.dark-mode .badge-card-display p.small { color: #adb5bd; }
-    .badge-card-display .card-footer small {
-        font-size: 0.75rem;
-    }
+    .badge-card-display .card-footer small { font-size: 0.75rem; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="profile-header">
     <div class="container">
-        <div class="profile-avatar-icon">
-            <i class="fas fa-user"></i> {# أيقونة المستخدم الافتراضية #}
-        </div>
+        <div class="profile-avatar-icon"><i class="fas fa-user"></i></div>
         <h1 class="display-5 fw-bold mt-2 mb-1">{{ user.get_full_name|default:user.username }}</h1>
         <p class="lead text-muted mb-3">{{ user.email }}</p>
         <a href="{% url 'core:settings' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
@@ -119,20 +42,19 @@
 </div>
 
 <div class="container mb-5">
-    <!-- قسم الإحصائيات -->
     <div class="card shadow-sm mb-5">
         <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>ملخص إنجازاتك</h5></div>
         <div class="card-body p-0">
             <div class="row g-0">
-                <div class="col-6 col-md-3 stat-item border-end"> {# استخدام border-end للفواصل #}
+                <div class="col-6 col-md-3 stat-item border-end">
                     <span class="stat-number">{{ total_tasks_completed|default:0 }}</span>
                     <span class="stat-label">مهام منجزة</span>
                 </div>
-                <div class="col-6 col-md-3 stat-item {% if not forloop.last %}border-end{% endif %}">
-                    <span class="stat-number">{{ total_tasks_pending_or_inprogress|default:0 }}</span>
+                <div class="col-6 col-md-3 stat-item border-end">
+                    <span class="stat-number">{{ total_tasks_pending|default:0 }}</span>
                     <span class="stat-label">مهام حالية</span>
                 </div>
-                <div class="col-6 col-md-3 stat-item border-end mt-3 mt-md-0"> {# mt-3 mt-md-0 للهوامش على الشاشات الصغيرة #}
+                <div class="col-6 col-md-3 stat-item border-end mt-3 mt-md-0">
                     <span class="stat-number">{{ files_marked_as_read_count|default:0 }}</span>
                     <span class="stat-label">ملفات مقروءة</span>
                 </div>
@@ -144,13 +66,13 @@
         </div>
     </div>
 
-    <!-- قسم الشارات المكتسبة (تضمين من achievements/user_badges_list.html) -->
     <div class="mb-5">
+        <h2 class="section-title"><i class="fas fa-trophy me-2"></i>شاراتك المكتسبة</h2>
         {% include "achievements/user_badges_list.html" with earned_badges=earned_badges display_user=user %}
     </div>
 
-    <!-- قسم المخططات البيانية (تضمين من achievements/achievement_stats.html) -->
     <div>
+        <h2 class="section-title"><i class="fas fa-chart-line me-2"></i>إحصائياتك</h2>
         {% include "achievements/achievement_stats.html" with tasks_completion_labels_raw=tasks_completion_labels_raw tasks_completion_data_raw=tasks_completion_data_raw tasks_by_subject_raw=tasks_by_subject_raw %}
     </div>
 </div>
@@ -158,6 +80,103 @@
 
 {% block extra_scripts %}
 {{ block.super }}
-{# JavaScript الخاص بالمخططات سيتم تضمينه من خلال achievements/achievement_stats.html #}
-{# تأكد من أن achievements/achievement_stats.html يحتوي على الـ <script> الخاص به #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const textColor = isDarkMode ? '#ccc' : '#555';
+    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+    // مخطط إنجاز المهام اليومي
+    const tasksCompletionCtx = document.getElementById('tasksCompletionChartProfile');
+    const tasksCompletionDataRaw = {{ tasks_completion_data_raw|default_if_none:'[]'|safe }};
+    const tasksCompletionLabelsRaw = {{ tasks_completion_labels_raw|default_if_none:'[]'|safe }};
+
+    if (tasksCompletionCtx && tasksCompletionDataRaw.length > 0 && tasksCompletionLabelsRaw.length > 0) {
+        const formattedLabels = tasksCompletionLabelsRaw.map(dateStr => {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ar-EG', { weekday: 'short' });
+        });
+
+        new Chart(tasksCompletionCtx, {
+            type: 'bar',
+            data: {
+                labels: formattedLabels,
+                datasets: [{
+                    label: 'المهام المنجزة',
+                    data: tasksCompletionDataRaw,
+                    backgroundColor: isDarkMode ? 'rgba(187, 134, 252, 0.6)' : 'rgba(13, 110, 253, 0.6)',
+                    borderColor: isDarkMode ? 'rgba(187, 134, 252, 1)' : 'rgba(13, 110, 253, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+                    x: { ticks: { color: textColor }, grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: true, labels: { color: textColor } },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#333' : '#fff',
+                        titleColor: isDarkMode ? '#fff' : '#333',
+                        bodyColor: isDarkMode ? '#eee' : '#555',
+                        borderColor: isDarkMode ? '#555' : '#ddd',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
+    } else if (tasksCompletionCtx) {
+        tasksCompletionCtx.parentNode.innerHTML = "<p class='text-center text-muted my-5 p-3 bg-light rounded small'>لا توجد بيانات كافية لعرض مخطط إنجاز المهام اليومي.</p>";
+        if (isDarkMode) tasksCompletionCtx.parentNode.querySelector('p').classList.replace('bg-light', 'bg-dark-subtle');
+    }
+
+    // مخطط توزيع المهام على المواد
+    const tasksBySubjectCtx = document.getElementById('tasksBySubjectChartProfile');
+    const tasksBySubjectRaw = {{ tasks_by_subject_raw|default_if_none:'[]'|safe }};
+
+    if (tasksBySubjectCtx && tasksBySubjectRaw.length > 0) {
+        const subjectLabels = tasksBySubjectRaw.map(item => item.subject__name || 'غير محدد');
+        const subjectData = tasksBySubjectRaw.map(item => item.count);
+        const backgroundColors = isDarkMode ?
+            ['#7E57C2', '#5C6BC0', '#42A5F5', '#29B6F6', '#26C6DA', '#26A69A', '#66BB6A'] :
+            ['#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4'];
+
+        new Chart(tasksBySubjectCtx, {
+            type: 'doughnut',
+            data: {
+                labels: subjectLabels,
+                datasets: [{
+                    label: 'المهام حسب المادة',
+                    data: subjectData,
+                    backgroundColor: backgroundColors,
+                    borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, padding: 15, usePointStyle: true, pointStyle: 'circle' } },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? '#333' : '#fff',
+                        titleColor: isDarkMode ? '#fff' : '#333',
+                        bodyColor: isDarkMode ? '#eee' : '#555',
+                        borderColor: isDarkMode ? '#555' : '#ddd',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
+    } else if (tasksBySubjectCtx) {
+        tasksBySubjectCtx.parentNode.innerHTML = "<p class='text-center text-muted my-5 p-3 bg-light rounded small'>لا توجد بيانات مهام منجزة حسب المواد لعرضها.</p>";
+        if (isDarkMode) tasksBySubjectCtx.parentNode.querySelector('p').classList.replace('bg-light', 'bg-dark-subtle');
+    }
+});
+</script>
 {% endblock %}

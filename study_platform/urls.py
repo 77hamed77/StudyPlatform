@@ -10,6 +10,7 @@ urlpatterns = [
     path('news/', include('news.urls')),
     path('tasks/', include('tasks.urls')),
     path('chat/', include('chat_assistant.urls')),  # روابط تطبيق المساعد الذكي للدردشة
+    path('prayer/', include('prayer_times.urls')),  # روابط تطبيق أوقات الصلاة
     path('achievements/', include('achievements.urls')),  # روابط تطبيق الإنجازات
     path('accounts/', include('django.contrib.auth.urls')),  # تسجيل الدخول/الخروج وتغيير كلمة المرور
     path('notes/', include('notes.urls', namespace='notes')),

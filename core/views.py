@@ -6,7 +6,7 @@ from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
-from .models import UserProfile, Notification, DailyQuote # استيراد DailyQuote
+from .models import UserProfile, Notification, DailyQuote
 from achievements.models import UserBadge
 from tasks.models import Task
 from files_manager.models import UserFileInteraction
@@ -16,8 +16,9 @@ import json
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-import random # لاستيراد random
-from news.models import NewsItem # لاستيراد أخبار الداشبورد
+import random
+from news.models import NewsItem
+from django.views.decorators.http import require_POST
 
 # ... (HomePageView, SignUpView كما هي من قبل) ...
 class HomePageView(TemplateView):
@@ -31,7 +32,6 @@ class SignUpView(CreateView):
         user = form.save(); login(self.request, user)
         messages.success(self.request, "تم إنشاء حسابك بنجاح!")
         return redirect(self.success_url)
-
 
 class UserSettingsView(LoginRequiredMixin, View):
     template_name = 'core/settings.html'
@@ -54,7 +54,7 @@ class UserSettingsView(LoginRequiredMixin, View):
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save() # سيتولى حفظ جميع حقول البروفايل بما فيها إعدادات بومودورو
+            profile_form.save()
             messages.success(request, 'تم تحديث إعداداتك بنجاح!')
             return redirect('core:settings')
         else:
@@ -64,14 +64,11 @@ class UserSettingsView(LoginRequiredMixin, View):
                 messages.error(request, 'يرجى تصحيح الأخطاء في إعدادات العرض والمؤقت.')
         return render(request, self.template_name, {'user_form': user_form, 'profile_form': profile_form})
 
-
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'core/dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # جلب اقتباس عشوائي نشط
         active_quotes = DailyQuote.objects.filter(is_active=True)
         if active_quotes.exists():
             count = active_quotes.count()
@@ -79,27 +76,22 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context['daily_quote'] = active_quotes[random_index]
         else:
             context['daily_quote'] = None
-        
-        # جلب آخر الأخبار الهامة
         try:
             context['latest_news'] = NewsItem.objects.filter(is_important=True).order_by('-publication_date')[:3]
-        except Exception: # في حال لم يتم إعداد تطبيق news بعد أو هناك مشكلة
+        except Exception:
             context['latest_news'] = None
-
-        # جلب المهام القادمة
         try:
             context['upcoming_tasks'] = Task.objects.filter(
-                user=self.request.user, 
-                status__in=['pending', 'in_progress'] # افترض أن لديك حالة in_progress
+                user=self.request.user,
+                status__in=['pending', 'in_progress']
             ).order_by('due_date')[:3]
-        except Exception: # في حال لم يتم إعداد تطبيق tasks بعد أو هناك مشكلة
+        except Exception:
             context['upcoming_tasks'] = None
-            
         return context
 
-# ... (UserProfileView و NotificationListView كما هي من قبل) ...
 class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'core/profile.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -110,7 +102,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         for day in days_range_raw:
             count = Task.objects.filter(user=user, status='completed', updated_at__date=day).count()
             completed_tasks_per_day_raw.append(count)
-        context['tasks_completion_labels_raw'] = days_range_raw
+        context['tasks_completion_labels_raw'] = [d.strftime('%Y-%m-%d') for d in days_range_raw]  # تنسيق صريح
         context['tasks_completion_data_raw'] = completed_tasks_per_day_raw
         tasks_by_subject_raw = list(Task.objects.filter(user=user, status='completed', subject__isnull=False).values('subject__name').annotate(count=Count('id')).order_by('-count'))
         context['tasks_by_subject_raw'] = tasks_by_subject_raw
@@ -134,7 +126,26 @@ class NotificationListView(GenericListView):
             try:
                 notif_to_mark = Notification.objects.get(pk=notification_to_mark_read_id, recipient=self.request.user, unread=True)
                 notif_to_mark.mark_as_read()
-            except (Notification.DoesNotExist, ValueError): pass
-        if not notification_to_mark_read_id: # تمييز الكل كمقروء عند زيارة الصفحة بدون تحديد إشعار
-             Notification.objects.filter(recipient=self.request.user, unread=True).update(unread=False)
+            except (Notification.DoesNotExist, ValueError):
+                pass
+        if not notification_to_mark_read_id:
+            Notification.objects.filter(recipient=self.request.user, unread=True).update(unread=False)
         return context
+
+@require_POST
+def mark_all_notifications_read(request):
+    if request.user.is_authenticated:
+        Notification.objects.filter(recipient=request.user, unread=True).update(unread=False)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Authentication required'}, status=403)
+
+def mark_notification_read(request):
+    if request.user.is_authenticated and 'id' in request.GET:
+        try:
+            notification = Notification.objects.get(id=request.GET['id'], recipient=request.user)
+            if notification.unread:
+                notification.mark_as_read()
+            return JsonResponse({'status': 'success'})
+        except Notification.DoesNotExist:
+            pass
+    return JsonResponse({'status': 'error'}, status=400)

@@ -52,7 +52,10 @@
                             <a class="nav-link {% if request.resolver_match.app_name == 'exam_prep' %}active{% endif %}" href="{% url 'exam_prep:exam_resources' %}">ركن الامتحانات</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'chat_assistant' %}active{% endif %}" href="{% url 'chat_assistant:chat_assistant' %}">مساعد الشات</a>
+                            <a class="nav-link {% if request.resolver_match.app_name == 'chat_assistant' %}active{% endif %}" href="{% url 'chat_assistant:chat_assistant' %}"> الشات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.app_name == 'prayer_times' %}active{% endif %}" href="{% url 'prayer_times:prayer_times' %}">أوقات الصلاة</a>
                         </li>
                     {% endif %}
                 </ul>

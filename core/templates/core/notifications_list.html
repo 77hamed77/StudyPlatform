@@ -8,30 +8,51 @@
 <style>
     .notification-item {
         border-left: 4px solid transparent;
-        transition: background-color 0.2s ease-in-out;
+        transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        position: relative;
     }
     .notification-item.unread {
-        background-color: rgba(var(--bs-info-rgb), 0.08); /* لون خلفية خفيف للإشعارات غير المقروءة */
+        background-color: rgba(var(--bs-info-rgb), 0.08);
         border-left-color: var(--bs-info);
     }
     body.dark-mode .notification-item.unread {
-        background-color: rgba(var(--bs-info-dark-rgb), 0.15); /* افترض أن لديك --bs-info-dark-rgb */
+        background-color: rgba(var(--bs-info-dark-rgb), 0.15);
         border-left-color: var(--bs-info-dark);
     }
     .notification-item:hover {
-        background-color: rgba(0,0,0,0.03);
+        background-color: rgba(0, 0, 0, 0.03);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     body.dark-mode .notification-item:hover {
-        background-color: rgba(255,255,255,0.05);
+        background-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
     }
     .notification-verb {
         font-weight: 500;
+        word-break: break-word;
     }
     .notification-target {
         color: var(--bs-primary);
+        word-break: break-word;
     }
     body.dark-mode .notification-target {
         color: var(--link-color-dark);
+    }
+    .mark-all-read-btn {
+        transition: background-color 0.2s ease-in-out;
+    }
+    .mark-all-read-btn:hover {
+        background-color: var(--bs-success-subtle);
+    }
+    body.dark-mode .mark-all-read-btn:hover {
+        background-color: rgba(var(--bs-success-rgb), 0.2);
+    }
+    .prayer-notification .notification-verb {
+        color: var(--bs-warning);
+    }
+    body.dark-mode .prayer-notification .notification-verb {
+        color: var(--bs-warning-subtle);
     }
 </style>
 {% endblock %}
@@ -40,15 +61,20 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <h2 class="mb-0"><i class="fas fa-bell me-2"></i>قائمة الإشعارات</h2>
-        {# تم حذف النموذج المُعلّق من هنا #}
+        {% if notifications_list and notifications_list|length > 0 %}
+            <button class="btn btn-sm btn-outline-success mark-all-read-btn" id="markAllReadBtn">
+                <i class="fas fa-check-double"></i> تمييز الكل كمقروء
+            </button>
+        {% endif %}
     </div>
 
     {% if notifications_list %}
         <div class="list-group shadow-sm">
             {% for notification_item_page in notifications_list %}
                 <a href="{{ notification_item_page.get_target_url|default:'#' }}"
-                   class="list-group-item list-group-item-action notification-item {% if notification_item_page.unread %}unread{% endif %}"
-                   aria-current="{% if notification_item_page.unread %}true{% endif %}">
+                   class="list-group-item list-group-item-action notification-item {% if notification_item_page.unread %}unread{% endif %} {% if 'صلاة' in notification_item_page.verb %}prayer-notification{% endif %}"
+                   aria-current="{% if notification_item_page.unread %}true{% endif %}"
+                   data-notification-id="{{ notification_item_page.id }}">
                     <div class="d-flex w-100 justify-content-between">
                         <p class="mb-1 notification-verb">
                             {% if notification_item_page.actor %}
@@ -81,4 +107,49 @@
         </div>
     {% endif %}
 </div>
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function () {
+            fetch('{% url "core:notification_mark_all_read" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload(); // إعادة تحميل الصفحة لتحديث الحالة
+                }
+            })
+            .catch(error => console.error('Error marking all as read:', error));
+        });
+    }
+
+    // تحديث حالة الإشعار عند النقر
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function () {
+            const notificationId = this.getAttribute('data-notification-id');
+            if (notificationId && this.classList.contains('unread')) {
+                fetch('{% url "core:notification_mark_read" %}?id=' + notificationId, {
+                    method: 'GET',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        this.classList.remove('unread');
+                    }
+                })
+                .catch(error => console.error('Error marking as read:', error));
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

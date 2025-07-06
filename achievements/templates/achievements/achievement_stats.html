@@ -7,10 +7,6 @@
     - tasks_by_subject_raw: قائمة بكائنات تحتوي على subject__name و count للمهام المنجزة لكل مادة.
 {% endcomment %}
 
-{% load static %}
-
-{# لا حاجة لـ extends "base.html" إذا كان هذا القالب سيُضمّن في قالب آخر مثل profile.html #}
-
 <div class="charts-section mb-4">
     <h4 class="mb-3">
         <i class="fas fa-chart-line text-success me-2"></i>مخططات تقدمك الدراسي
@@ -22,142 +18,23 @@
                     <h6 class="mb-0 fw-normal"><i class="fas fa-calendar-check me-1"></i>المهام المنجزة (آخر 7 أيام)</h6>
                 </div>
                 <div class="card-body">
-                    <div class="chart-container" style="height:300px;"> {# تحديد ارتفاع ثابت للحاوية #}
-                        <canvas id="tasksCompletionChartProfile"></canvas> {# اسم id فريد إذا كان لديك مخطط آخر بنفس الاسم #}
+                    <div class="chart-container" style="height:300px;">
+                        <canvas id="tasksCompletionChartProfile"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-5 mb-4 d-flex">
-             <div class="card shadow-sm flex-fill">
+            <div class="card shadow-sm flex-fill">
                 <div class="card-header">
                     <h6 class="mb-0 fw-normal"><i class="fas fa-pie-chart me-1"></i>توزيع المهام المنجزة على المواد</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-container" style="height:300px;">
-                        <canvas id="tasksBySubjectChartProfile"></canvas> {# اسم id فريد #}
+                        <canvas id="tasksBySubjectChartProfile"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-{% block extra_scripts_achievement_stats %} {# اسم block فريد #}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // تأكد من تضمين Chart.js في الصفحة الرئيسية (base.html أو profile.html)
-    if (typeof Chart === 'undefined') {
-        console.error("Chart.js is not loaded. Charts will not be displayed.");
-        return;
-    }
-
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const textColor = isDarkMode ? '#ccc' : '#555';
-    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-
-    // مخطط إنجاز المهام اليومي
-    const tasksCompletionCtxProfile = document.getElementById('tasksCompletionChartProfile');
-    const tasksCompletionDataRawProfile = {{ tasks_completion_data_raw|default_if_none:'[]'|safe }};
-    const tasksCompletionLabelsRawProfile = {{ tasks_completion_labels_raw|default_if_none:'[]'|safe }};
-
-    if (tasksCompletionCtxProfile && tasksCompletionDataRawProfile.length > 0 && tasksCompletionLabelsRawProfile.length > 0) {
-        const formattedLabels = tasksCompletionLabelsRawProfile.map(dateStr => {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ar-EG', { weekday: 'short' });
-        });
-
-        new Chart(tasksCompletionCtxProfile, {
-            type: 'bar',
-            data: {
-                labels: formattedLabels,
-                datasets: [{
-                    label: 'المهام المنجزة',
-                    data: tasksCompletionDataRawProfile,
-                    backgroundColor: isDarkMode ? 'rgba(187, 134, 252, 0.6)' : 'rgba(13, 110, 253, 0.6)',
-                    borderColor: isDarkMode ? 'rgba(187, 134, 252, 1)' : 'rgba(13, 110, 253, 1)',
-                    borderWidth: 1,
-                    borderRadius: 4, // حواف دائرية للأعمدة
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1, color: textColor },
-                        grid: { color: gridColor }
-                    },
-                    x: {
-                        ticks: { color: textColor },
-                        grid: { display: false } // إخفاء خطوط الشبكة لمحور السينات
-                    }
-                },
-                plugins: {
-                    legend: { display: true, labels: { color: textColor } },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#333' : '#fff',
-                        titleColor: isDarkMode ? '#fff' : '#333',
-                        bodyColor: isDarkMode ? '#eee' : '#555',
-                        borderColor: isDarkMode ? '#555' : '#ddd',
-                        borderWidth: 1
-                    }
-                }
-            }
-        });
-    } else if (tasksCompletionCtxProfile) {
-        tasksCompletionCtxProfile.parentNode.innerHTML = "<p class='text-center text-muted my-5 p-3 bg-light rounded small'>لا توجد بيانات كافية لعرض مخطط إنجاز المهام اليومي.</p>";
-         if (isDarkMode) tasksCompletionCtxProfile.parentNode.querySelector('p').classList.replace('bg-light', 'bg-dark-subtle');
-    }
-
-    // مخطط توزيع المهام على المواد
-    const tasksBySubjectCtxProfile = document.getElementById('tasksBySubjectChartProfile');
-    const tasksBySubjectRawProfile = {{ tasks_by_subject_raw|default_if_none:'[]'|safe }};
-
-    if (tasksBySubjectCtxProfile && tasksBySubjectRawProfile.length > 0) {
-        const subjectLabels = tasksBySubjectRawProfile.map(item => item.subject__name || 'غير محدد');
-        const subjectData = tasksBySubjectRawProfile.map(item => item.count);
-        const backgroundColors = isDarkMode ?
-            ['#7E57C2', '#5C6BC0', '#42A5F5', '#29B6F6', '#26C6DA', '#26A69A', '#66BB6A'] : // ألوان الوضع الليلي
-            ['#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4']; // ألوان الوضع النهاري
-
-        new Chart(tasksBySubjectCtxProfile, {
-            type: 'doughnut', // أو 'pie'
-            data: {
-                labels: subjectLabels,
-                datasets: [{
-                    label: 'المهام حسب المادة',
-                    data: subjectData,
-                    backgroundColor: backgroundColors,
-                    borderColor: isDarkMode ? '#1e1e1e' : '#ffffff', // لون الحدود بين القطع
-                    borderWidth: 2,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: textColor, padding: 15, usePointStyle: true, pointStyle: 'circle' }
-                    },
-                    title: { display: false },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#333' : '#fff',
-                        titleColor: isDarkMode ? '#fff' : '#333',
-                        bodyColor: isDarkMode ? '#eee' : '#555',
-                        borderColor: isDarkMode ? '#555' : '#ddd',
-                        borderWidth: 1
-                    }
-                }
-            }
-        });
-    } else if (tasksBySubjectCtxProfile) {
-        tasksBySubjectCtxProfile.parentNode.innerHTML = "<p class='text-center text-muted my-5 p-3 bg-light rounded small'>لا توجد بيانات مهام منجزة حسب المواد لعرضها.</p>";
-        if (isDarkMode) tasksBySubjectCtxProfile.parentNode.querySelector('p').classList.replace('bg-light', 'bg-dark-subtle');
-    }
-});
-</script>
-{% endblock %}

@@ -10,7 +10,6 @@ urlpatterns = [
     path('profile/', views.UserProfileView.as_view(), name='profile'),
     path('settings/', views.UserSettingsView.as_view(), name='settings'),
     path('notifications/', views.NotificationListView.as_view(), name='notifications_list'),
-    # يمكنك إضافة مسارات AJAX لتمييز الإشعارات كمقروءة هنا إذا أردت
-    # path('ajax/notifications/mark-as-read/<int:notification_id>/', views.mark_notification_as_read_ajax, name='ajax_mark_notification_read'),
-    # path('ajax/notifications/mark-all-as-read/', views.mark_all_notifications_as_read_ajax, name='ajax_mark_all_notifications_read'),
+    path('notifications/mark_all_read/', views.mark_all_notifications_read, name='notification_mark_all_read'),
+    path('notifications/mark_read/', views.mark_notification_read, name='notification_mark_read'),
 ]
