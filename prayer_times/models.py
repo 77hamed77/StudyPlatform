@@ -72,9 +72,21 @@ class PrayerReminder(models.Model):
     )
     enabled = models.BooleanField(
         default=True,
-        verbose_name=_("تفعيل التذكيرات الصوتية"),
+        verbose_name=_("تفعيل تذكيرات الصلاة"),
         help_text=_("تفعيل هذا الخيار سيسمح بتشغيل صوت الأذان عند وقت الصلاة.")
     )
+    # --- حقول جديدة لتذكير الورد اليومي ---
+    daily_werd_reminder_enabled = models.BooleanField(
+        default=False,
+        verbose_name=_("تفعيل تذكير الورد اليومي"),
+        help_text=_("تفعيل هذا الخيار لتذكيرك بقراءة الورد اليومي.")
+    )
+    daily_werd_reminder_time = models.TimeField(
+        default='07:00:00', # وقت افتراضي، يمكن أن يكون بعد الفجر مثلاً
+        verbose_name=_("وقت تذكير الورد اليومي"),
+        help_text=_("الوقت الذي ترغب فيه بتلقي تذكير الورد اليومي (مثال: 07:00 صباحاً).")
+    )
+    # ------------------------------------
 
     class Meta:
         verbose_name = _("إعداد تذكير الصلاة")

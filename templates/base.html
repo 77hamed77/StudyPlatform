@@ -70,11 +70,19 @@
                                 <i class="fas fa-comments me-1"></i> الشات المساعد
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'prayer_times' %}active{% endif %}" href="{% url 'prayer_times:prayer_times_list' %}">
-                                <i class="fas fa-mosque me-1"></i> أوقات الصلاة
+                        {# --- قائمة منسدلة جديدة للمصادر الإسلامية --- #}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'prayer_times' %}active{% endif %}" href="#" id="islamicResourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-book-reader me-1"></i> المصادر الإسلامية
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="islamicResourcesDropdown">
+                                <li><a class="dropdown-item" href="{% url 'prayer_times:prayer_times_list' %}">أوقات الصلاة</a></li>
+                                <li><a class="dropdown-item" href="{% url 'prayer_times:quran_page' %}">القرآن الكريم</a></li>
+                                <li><a class="dropdown-item" href="{% url 'prayer_times:adhkar_page' %}">الأذكار</a></li>
+                                <li><a class="dropdown-item" href="{% url 'prayer_times:duas_page' %}">الأدعية</a></li>
+                            </ul>
                         </li>
+                        {# --- نهاية قائمة المصادر الإسلامية --- #}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">

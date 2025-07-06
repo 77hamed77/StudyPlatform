@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "الأذكار" %} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .adhkar-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .adhkar-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .adhkar-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+    }
+    body.dark-mode .adhkar-header h2 {
+        color: #e4c975;
+    }
+    .adhkar-category {
+        margin-bottom: 30px;
+        text-align: right;
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 12px;
+        padding: 20px;
+        background-color: var(--bg-light, #f8f9fa);
+    }
+    body.dark-mode .adhkar-category {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .adhkar-category h3 {
+        font-size: 1.8rem;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 15px;
+        border-bottom: 2px solid var(--primary-color, #007bff);
+        padding-bottom: 10px;
+        display: inline-block; /* لجعل الخط السفلي بحجم النص */
+    }
+    body.dark-mode .adhkar-category h3 {
+        color: #e4c975;
+        border-color: #e4c975;
+    }
+    .dhikr-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--bg-secondary, #f0f4fa);
+        border-radius: 10px;
+        text-align: justify;
+        line-height: 1.8;
+        font-size: 1.15rem;
+        position: relative;
+    }
+    body.dark-mode .dhikr-item {
+        background-color: #2a3d52;
+    }
+    .dhikr-text {
+        font-weight: 500;
+        margin-bottom: 10px;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .dhikr-text {
+        color: #e8ecf1;
+    }
+    .dhikr-count {
+        font-size: 0.95rem;
+        color: var(--text-muted, #6c757d);
+        margin-top: 5px;
+    }
+    body.dark-mode .dhikr-count {
+        color: #b1bdd1;
+    }
+    .dhikr-reference {
+        font-size: 0.9rem;
+        color: var(--text-muted, #888);
+        margin-top: 5px;
+        font-style: italic;
+    }
+    body.dark-mode .dhikr-reference {
+        color: #b1bdd1;
+    }
+    .dhikr-description {
+        font-size: 0.95rem;
+        color: var(--text-muted, #555);
+        margin-top: 10px;
+        border-top: 1px dashed var(--border-color, #ccc);
+        padding-top: 10px;
+    }
+    body.dark-mode .dhikr-description {
+        border-color: #3b4d66;
+        color: #b1bdd1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    {% include "prayer_times/partials/islamic_resources_nav.html" %}
+
+    <div class="adhkar-container">
+        <div class="adhkar-header">
+            <h2><i class="fas fa-hands-praying me-2"></i> {% translate "الأذكار" %}</h2>
+            <p class="text-muted">{% translate "مجموعة من الأذكار اليومية للمسلم." %}</p>
+        </div>
+
+        {% if adhkar_data %}
+            {% comment %}
+                نحتاج إلى تجميع الأذكار حسب الفئة (category)
+                لأن الـ API يعيد قائمة مسطحة.
+                يمكن القيام بذلك في الـ view أو هنا في القالب.
+                لتبسيط القالب، سنفترض أن الـ view قد قام بتصفية الأذكار.
+                إذا كانت البيانات لا تزال تحتوي على فئات مختلفة، يمكننا تجميعها يدوياً هنا.
+            {% endcomment %}
+            {% regroup adhkar_data by category as categories %}
+            {% for category in categories %}
+            <div class="adhkar-category">
+                <h3>{{ category.grouper }}</h3>
+                {% for dhikr in category.list %}
+                <div class="dhikr-item">
+                    <p class="dhikr-text">{{ dhikr.arabic }}</p>
+                    {% if dhikr.translation %}
+                        <p class="dhikr-description">{% translate "المعنى" %}: {{ dhikr.translation }}</p>
+                    {% endif %}
+                    {% if dhikr.count %}
+                        <p class="dhikr-count">{% translate "العدد" %}: {{ dhikr.count }}</p>
+                    {% endif %}
+                    {% if dhikr.reference %}
+                        <p class="dhikr-reference">{% translate "المرجع" %}: {{ dhikr.reference }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info mt-4">
+                <p>{% translate "تعذر جلب الأذكار حالياً." %}</p>
+                <p>{% translate "يرجى المحاولة لاحقاً." %}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

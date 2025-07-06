@@ -13,13 +13,24 @@ class PrayerTimeAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'prayer_type', 'time', 'is_notified')
     list_filter = ('user', 'date', 'prayer_type', 'is_notified')
     search_fields = ('user__username', 'date')
-    date_hierarchy = 'date' # لتمكين التنقل حسب التاريخ
-    readonly_fields = ('user', 'date', 'prayer_type', 'time') # لا تسمح بتعديل هذه الحقول يدوياً
+    date_hierarchy = 'date'
+    readonly_fields = ('user', 'date', 'prayer_type', 'time')
 
 @admin.register(PrayerReminder)
 class PrayerReminderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification_time_before', 'enabled')
+    list_display = ('user', 'notification_time_before', 'enabled', 'daily_werd_reminder_enabled', 'daily_werd_reminder_time')
     search_fields = ('user__username',)
-    list_filter = ('enabled',)
-    raw_id_fields = ('user',) # لتحسين أداء البحث عن المستخدمين
+    list_filter = ('enabled', 'daily_werd_reminder_enabled')
+    raw_id_fields = ('user',)
+    fieldsets = (
+        (None, {
+            'fields': ('user',)
+        }),
+        (_('إعدادات تذكير الصلوات'), {
+            'fields': ('notification_time_before', 'enabled'),
+        }),
+        (_('إعدادات تذكير الورد اليومي'), {
+            'fields': ('daily_werd_reminder_enabled', 'daily_werd_reminder_time'),
+        }),
+    )
 

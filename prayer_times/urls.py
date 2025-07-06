@@ -1,10 +1,12 @@
 from django.urls import path
-from .views import PrayerTimesView # لا نحتاج get_prayer_times_json هنا
+from .views import PrayerTimesView, QuranView, AdhkarView, DuasView
 
 app_name = 'prayer_times'
 
 urlpatterns = [
     path('', PrayerTimesView.as_view(), name='prayer_times_list'),
-    # لا حاجة لـ 'api/' نقطة نهاية منفصلة إذا كان الـ JS يعتمد على البيانات المضمنة في القالب
-    # أو يمكن إضافتها إذا كنت تخطط لجلب البيانات بشكل ديناميكي بالكامل عبر AJAX
+    path('quran/', QuranView.as_view(), name='quran_page'),
+    path('adhkar/', AdhkarView.as_view(), name='adhkar_page'),
+    path('duas/', DuasView.as_view(), name='duas_page'),
 ]
+# Note: Ensure that the views (PrayerTimesView, QuranView, AdhkarView, DuasView) are defined in views.py
