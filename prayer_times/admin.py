@@ -18,9 +18,19 @@ class PrayerTimeAdmin(admin.ModelAdmin):
 
 @admin.register(PrayerReminder)
 class PrayerReminderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification_time_before', 'enabled', 'daily_werd_reminder_enabled', 'daily_werd_reminder_time')
+    list_display = (
+        'user', 
+        'notification_time_before', 
+        'enabled', 
+        'daily_werd_reminder_enabled', 
+        'daily_werd_reminder_time',
+        'is_notified_morning_adhkar_today', # <--- جديد
+        'is_notified_evening_adhkar_today', # <--- جديد
+        'is_notified_werd_today',           # <--- جديد
+        'last_notification_reset_date',     # <--- جديد
+    )
     search_fields = ('user__username',)
-    list_filter = ('enabled', 'daily_werd_reminder_enabled')
+    list_filter = ('enabled', 'daily_werd_reminder_enabled', 'is_notified_morning_adhkar_today', 'is_notified_evening_adhkar_today', 'is_notified_werd_today')
     raw_id_fields = ('user',)
     fieldsets = (
         (None, {
@@ -31,6 +41,15 @@ class PrayerReminderAdmin(admin.ModelAdmin):
         }),
         (_('إعدادات تذكير الورد اليومي'), {
             'fields': ('daily_werd_reminder_enabled', 'daily_werd_reminder_time'),
+        }),
+        (_('حالة الإشعارات اليومية'), { # <--- جديد
+            'fields': (
+                'is_notified_morning_adhkar_today',
+                'is_notified_evening_adhkar_today',
+                'is_notified_werd_today',
+                'last_notification_reset_date',
+            ),
+            'description': _("هذه الحقول تستخدم لتتبع الإشعارات التي تم إرسالها لهذا اليوم."),
         }),
     )
 

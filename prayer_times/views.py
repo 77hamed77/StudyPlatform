@@ -44,7 +44,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
                     if prayer_time_str:
                         try:
                             prayer_time_obj = datetime.strptime(prayer_time_str, '%H:%M').time()
-                            # تأكد من أن prayer_type موجود في PRAYER_CHOICES
                             if prayer_type.lower() in [choice[0] for choice in PrayerTime.PRAYER_CHOICES]:
                                 PrayerTime.objects.update_or_create(
                                     user=request.user,
@@ -64,11 +63,9 @@ class PrayerTimesView(LoginRequiredMixin, View):
 
         reminder_setting, created = PrayerReminder.objects.get_or_create(user=request.user)
 
-        # التحقق من التذكيرات وإنشاء الإشعارات (فقط لليوم الحالي)
         if target_date == timezone.now().date():
             self._check_and_create_reminders(request.user, prayer_times_qs, reminder_setting)
 
-        # ترتيب الصلوات للعرض في القالب
         ordered_prayer_types = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha', 'imsak', 'midnight']
         
         prayer_times_dict = {pt.prayer_type: pt for pt in prayer_times_qs}
@@ -112,7 +109,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
 
             reminder_setting.enabled = request.POST.get('enable_notifications') == 'on'
             
-            # --- حفظ إعدادات الورد اليومي ---
             reminder_setting.daily_werd_reminder_enabled = request.POST.get('daily_werd_reminder_enabled') == 'on'
             werd_time_str = request.POST.get('daily_werd_reminder_time')
             if werd_time_str:
@@ -121,7 +117,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
                     reminder_setting.daily_werd_reminder_time = werd_time_obj
                 except ValueError:
                     messages.error(request, _("تنسيق وقت الورد اليومي غير صالح. استخدم HH:MM."))
-            # ----------------------------------
 
             reminder_setting.save()
             messages.success(request, _("تم حفظ إعدادات التذكير بنجاح."))
@@ -162,10 +157,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
             return None
 
     def _check_and_create_reminders(self, user, prayer_times_qs, reminder_setting):
-        """
-        يتحقق من أوقات الصلاة وينشئ إشعارات للمستخدم إذا حان وقت التذكير،
-        بالإضافة إلى أذكار الصباح والمساء والورد اليومي.
-        """
         now = timezone.now()
         today_date = now.date()
 
@@ -178,8 +169,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
                 )
                 reminder_time = prayer_datetime - timedelta(minutes=reminder_setting.notification_time_before)
 
-                # تحقق إذا كان وقت التذكير قد حان للتو ولم يتم إرسال الإشعار بعد
-                # ويكون وقت الصلاة في المستقبل (لتجنب إشعارات الصلوات الماضية)
                 if reminder_time <= now < (reminder_time + timedelta(minutes=1)) and not prayer.is_notified and prayer_datetime > now:
                     Notification.objects.create(
                         recipient=user,
@@ -194,41 +183,37 @@ class PrayerTimesView(LoginRequiredMixin, View):
                     print(f"Notification created for {prayer.get_prayer_type_display()} for user {user.username}")
 
         # --- تذكير أذكار الصباح والمساء والورد اليومي ---
-        # نستخدم PrayerTime.objects.filter().first() للحصول على وقت الصلاة لليوم
         fajr_time_obj = PrayerTime.objects.filter(user=user, date=today_date, prayer_type='fajr').first()
         asr_time_obj = PrayerTime.objects.filter(user=user, date=today_date, prayer_type='asr').first()
 
-        # تذكير أذكار الصباح (بعد الفجر بـ 15 دقيقة، أو وقت محدد)
-        if fajr_time_obj:
-            morning_adhkar_reminder_time = timezone.make_aware(
+        # تذكير أذكار الصباح (بعد الفجر بـ 15 دقيقة)
+        if fajr_time_obj and fajr_time_obj.time:
+            morning_adhkar_reminder_datetime = timezone.make_aware(
                 datetime.combine(today_date, fajr_time_obj.time),
                 timezone.get_current_timezone()
-            ) + timedelta(minutes=15) # 15 دقيقة بعد الفجر
+            ) + timedelta(minutes=15)
 
-            # استخدم حقل is_notified_morning_adhkar في PrayerReminder لتتبع الإشعار
-            if morning_adhkar_reminder_time <= now < (morning_adhkar_reminder_time + timedelta(minutes=1)) and not reminder_setting.is_notified_morning_adhkar_today:
+            if morning_adhkar_reminder_datetime <= now < (morning_adhkar_reminder_datetime + timedelta(minutes=1)) and not reminder_setting.is_notified_morning_adhkar_today:
                 Notification.objects.create(
                     recipient=user,
                     verb=_("تذكير أذكار الصباح"),
                     description=_("حان وقت قراءة أذكار الصباح."),
                     timestamp=now,
-                    # يمكنك ربطها بصفحة الأذكار
                     target_content_type=ContentType.objects.get_for_model(PrayerReminder),
                     target_object_id=reminder_setting.pk,
                 )
-                reminder_setting.is_notified_morning_adhkar_today = True # تحديث الحقل
+                reminder_setting.is_notified_morning_adhkar_today = True
                 reminder_setting.save(update_fields=['is_notified_morning_adhkar_today'])
                 print(f"Notification created for Morning Adhkar for user {user.username}")
 
-        # تذكير أذكار المساء (بعد العصر بـ 15 دقيقة، أو وقت محدد)
-        if asr_time_obj:
-            evening_adhkar_reminder_time = timezone.make_aware(
+        # تذكير أذكار المساء (بعد العصر بـ 15 دقيقة)
+        if asr_time_obj and asr_time_obj.time:
+            evening_adhkar_reminder_datetime = timezone.make_aware(
                 datetime.combine(today_date, asr_time_obj.time),
                 timezone.get_current_timezone()
-            ) + timedelta(minutes=15) # 15 دقيقة بعد العصر
+            ) + timedelta(minutes=15)
 
-            # استخدم حقل is_notified_evening_adhkar في PrayerReminder لتتبع الإشعار
-            if evening_adhkar_reminder_time <= now < (evening_adhkar_reminder_time + timedelta(minutes=1)) and not reminder_setting.is_notified_evening_adhkar_today:
+            if evening_adhkar_reminder_datetime <= now < (evening_adhkar_reminder_datetime + timedelta(minutes=1)) and not reminder_setting.is_notified_evening_adhkar_today:
                 Notification.objects.create(
                     recipient=user,
                     verb=_("تذكير أذكار المساء"),
@@ -237,7 +222,7 @@ class PrayerTimesView(LoginRequiredMixin, View):
                     target_content_type=ContentType.objects.get_for_model(PrayerReminder),
                     target_object_id=reminder_setting.pk,
                 )
-                reminder_setting.is_notified_evening_adhkar_today = True # تحديث الحقل
+                reminder_setting.is_notified_evening_adhkar_today = True
                 reminder_setting.save(update_fields=['is_notified_evening_adhkar_today'])
                 print(f"Notification created for Evening Adhkar for user {user.username}")
 
@@ -248,7 +233,6 @@ class PrayerTimesView(LoginRequiredMixin, View):
                 timezone.get_current_timezone()
             )
 
-            # استخدم حقل is_notified_werd_today في PrayerReminder لتتبع الإشعار
             if werd_reminder_datetime <= now < (werd_reminder_datetime + timedelta(minutes=1)) and not reminder_setting.is_notified_werd_today:
                 Notification.objects.create(
                     recipient=user,
@@ -258,13 +242,11 @@ class PrayerTimesView(LoginRequiredMixin, View):
                     target_content_type=ContentType.objects.get_for_model(PrayerReminder),
                     target_object_id=reminder_setting.pk,
                 )
-                reminder_setting.is_notified_werd_today = True # تحديث الحقل
+                reminder_setting.is_notified_werd_today = True
                 reminder_setting.save(update_fields=['is_notified_werd_today'])
                 print(f"Notification created for Daily Werd for user {user.username}")
         
         # إعادة تعيين حالة الإشعارات اليومية في بداية يوم جديد
-        # هذا يتطلب تشغيل Celery Beat أو مهمة مجدولة
-        # For now, we'll just reset them if the date changes
         if reminder_setting.last_notification_reset_date != today_date:
             reminder_setting.is_notified_morning_adhkar_today = False
             reminder_setting.is_notified_evening_adhkar_today = False
@@ -282,12 +264,12 @@ class PrayerTimesView(LoginRequiredMixin, View):
 # --- Views الجديدة للقرآن والأذكار والأدعية ---
 
 class QuranView(LoginRequiredMixin, TemplateView):
-    template_name = 'prayer_times/quran_page.html' # سيتم إنشاء هذا القالب
+    template_name = 'prayer_times/quran_page.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        surah_number = self.request.GET.get('surah', '1') # افتراضياً سورة الفاتحة
-        reciter = self.request.GET.get('reciter', 'ar.alafasy') # افتراضياً العفاسي
+        surah_number = self.request.GET.get('surah', '1')
+        reciter = self.request.GET.get('reciter', 'ar.alafasy')
 
         api_url = f"https://api.alquran.cloud/v1/surah/{surah_number}/{reciter}"
         
@@ -307,8 +289,7 @@ class QuranView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(self.request, _(f"حدث خطأ غير متوقع: {e}"))
 
-        # قائمة بأسماء السور للـ dropdown (يمكن جلبها من API أو تخزينها محلياً)
-        # لتبسيط الأمر، سأضع قائمة بسيطة بأول 10 سور
+        # قائمة بجميع سور القرآن الكريم الـ 114
         context['surahs_list'] = [
             {'number': 1, 'name': _('الفاتحة')},
             {'number': 2, 'name': _('البقرة')},
@@ -320,100 +301,216 @@ class QuranView(LoginRequiredMixin, TemplateView):
             {'number': 8, 'name': _('الأنفال')},
             {'number': 9, 'name': _('التوبة')},
             {'number': 10, 'name': _('يونس')},
-            # ... يمكنك إضافة جميع السور الـ 114 هنا
+            {'number': 11, 'name': _('هود')},
+            {'number': 12, 'name': _('يوسف')},
+            {'number': 13, 'name': _('الرعد')},
+            {'number': 14, 'name': _('إبراهيم')},
+            {'number': 15, 'name': _('الحجر')},
+            {'number': 16, 'name': _('النحل')},
+            {'number': 17, 'name': _('الإسراء')},
+            {'number': 18, 'name': _('الكهف')},
+            {'number': 19, 'name': _('مريم')},
+            {'number': 20, 'name': _('طه')},
+            {'number': 21, 'name': _('الأنبياء')},
+            {'number': 22, 'name': _('الحج')},
+            {'number': 23, 'name': _('المؤمنون')},
+            {'number': 24, 'name': _('النور')},
+            {'number': 25, 'name': _('الفرقان')},
+            {'number': 26, 'name': _('الشعراء')},
+            {'number': 27, 'name': _('النمل')},
+            {'number': 28, 'name': _('القصص')},
+            {'number': 29, 'name': _('العنكبوت')},
+            {'number': 30, 'name': _('الروم')},
+            {'number': 31, 'name': _('لقمان')},
+            {'number': 32, 'name': _('السجدة')},
+            {'number': 33, 'name': _('الأحزاب')},
+            {'number': 34, 'name': _('سبأ')},
+            {'number': 35, 'name': _('فاطر')},
+            {'number': 36, 'name': _('يس')},
+            {'number': 37, 'name': _('الصافات')},
+            {'number': 38, 'name': _('ص')},
+            {'number': 39, 'name': _('الزمر')},
+            {'number': 40, 'name': _('غافر')},
+            {'number': 41, 'name': _('فصلت')},
+            {'number': 42, 'name': _('الشورى')},
+            {'number': 43, 'name': _('الزخرف')},
+            {'number': 44, 'name': _('الدخان')},
+            {'number': 45, 'name': _('الجاثية')},
+            {'number': 46, 'name': _('الأحقاف')},
+            {'number': 47, 'name': _('محمد')},
+            {'number': 48, 'name': _('الفتح')},
+            {'number': 49, 'name': _('الحجرات')},
+            {'number': 50, 'name': _('ق')},
+            {'number': 51, 'name': _('الذاريات')},
+            {'number': 52, 'name': _('الطور')},
+            {'number': 53, 'name': _('النجم')},
+            {'number': 54, 'name': _('القمر')},
+            {'number': 55, 'name': _('الرحمن')},
+            {'number': 56, 'name': _('الواقعة')},
+            {'number': 57, 'name': _('الحديد')},
+            {'number': 58, 'name': _('المجادلة')},
+            {'number': 59, 'name': _('الحشر')},
+            {'number': 60, 'name': _('الممتحنة')},
+            {'number': 61, 'name': _('الصف')},
+            {'number': 62, 'name': _('الجمعة')},
+            {'number': 63, 'name': _('المنافقون')},
+            {'number': 64, 'name': _('التغابن')},
+            {'number': 65, 'name': _('الطلاق')},
+            {'number': 66, 'name': _('التحريم')},
+            {'number': 67, 'name': _('الملك')},
+            {'number': 68, 'name': _('القلم')},
+            {'number': 69, 'name': _('الحاقة')},
+            {'number': 70, 'name': _('المعارج')},
+            {'number': 71, 'name': _('نوح')},
+            {'number': 72, 'name': _('الجن')},
+            {'number': 73, 'name': _('المزمل')},
+            {'number': 74, 'name': _('المدثر')},
+            {'number': 75, 'name': _('القيامة')},
+            {'number': 76, 'name': _('الإنسان')},
+            {'number': 77, 'name': _('المرسلات')},
+            {'number': 78, 'name': _('النبأ')},
+            {'number': 79, 'name': _('النازعات')},
+            {'number': 80, 'name': _('عبس')},
+            {'number': 81, 'name': _('التكوير')},
+            {'number': 82, 'name': _('الانفطار')},
+            {'number': 83, 'name': _('المطففين')},
+            {'number': 84, 'name': _('الانشقاق')},
+            {'number': 85, 'name': _('البروج')},
+            {'number': 86, 'name': _('الطارق')},
+            {'number': 87, 'name': _('الأعلى')},
+            {'number': 88, 'name': _('الغاشية')},
+            {'number': 89, 'name': _('الفجر')},
+            {'number': 90, 'name': _('البلد')},
+            {'number': 91, 'name': _('الشمس')},
+            {'number': 92, 'name': _('الليل')},
+            {'number': 93, 'name': _('الضحى')},
+            {'number': 94, 'name': _('الشرح')},
+            {'number': 95, 'name': _('التين')},
+            {'number': 96, 'name': _('العلق')},
+            {'number': 97, 'name': _('القدر')},
+            {'number': 98, 'name': _('البينة')},
+            {'number': 99, 'name': _('الزلزلة')},
+            {'number': 100, 'name': _('العاديات')},
+            {'number': 101, 'name': _('القارعة')},
+            {'number': 102, 'name': _('التكاثر')},
+            {'number': 103, 'name': _('العصر')},
+            {'number': 104, 'name': _('الهمزة')},
+            {'number': 105, 'name': _('الفيل')},
+            {'number': 106, 'name': _('قريش')},
+            {'number': 107, 'name': _('الماعون')},
+            {'number': 108, 'name': _('الكوثر')},
+            {'number': 109, 'name': _('الكافرون')},
+            {'number': 110, 'name': _('النصر')},
+            {'number': 111, 'name': _('المسد')},
+            {'number': 112, 'name': _('الإخلاص')},
+            {'number': 113, 'name': _('الفلق')},
+            {'number': 114, 'name': _('الناس')},
         ]
-        # قائمة بالقراء (Reciters) المدعومين من API
         context['reciters_list'] = [
             {'id': 'ar.alafasy', 'name': _('مشاري العفاسي')},
             {'id': 'ar.abdulbasit', 'name': _('عبد الباسط عبد الصمد')},
             {'id': 'ar.minshawi', 'name': _('محمد صديق المنشاوي')},
             {'id': 'ar.saoodshuraym', 'name': _('سعود الشريم')},
             {'id': 'ar.mahermuaiqly', 'name': _('ماهر المعيقلي')},
-            # ... والمزيد
         ]
         return context
 
 class AdhkarView(LoginRequiredMixin, TemplateView):
-    template_name = 'prayer_times/adhkar_page.html' # سيتم إنشاء هذا القالب
+    template_name = 'prayer_times/adhkar_page.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        api_url = "https://hisnulmuslim-api.vercel.app/api/ar" # API يوفر جميع الأذكار والأدعية
+        
+        # API الجديد للأذكار
+        adhkar_api_base_url = "https://ahegazy.github.io/muslimsazkar/"
+        
+        # قائمة بالملفات JSON للأذكار التي نريد جلبها
+        adhkar_files = {
+            _("أذكار الصباح"): "azkar_sabah.json",
+            _("أذكار المساء"): "azkar_masa.json",
+            _("أذكار النوم"): "azkar_elnoom.json",
+            _("أذكار الاستيقاظ"): "azkar_elestkadh.json",
+            _("أذكار الصلاة"): "azkar_elsalah.json",
+            _("أذكار الطعام"): "azkar_elta3am.json",
+            _("أذكار متنوعة"): "azkar_motafareka.json",
+        }
+        
+        all_adhkar_data = []
+        for category_name, file_name in adhkar_files.items():
+            api_url = f"{adhkar_api_base_url}{file_name}"
+            try:
+                response = requests.get(api_url, timeout=10)
+                response.raise_for_status() # يرفع استثناء لأخطاء 4xx/5xx
+                data = response.json()
+                if isinstance(data, list):
+                    # إضافة اسم الفئة لكل ذكر
+                    for dhikr in data:
+                        dhikr['category'] = category_name
+                    all_adhkar_data.extend(data)
+                else:
+                    print(f"Warning: Unexpected data format for {file_name}. Expected a list.")
+            except requests.exceptions.RequestException as e:
+                messages.error(self.request, _(f"خطأ في الاتصال بـ API الأذكار ({category_name}): {e}"))
+            except Exception as e:
+                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء جلب {category_name}: {e}"))
 
-        try:
-            response = requests.get(api_url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-
-            # API هذا يعيد قائمة كبيرة، سنحتاج لتصفيتها للأذكار فقط
-            # بناءً على بنية الـ API، قد تحتاج إلى تحديد الفئات التي تمثل الأذكار
-            # كمثال، سأفترض أن الأذكار هي التي تحتوي على "أذكار" في عنوانها
-            adhkar_categories = [
-                "أذكار الصباح والمساء",
-                "أذكار النوم",
-                "أذكار الاستيقاظ",
-                "أذكار الصلاة"
-            ]
-            
-            # تصفية الأذكار
-            filtered_adhkar = []
-            if data and isinstance(data, list):
-                for item in data:
-                    if item.get('category') in adhkar_categories: # يمكنك تحسين هذا الشرط
-                        filtered_adhkar.append(item)
-            
-            # إذا لم يتم العثور على أذكار محددة، قد تحتاج إلى جلبها كلها
-            if not filtered_adhkar and data and isinstance(data, list):
-                # إذا لم تنجح الفلترة، اعرض كل شيء أو جزء منه
-                filtered_adhkar = data # لعرض كل شيء كاحتياط
-                messages.warning(self.request, _("لم يتم العثور على أذكار محددة. يتم عرض جميع الأدعية والأذكار المتاحة."))
-
-            context['adhkar_data'] = filtered_adhkar
-        except requests.exceptions.RequestException as e:
-            messages.error(self.request, _(f"خطأ في الاتصال بـ API الأذكار: {e}"))
-        except Exception as e:
-            messages.error(self.request, _(f"حدث خطأ غير متوقع: {e}"))
+        context['adhkar_data'] = all_adhkar_data
         return context
 
 class DuasView(LoginRequiredMixin, TemplateView):
-    template_name = 'prayer_times/duas_page.html' # سيتم إنشاء هذا القالب
+    template_name = 'prayer_times/duas_page.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        api_url = "https://hisnulmuslim-api.vercel.app/api/ar" # نفس API الأذكار
+        
+        # API الجديد للأدعية
+        duas_api_base_url = "https://ahegazy.github.io/muslimsazkar/"
+        
+        # ملفات JSON للأدعية (قد تحتاج إلى تحديدها بدقة من الـ API)
+        # هذا الـ API لا يفصل الأذكار عن الأدعية بشكل صريح في مسارات مختلفة
+        # لذا، سنحاول جلب بعض الملفات التي قد تحتوي على أدعية عامة أو تصفية من "أذكار متنوعة"
+        # أو البحث عن API آخر مخصص للأدعية فقط.
+        # كمثال، سأجلب "أذكار متنوعة" وأفترض أنها تحتوي على بعض الأدعية.
+        # إذا كان هناك ملف JSON محدد للأدعية في هذا الـ API، يرجى تحديثه.
+        duas_files = {
+    _("أذكار الصباح"): "azkar_sabah.json",
+    _("أذكار المساء"): "azkar_massa.json",
+    _("أذكار بعد الصلاة"): "azkar_baadasalah.json",
+    _("أذكار النوم"): "azkar_noum.json",
+    _("أذكار الاستيقاظ"): "azkar_estikaz.json",
+    _("دعاء الركوب"): "azkar_rakoub.json",
+    _("دعاء السفر"): "azkar_safar.json",
+    _("دعاء دخول المنزل"): "azkar_dkhoul_almanzel.json",
+    _("دعاء الخروج من المنزل"): "azkar_khrog_manzel.json",
+    _("دعاء دخول المسجد"): "azkar_dkhoul_masjed.json",
+    _("دعاء الخروج من المسجد"): "azkar_khrog_masjed.json",
+    _("دعاء دخول الخلاء"): "azkar_dkhoul_elkhala.json",
+    _("دعاء الخروج من الخلاء"): "azkar_khrog_elkhala.json",
+    _("الرقية الشرعية"): "roqia.json",
+    _("دعاء الاستخارة"): "istikara.json",
+    _("دعاء الكرب"): "azkar_alkrb.json",
+    _("أدعية من القرآن"): "azkar_elquraan.json",
+    _("أدعية عامة"): "azkar_motafareka.json"
+}
 
-        try:
-            response = requests.get(api_url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
 
-            # تصفية الأدعية (يمكنك تحسين منطق التصفية بناءً على الفئات المتاحة في API)
-            duas_categories = [
-                "دعاء الاستفتاح",
-                "دعاء لبس الثوب",
-                "دعاء دخول الخلاء",
-                "دعاء الخروج من الخلاء",
-                "دعاء قبل النوم",
-                "دعاء الهم والحزن",
-                "دعاء قنوت الوتر",
-                "دعاء السفر",
-                "دعاء الاستخارة",
-            ]
-            
-            filtered_duas = []
-            if data and isinstance(data, list):
-                for item in data:
-                    if item.get('category') in duas_categories: # يمكنك تحسين هذا الشرط
-                        filtered_duas.append(item)
-            
-            # إذا لم يتم العثور على أدعية محددة، قد تحتاج إلى جلبها كلها
-            if not filtered_duas and data and isinstance(data, list):
-                filtered_duas = data # لعرض كل شيء كاحتياط
+        all_duas_data = []
+        for category_name, file_name in duas_files.items():
+            api_url = f"{duas_api_base_url}{file_name}"
+            try:
+                response = requests.get(api_url, timeout=10)
+                response.raise_for_status()
+                data = response.json()
+                if isinstance(data, list):
+                    for dua in data:
+                        dua['category'] = category_name
+                    all_duas_data.extend(data)
+                else:
+                    print(f"Warning: Unexpected data format for {file_name}. Expected a list.")
+            except requests.exceptions.RequestException as e:
+                messages.error(self.request, _(f"خطأ في الاتصال بـ API الأدعية ({category_name}): {e}"))
+            except Exception as e:
+                messages.error(self.request, _(f"حدث خطأ غير متوقع أثناء جلب {category_name}: {e}"))
 
-            context['duas_data'] = filtered_duas
-        except requests.exceptions.RequestException as e:
-            messages.error(self.request, _(f"خطأ في الاتصال بـ API الأدعية: {e}"))
-        except Exception as e:
-            messages.error(self.request, _(f"حدث خطأ غير متوقع: {e}"))
+        context['duas_data'] = all_duas_data
         return context
-

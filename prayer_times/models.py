@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from datetime import date # لاستخدام date.today() كقيمة افتراضية
 
 User = get_user_model() # للحصول على نموذج المستخدم الحالي
 
@@ -37,7 +38,6 @@ class PrayerTime(models.Model):
         ('asr', _('العصر')),
         ('maghrib', _('المغرب')),
         ('isha', _('العشاء')),
-        # يمكنك إضافة المزيد إذا كان الـ API يوفرها وتريد تخزينها
         ('imsak', _('الإمساك')),
         ('midnight', _('منتصف الليل')),
     ]
@@ -51,7 +51,7 @@ class PrayerTime(models.Model):
     class Meta:
         verbose_name = _("وقت صلاة")
         verbose_name_plural = _("أوقات الصلاة")
-        unique_together = ('user', 'date', 'prayer_type') # كل صلاة فريدة لكل مستخدم وتاريخ
+        unique_together = ('user', 'date', 'prayer_type')
         ordering = ['date', 'time']
         indexes = [
             models.Index(fields=['user', 'date']),
@@ -75,18 +75,35 @@ class PrayerReminder(models.Model):
         verbose_name=_("تفعيل تذكيرات الصلاة"),
         help_text=_("تفعيل هذا الخيار سيسمح بتشغيل صوت الأذان عند وقت الصلاة.")
     )
-    # --- حقول جديدة لتذكير الورد اليومي ---
     daily_werd_reminder_enabled = models.BooleanField(
         default=False,
         verbose_name=_("تفعيل تذكير الورد اليومي"),
         help_text=_("تفعيل هذا الخيار لتذكيرك بقراءة الورد اليومي.")
     )
     daily_werd_reminder_time = models.TimeField(
-        default='07:00:00', # وقت افتراضي، يمكن أن يكون بعد الفجر مثلاً
+        default='07:00:00',
         verbose_name=_("وقت تذكير الورد اليومي"),
         help_text=_("الوقت الذي ترغب فيه بتلقي تذكير الورد اليومي (مثال: 07:00 صباحاً).")
     )
-    # ------------------------------------
+    
+    # --- حقول جديدة لتتبع حالة الإشعارات اليومية ---
+    is_notified_morning_adhkar_today = models.BooleanField(
+        default=False,
+        verbose_name=_("تم إشعار أذكار الصباح اليوم")
+    )
+    is_notified_evening_adhkar_today = models.BooleanField(
+        default=False,
+        verbose_name=_("تم إشعار أذكار المساء اليوم")
+    )
+    is_notified_werd_today = models.BooleanField(
+        default=False,
+        verbose_name=_("تم إشعار الورد اليومي اليوم")
+    )
+    last_notification_reset_date = models.DateField(
+        default=date.today, # القيمة الافتراضية هي تاريخ اليوم
+        verbose_name=_("آخر تاريخ لإعادة تعيين الإشعارات")
+    )
+    # ------------------------------------------------
 
     class Meta:
         verbose_name = _("إعداد تذكير الصلاة")
