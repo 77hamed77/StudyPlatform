@@ -6,431 +6,246 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}المنصة المساعدة للدراسة{% endblock %}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'arabic': ['Cairo', 'Tajawal', 'Amiri', 'sans-serif'],
-                    },
-                    colors: {
-                        'primary': {
-                            50: '#eff6ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a',
-                        },
-                        'dark': {
-                            50: '#f8fafc',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&family=Tajawal:wght@200;300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Custom Styles -->
-    <style>
-        * {
-            font-family: 'Cairo', 'Tajawal', sans-serif;
-        }
-        
-        .navbar-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .dark .navbar-glass {
-            background: rgba(30, 41, 59, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .nav-link-hover {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link-hover::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-        
-        .nav-link-hover:hover::after,
-        .nav-link-hover.active::after {
-            width: 100%;
-        }
-        
-        .dropdown-menu-animated {
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .dropdown-menu-animated.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .notification-badge {
-            animation: pulse 2s infinite;
-        }
-        
-        .scroll-to-top {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 1000;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-        }
-        
-        .scroll-to-top.show {
-            opacity: 1;
-            transform: scale(1);
-        }
-        
-        .mobile-menu {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-        
-        .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .alert-modern {
-            border-left: 4px solid;
-            border-radius: 0.5rem;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-        
-        .alert-success { border-left-color: #10b981; }
-        .alert-danger { border-left-color: #ef4444; }
-        .alert-warning { border-left-color: #f59e0b; }
-        .alert-info { border-left-color: #3b82f6; }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
-        .feature-card {
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Dark mode improvements */
-        .dark .alert-modern {
-            background: rgba(30, 41, 59, 0.9);
-            color: #e2e8f0;
-        }
-        
-        .dark .dropdown-menu-animated {
-            background: #1e293b;
-            border: 1px solid #334155;
-        }
-        
-        .dark .dropdown-item:hover {
-            background: #334155;
-            color: #f1f5f9;
-        }
-    </style>
+    <!-- Google Fonts (Cairo and Tajawal) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&family=Tajawal:wght@200;300;400;500;700;900&display=swap" rel="stylesheet">
     
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dark_mode.css' %}">
+
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
+<body class="d-flex flex-column min-vh-100"
       data-is-authenticated="{{ user.is_authenticated|yesno:'true,false' }}" 
       data-settings-url="{% url 'core:settings' %}">
 
-    <!-- Navigation -->
-    <nav class="navbar-glass sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="{% url 'core:home' %}" class="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                        <i class="fas fa-graduation-cap text-2xl text-blue-600"></i>
-                        <span class="mr-2">المنصة المساعدة</span>
-                    </a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light custom-navbar sticky-top shadow-sm py-3">
+        <div class="container-fluid px-md-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
+                <i class="fas fa-graduation-cap fs-4 me-2 text-primary"></i>
+                <span class="fw-bold fs-5">المنصة المساعدة</span>
+            </a>
+
+            <!-- Mobile Toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Offcanvas Navbar for Mobile -->
+            <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">القائمة</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-
-                <!-- Desktop Navigation -->
-                <div class="hidden lg:flex items-center space-x-4">
-                    <a href="{% url 'core:home' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.url_name == 'home' and request.resolver_match.app_name == 'core' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                        الرئيسية
-                    </a>
-                    
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'core:dashboard' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.url_name == 'dashboard' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            لوحة التحكم
-                        </a>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' and request.resolver_match.app_name == 'core' %}active{% endif %}" href="{% url 'core:home' %}">
+                                الرئيسية
+                            </a>
+                        </li>
                         
-                        <!-- Files Dropdown -->
-                        <div class="relative group">
-                            <button class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center {% if request.resolver_match.app_name == 'files_manager' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                                <i class="fas fa-folder-open ml-1"></i>
-                                الملفات
-                                <i class="fas fa-chevron-down mr-1 text-xs"></i>
-                            </button>
-                            <div class="dropdown-menu-animated absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
-                                <a href="{% url 'files_manager:main_file_list' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">الملفات الرئيسية</a>
-                                <a href="{% url 'files_manager:student_summary_list' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">ملخصات الطلاب (معتمدة)</a>
-                                <a href="{% url 'files_manager:my_summaries_list' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">ملخصاتي المرفوعة</a>
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                <a href="{% url 'files_manager:student_summary_upload' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">رفع ملخص جديد</a>
-                            </div>
-                        </div>
-                        
-                        <a href="{% url 'news:news_list' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.app_name == 'news' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            <i class="far fa-newspaper ml-1"></i>
-                            الأخبار
-                        </a>
-                        
-                        <a href="{% url 'tasks:task_list' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.app_name == 'tasks' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            <i class="fas fa-tasks ml-1"></i>
-                            المهام
-                        </a>
-                        
-                        <a href="{% url 'notes:note_list' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.app_name == 'notes' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            <i class="far fa-clipboard ml-1"></i>
-                            ملاحظاتي
-                        </a>
-                        
-                        <a href="{% url 'exam_prep:exam_resources' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.app_name == 'exam_prep' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            <i class="fas fa-graduation-cap ml-1"></i>
-                            ركن الامتحانات
-                        </a>
-                        
-                        <a href="{% url 'chat_assistant:chat_assistant' %}" class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors {% if request.resolver_match.app_name == 'chat_assistant' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                            <i class="fas fa-comments ml-1"></i>
-                            الشات المساعد
-                        </a>
-                        
-                        <!-- Islamic Resources Dropdown -->
-                        <div class="relative group">
-                            <button class="nav-link-hover px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center {% if request.resolver_match.app_name == 'prayer_times' %}active text-blue-600 dark:text-blue-400{% endif %}">
-                                <i class="fas fa-book-reader ml-1"></i>
-                                المصادر الإسلامية
-                                <i class="fas fa-chevron-down mr-1 text-xs"></i>
-                            </button>
-                            <div class="dropdown-menu-animated absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
-                                <a href="{% url 'prayer_times:prayer_times_list' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">أوقات الصلاة</a>
-                                <a href="{% url 'prayer_times:quran_page' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">القرآن الكريم</a>
-                                <a href="{% url 'prayer_times:adhkar_page' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">الأذكار</a>
-                                <a href="{% url 'prayer_times:duas_page' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">الأدعية</a>
-                                <a href="{% url 'prayer_times:hadith_page' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">الأحاديث</a>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Right Side Actions -->
-                <div class="flex items-center space-x-4">
-                    <!-- Theme Toggle -->
-                    <button id="theme-toggle-btn" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="تبديل المظهر">
-                        <i class="fas fa-moon dark:hidden text-gray-600"></i>
-                        <i class="fas fa-sun hidden dark:inline text-yellow-400"></i>
-                    </button>
-
-                    {% if user.is_authenticated %}
-                        <!-- Notifications -->
-                        <div class="relative">
-                            <button class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" id="notifications-btn">
-                                <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
-                                {% if unread_notifications_count > 0 %}
-                                    <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                        {{ unread_notifications_count }}
-                                    </span>
-                                {% endif %}
-                            </button>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'core:dashboard' %}">
+                                    لوحة التحكم
+                                </a>
+                            </li>
                             
-                            <!-- Notifications Dropdown -->
-                            <div id="notifications-dropdown" class="dropdown-menu-animated absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible max-h-96 overflow-y-auto">
-                                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">الإشعارات</h3>
-                                </div>
-                                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Files Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'files_manager' %}active{% endif %}" href="#" id="filesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-folder-open me-1"></i>
+                                    الملفات
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-animated" aria-labelledby="filesDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'files_manager:main_file_list' %}">الملفات الرئيسية</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'files_manager:student_summary_list' %}">ملخصات الطلاب (معتمدة)</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'files_manager:my_summaries_list' %}">ملخصاتي المرفوعة</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'files_manager:student_summary_upload' %}">رفع ملخص جديد</a></li>
+                                </ul>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'news' %}active{% endif %}" href="{% url 'news:news_list' %}">
+                                    <i class="far fa-newspaper me-1"></i>
+                                    الأخبار
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
+                                    <i class="fas fa-tasks me-1"></i>
+                                    المهام
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'notes' %}active{% endif %}" href="{% url 'notes:note_list' %}">
+                                    <i class="far fa-clipboard me-1"></i>
+                                    ملاحظاتي
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'exam_prep' %}active{% endif %}" href="{% url 'exam_prep:exam_resources' %}">
+                                    <i class="fas fa-graduation-cap me-1"></i>
+                                    ركن الامتحانات
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'chat_assistant' %}active{% endif %}" href="{% url 'chat_assistant:chat_assistant' %}">
+                                    <i class="fas fa-comments me-1"></i>
+                                    الشات المساعد
+                                </a>
+                            </li>
+                            
+                            <!-- Islamic Resources Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'prayer_times' %}active{% endif %}" href="#" id="islamicResourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-book-reader me-1"></i>
+                                    المصادر الإسلامية
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-animated" aria-labelledby="islamicResourcesDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'prayer_times:prayer_times_list' %}">أوقات الصلاة</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'prayer_times:quran_page' %}">القرآن الكريم</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'prayer_times:adhkar_page' %}">الأذكار</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'prayer_times:duas_page' %}">الأدعية</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'prayer_times:hadith_page' %}">الأحاديث</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- Right Side Actions (Desktop & Mobile) -->
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+                        <!-- Theme Toggle -->
+                        <li class="nav-item me-2">
+                            <button id="theme-toggle-btn" class="btn btn-outline-light rounded-circle p-2" title="تبديل المظهر">
+                                <i class="fas fa-moon d-none dark-mode-icon"></i>
+                                <i class="fas fa-sun light-mode-icon"></i>
+                            </button>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                            <!-- Notifications -->
+                            <li class="nav-item dropdown me-2">
+                                <button class="btn btn-link nav-link position-relative p-2" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-bell"></i>
+                                    {% if unread_notifications_count > 0 %}
+                                        <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ unread_notifications_count }}
+                                            <span class="visually-hidden">unread messages</span>
+                                        </span>
+                                    {% endif %}
+                                </button>
+                                
+                                <!-- Notifications Dropdown Menu -->
+                                <ul class="dropdown-menu dropdown-menu-animated dropdown-menu-end" aria-labelledby="notificationsDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                                    <li><h6 class="dropdown-header">الإشعارات</h6></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     {% if latest_notifications_for_dropdown %}
                                         {% for notification_item_nav in latest_notifications_for_dropdown %}
-                                            <a href="{% if notification_item_nav.get_target_url %}{{ notification_item_nav.get_target_url }}{% else %}{% url 'core:notifications_list' %}{% endif %}?mark_read={{ notification_item_nav.pk }}" 
-                                               class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors {% if notification_item_nav.unread %}bg-blue-50 dark:bg-blue-900/20{% endif %}">
-                                                <div class="flex items-start space-x-3">
-                                                    <div class="flex-1">
-                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                            {% if notification_item_nav.actor %}{{ notification_item_nav.actor }} {% endif %}
-                                                            {{ notification_item_nav.verb }}
-                                                        </p>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                            {{ notification_item_nav.description|truncatechars:60 }}
-                                                        </p>
-                                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                                            {{ notification_item_nav.timestamp|timesince }}
-                                                        </p>
+                                            <li>
+                                                <a class="dropdown-item {% if notification_item_nav.unread %}bg-light-blue{% endif %}" href="{% if notification_item_nav.get_target_url %}{{ notification_item_nav.get_target_url }}{% else %}{% url 'core:notifications_list' %}{% endif %}?mark_read={{ notification_item_nav.pk }}">
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="flex-grow-1">
+                                                            <p class="mb-0 fw-bold">{{ notification_item_nav.verb }}</p>
+                                                            <small class="text-muted">{{ notification_item_nav.description|truncatechars:60 }}</small><br>
+                                                            <small class="text-secondary">{{ notification_item_nav.timestamp|timesince }} {% translate "مضت" %}</small>
+                                                        </div>
+                                                        {% if notification_item_nav.unread %}
+                                                            <span class="badge bg-primary rounded-circle p-1 ms-2"></span>
+                                                        {% endif %}
                                                     </div>
-                                                    {% if notification_item_nav.unread %}
-                                                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                                                    {% endif %}
-                                                </div>
-                                            </a>
+                                                </a>
+                                            </li>
                                         {% endfor %}
                                     {% else %}
-                                        <div class="p-4 text-center text-gray-500 dark:text-gray-400">
-                                            <i class="fas fa-bell-slash text-2xl mb-2"></i>
-                                            <p>لا توجد إشعارات</p>
-                                        </div>
+                                        <li><span class="dropdown-item text-center text-muted">لا توجد إشعارات</span></li>
                                     {% endif %}
-                                </div>
-                                <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-                                    <a href="{% url 'core:notifications_list' %}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
-                                        عرض جميع الإشعارات
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-center text-primary" href="{% url 'core:notifications_list' %}">عرض جميع الإشعارات</a></li>
+                                </ul>
+                            </li>
 
-                        <!-- User Menu -->
-                        <div class="relative group">
-                            <button class="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                <div class="user-avatar">
-                                    {{ user.username|first|upper }}
-                                </div>
-                                <span class="hidden md:inline text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">{{ user.username }}</span>
-                                <i class="fas fa-chevron-down text-xs text-gray-500"></i>
-                            </button>
-                            <div class="dropdown-menu-animated absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
-                                <a href="{% url 'core:profile' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <i class="fas fa-user ml-2"></i>
-                                    ملفي الشخصي
+                            <!-- User Menu -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar me-2">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                    <span class="d-none d-md-inline me-2">{{ user.username }}</span>
                                 </a>
-                                <a href="{% url 'core:settings' %}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                    <i class="fas fa-cog ml-2"></i>
-                                    الإعدادات
+                                <ul class="dropdown-menu dropdown-menu-animated dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'core:profile' %}">
+                                        <i class="fas fa-user me-2"></i> ملفي الشخصي
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'core:settings' %}">
+                                        <i class="fas fa-cog me-2"></i> الإعدادات
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="post" action="{% url 'logout' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-sign-out-alt me-2"></i> تسجيل الخروج
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item me-2">
+                                <a class="btn btn-outline-primary" href="{% url 'login' %}">
+                                    تسجيل الدخول
                                 </a>
-                                <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                                <form method="post" action="{% url 'logout' %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="w-full text-right px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                        <i class="fas fa-sign-out-alt ml-2"></i>
-                                        تسجيل الخروج
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="flex items-center space-x-2">
-                            <a href="{% url 'login' %}" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                تسجيل الدخول
-                            </a>
-                            <a href="{% url 'core:signup' %}" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
-                                إنشاء حساب
-                            </a>
-                        </div>
-                    {% endif %}
-
-                    <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <i class="fas fa-bars text-gray-600 dark:text-gray-300"></i>
-                    </button>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary" href="{% url 'core:signup' %}">
+                                    إنشاء حساب
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 shadow-xl z-50 lg:hidden">
-        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">القائمة</h2>
-                <button id="close-mobile-menu" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
-                </button>
-            </div>
-        </div>
-        <div class="p-4 space-y-2">
-            <!-- Mobile menu items would go here -->
-        </div>
-    </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden opacity-0 invisible transition-all duration-300"></div>
-
     <!-- Main Content -->
-    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="container my-4 flex-grow-1">
         <!-- Messages -->
         {% if messages %}
-            <div class="mb-6 space-y-4">
+            <div class="messages-container mb-4">
                 {% for message in messages %}
-                    <div class="alert-modern p-4 rounded-lg shadow-sm {% if message.tags == 'error' %}border-red-500 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200{% elif message.tags == 'success' %}border-green-500 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200{% elif message.tags == 'warning' %}border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200{% else %}border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200{% endif %}">
-                        <div class="flex items-start space-x-3">
-                            <div class="flex-shrink-0 mt-0.5">
+                    <div class="alert alert-dismissible fade show alert-modern {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}" role="alert">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-shrink-0 me-3">
                                 {% if message.tags == 'error' %}
-                                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
                                 {% elif message.tags == 'success' %}
-                                    <i class="fas fa-check-circle text-green-500"></i>
+                                    <i class="fas fa-check-circle text-success"></i>
                                 {% elif message.tags == 'warning' %}
-                                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
                                 {% else %}
-                                    <i class="fas fa-info-circle text-blue-500"></i>
+                                    <i class="fas fa-info-circle text-info"></i>
                                 {% endif %}
                             </div>
-                            <div class="flex-1 mr-3">
-                                <p class="text-sm font-medium">{{ message }}</p>
+                            <div class="flex-grow-1">
+                                {{ message }}
                             </div>
-                            <button class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onclick="this.parentElement.parentElement.remove()">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     </div>
                 {% endfor %}
@@ -438,78 +253,205 @@
         {% endif %}
 
         {% block content %}
-        <!-- المحتوى الخاص بالصفحة سيتم إدراجه هنا -->
+        <!-- Page specific content will be inserted here -->
         {% endblock content %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer class="footer mt-auto py-4 border-top">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-4 g-4">
                 <!-- Company Info -->
-                <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <i class="fas fa-graduation-cap text-2xl text-blue-600"></i>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mr-2">المنصة المساعدة</h3>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-graduation-cap fs-4 me-2 text-primary"></i>
+                        <h3 class="fs-5 fw-bold mb-0">المنصة المساعدة</h3>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    <p class="text-muted mb-3">
                         مكانك المتكامل للتعلم والتفوق الأكاديمي
                     </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-blue-600 dark:hover:text
-blue-400 transition-colors">
+                        <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>
                 </div>
                 <!-- Quick Links -->
-                <div class="col-span-1">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">روابط سريعة</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'core:home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الرئيسية</a></li>
+                <div class="col">
+                    <h4 class="fs-6 fw-bold mb-3">روابط سريعة</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'core:home' %}" class="text-muted hover-primary transition-colors">الرئيسية</a></li>
                         {% if user.is_authenticated %}
-                            <li><a href="{% url 'core:dashboard' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">لوحة التحكم</a></li>
+                            <li class="mb-2"><a href="{% url 'core:dashboard' %}" class="text-muted hover-primary transition-colors">لوحة التحكم</a></li>
                         {% endif %}
-                        <li><a href="{% url 'files_manager:main_file_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الملفات الرئيسية</a></li>
-                        <li><a href="{% url 'news:news_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الأخبار</a></li>
-                        <li><a href="{% url 'tasks:task_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">المهام</a></li>
-                        <li><a href="{% url 'notes:note_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">ملاحظاتي</a></li>
-                        <li><a href="{% url 'exam_prep:exam_resources' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">ركن الامتحانات</a></li>
-                        <li><a href="{% url 'chat_assistant:chat_assistant' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الشات المساعد</a></li>
-                        <li><a href="{% url 'prayer_times:prayer_times_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">أوقات الصلاة</a></li>
-                        <li><a href="{% url 'prayer_times:quran_page' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">القرآن الكريم</a></li>
-                        <li><a href="{% url 'prayer_times:adhkar_page' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الأذكار</a></li>
-                        <li><a href="{% url 'prayer_times:duas_page' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الأدعية</a></li>
-                        <li><a href="{% url 'prayer_times:hadith_page' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">الأحاديث</a></li>
+                        <li class="mb-2"><a href="{% url 'files_manager:main_file_list' %}" class="text-muted hover-primary transition-colors">الملفات الرئيسية</a></li>
+                        <li class="mb-2"><a href="{% url 'news:news_list' %}" class="text-muted hover-primary transition-colors">الأخبار</a></li>
+                        <li class="mb-2"><a href="{% url 'tasks:task_list' %}" class="text-muted hover-primary transition-colors">المهام</a></li>
+                        <li class="mb-2"><a href="{% url 'notes:note_list' %}" class="text-muted hover-primary transition-colors">ملاحظاتي</a></li>
+                        <li class="mb-2"><a href="{% url 'exam_prep:exam_resources' %}" class="text-muted hover-primary transition-colors">ركن الامتحانات</a></li>
+                        <li class="mb-2"><a href="{% url 'chat_assistant:chat_assistant' %}" class="text-muted hover-primary transition-colors">الشات المساعد</a></li>
+                        <li class="mb-2"><a href="{% url 'prayer_times:prayer_times_list' %}" class="text-muted hover-primary transition-colors">أوقات الصلاة</a></li>
+                        <li class="mb-2"><a href="{% url 'prayer_times:quran_page' %}" class="text-muted hover-primary transition-colors">القرآن الكريم</a></li>
+                        <li class="mb-2"><a href="{% url 'prayer_times:adhkar_page' %}" class="text-muted hover-primary transition-colors">الأذكار</a></li>
+                        <li class="mb-2"><a href="{% url 'prayer_times:duas_page' %}" class="text-muted hover-primary transition-colors">الأدعية</a></li>
+                        <li class="mb-2"><a href="{% url 'prayer_times:hadith_page' %}" class="text-muted hover-primary transition-colors">الأحاديث</a></li>
                     </ul>
                 </div>
                 <!-- Contact Info -->
-                <div class="col-span-1">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">معلومات الاتصال</h4>
-                    <p class="text-gray-600 dark:text-gray-400 mb-2">
-                        <i class="fas fa-envelope mr-2"></i>
-                        <a href="mailto:info@example.com" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">info@example.com</a>
-                    </p>
-                    <p class="text-gray-600 dark:text-gray-400 mb-2">
-                        <i class="fas fa-phone mr-2"></i>
-                        <a href="tel:+1234567890" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">+1234567890</a>
-                    </p>
-                    <p class="text-gray-600 dark:text-gray-400 mb-2">
-                        <i class="fas fa-map-marker-alt mr-2"></i>
-                        <span>123 Main St, Anytown, USA</span>
-                    </p>
+                <div class="col">
+                    <h4 class="fs-6 fw-bold mb-3">معلومات الاتصال</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2 text-muted">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a href="mailto:info@example.com" class="text-muted hover-primary transition-colors">info@example.com</a>
+                        </li>
+                        <li class="mb-2 text-muted">
+                            <i class="fas fa-phone me-2"></i>
+                            <a href="tel:+1234567890" class="text-muted hover-primary transition-colors">+1234567890</a>
+                        </li>
+                        <li class="mb-2 text-muted">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span>123 Main St, Anytown, USA</span>
+                        </li>
+                    </ul>
                 </div>
+            </div>
+            
+            <div class="border-top pt-4 mt-4 text-center text-muted">
+                <p class="mb-0">&copy; 2024 المنصة المساعدة للدراسة. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.body;
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const lightModeIcon = themeToggleBtn.querySelector('.light-mode-icon');
+            const darkModeIcon = themeToggleBtn.querySelector('.dark-mode-icon');
+            const isAuthenticated = body.dataset.isAuthenticated === 'true';
+            const settingsUrl = body.dataset.settingsUrl;
+
+            // Function to apply theme
+            function applyTheme(isDark) {
+                if (isDark) {
+                    body.classList.add('dark-mode');
+                    lightModeIcon.style.display = 'none';
+                    darkModeIcon.style.display = 'inline-block';
+                } else {
+                    body.classList.remove('dark-mode');
+                    lightModeIcon.style.display = 'inline-block';
+                    darkModeIcon.style.display = 'none';
+                }
+            }
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                applyTheme(true);
+            } else {
+                applyTheme(false); // Default to light if no preference or 'light'
+            }
+
+            // Theme Toggle Event Listener
+            themeToggleBtn.addEventListener('click', function() {
+                const isDark = body.classList.contains('dark-mode');
+                const newTheme = !isDark;
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+
+                // Send theme preference to Django backend if authenticated
+                if (isAuthenticated) {
+                    fetch(settingsUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: `update_theme_only=true&dark_mode_enabled=${newTheme ? 'on' : 'off'}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Theme preference updated on server:', data.dark_mode_enabled);
+                        } else {
+                            console.error('Failed to update theme preference on server:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error sending theme preference:', error));
+                }
+            });
+
+            // Helper function to get CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Notifications Dropdown Logic (if needed beyond Bootstrap's native behavior)
+            // Bootstrap's dropdowns handle visibility automatically with data-bs-toggle="dropdown"
+            // If you have custom animation classes (dropdown-menu-animated), ensure they are applied
+            // and the 'show' class is toggled by Bootstrap.
+            const notificationsDropdown = document.getElementById('notificationsDropdown');
+            if (notificationsDropdown) {
+                notificationsDropdown.addEventListener('show.bs.dropdown', function () {
+                    const dropdownMenu = this.nextElementSibling;
+                    if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu-animated')) {
+                        dropdownMenu.classList.add('show');
+                    }
+                });
+                notificationsDropdown.addEventListener('hidden.bs.dropdown', function () {
+                    const dropdownMenu = this.nextElementSibling;
+                    if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu-animated')) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+
+            // Scroll to Top Button (if needed)
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            if (scrollToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) { // Show button after scrolling 300px
+                        scrollToTopBtn.classList.add('show');
+                    } else {
+                        scrollToTopBtn.classList.remove('show');
+                    }
+                });
+
+                scrollToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

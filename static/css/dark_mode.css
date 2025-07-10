@@ -4,19 +4,19 @@
 /* --- أساس المتغيرات اللونية --- */
 body.dark-mode {
     /* لوحة ألوان شام داكنة */
-    --su-primary: #20304a;          /* كحلي غامق أساسي */
-    --su-primary-dark: #131c2c;     /* أزرق كحلي داكن جدًا */
-    --su-accent: #e4c975;           /* ذهبي */
-    --su-accent-light: #3a2f1a;     /* ذهبي/بني داكن */
-    --su-secondary: #5b6f8e;        /* أزرق ثانوي غامق */
-    --su-bg: #161e2f;               /* خلفية عامة داكنة جدًا */
-    --su-card-bg: #222e43;          /* خلفية البطاقات */
-    --su-border: #32405a;           /* حدود داكنة ناعمة */
-    --su-table-header-bg: #232f47;  /* رأس الجدول */
-    --su-table-row-hover: #1d263c;  /* هوفر الجدول */
-    --su-link: #e4c975;             /* روابط ذهبية */
-    --su-link-hover: #fff7c7;       /* روابط ذهبية فاتحة */
-    --su-success: #62c185;          /* أخضر فاتح */
+    --su-primary: #20304a;       /* كحلي غامق أساسي */
+    --su-primary-dark: #131c2c;  /* أزرق كحلي داكن جدًا */
+    --su-accent: #e4c975;        /* ذهبي */
+    --su-accent-light: #3a2f1a;  /* ذهبي/بني داكن */
+    --su-secondary: #5b6f8e;     /* أزرق ثانوي غامق */
+    --su-bg: #161e2f;            /* خلفية عامة داكنة جدًا */
+    --su-card-bg: #222e43;       /* خلفية البطاقات */
+    --su-border: #32405a;        /* حدود داكنة ناعمة */
+    --su-table-header-bg: #232f47; /* رأس الجدول */
+    --su-table-row-hover: #1d263c; /* هوفر الجدول */
+    --su-link: #e4c975;          /* روابط ذهبية */
+    --su-link-hover: #fff7c7;    /* روابط ذهبية فاتحة */
+    --su-success: #62c185;       /* أخضر فاتح */
     --su-danger: #e87475;
     --su-warning: #eec75a;
     --su-info: #5db0e5;
@@ -49,6 +49,15 @@ body.dark-mode {
     --shadow-md: 0 .25rem .75rem rgba(10,18,27,.28);
     --shadow-lg: 0 .5rem 1.5rem rgba(10,18,27,.32);
     --hr-color: #35415b;
+
+    /* --- Landing Page Specific Variables (Dark Mode) --- */
+    --hero-gradient-dark: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --gradient-text-dark: linear-gradient(45deg, #e4c975, #f0e68c); /* Adjusted for dark mode */
+    --glass-card-bg-dark: rgba(30, 41, 59, 0.3);
+    --glass-card-border-dark: rgba(255, 255, 255, 0.1);
+    --dark-card-bg: #1d2c3b; /* Re-using existing dark card bg */
+    --dark-border-color: #3b4d66; /* Re-using existing dark border color */
+    --dark-hover-bg: #293b54; /* Re-using existing dark hover bg */
 }
 
 body.dark-mode {
@@ -294,4 +303,80 @@ body.dark-mode ::-webkit-scrollbar-thumb { background: #2d3950; border-radius: 5
 @media (max-width: 767px) {
     body.dark-mode .card { border-radius: 0.5rem; }
     body.dark-mode .table, body.dark-mode .table th, body.dark-mode .table td { font-size: 0.96rem; }
+}
+
+/* --- Landing Page Specific Styles (Dark Mode) --- */
+body.dark-mode .hero-bg {
+    background: var(--hero-gradient-dark);
+}
+
+body.dark-mode .gradient-text {
+    background: var(--gradient-text-dark);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .glass-card {
+    background: var(--glass-card-bg-dark);
+    border: 1px solid var(--glass-card-border-dark);
+}
+
+body.dark-mode .feature-card {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+    color: var(--text-color); /* Use general text color for dark mode */
+}
+body.dark-mode .feature-card:hover {
+    background-color: var(--dark-hover-bg);
+}
+
+/* Ensure text colors are correct in dark mode for landing page elements */
+body.dark-mode .text-white {
+    color: #e2e5ee !important; /* Lighter white for dark mode */
+}
+body.dark-mode .text-gray-200 {
+    color: #b1bdd1 !important;
+}
+body.dark-mode .text-yellow-300 {
+    color: #f0e68c !important; /* Adjusted yellow for dark mode */
+}
+body.dark-mode .text-gray-900 {
+    color: #e2e5ee !important;
+}
+body.dark-mode .text-gray-600 {
+    color: #b1bdd1 !important;
+}
+body.dark-mode .bg-white {
+    background-color: var(--su-card-bg) !important; /* Ensure card bg is correct */
+}
+body.dark-mode .bg-gray-50 { /* This will be the body background in dark mode */
+    background-color: var(--su-bg) !important;
+}
+body.dark-mode .bg-gray-800 { /* Feature card background in dark mode */
+    background-color: var(--su-card-bg) !important;
+}
+body.dark-mode .bg-gray-900 { /* Footer background in dark mode */
+    background-color: var(--su-primary-dark) !important;
+}
+body.dark-mode .bg-blue-100 {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Bootstrap primary with opacity */
+}
+body.dark-mode .bg-purple-100 {
+    background-color: rgba(111, 66, 193, 0.1) !important; /* Bootstrap purple with opacity */
+}
+body.dark-mode .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.dark-mode .bg-white\/5 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+body.dark-mode .bg-blue-400\/10 {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+body.dark-mode .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+body.dark-mode .bg-white\/30 {
+    background-color: rgba(255, 255, 255, 0.3) !important;
 }

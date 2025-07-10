@@ -20,16 +20,21 @@ import random
 from news.models import NewsItem
 from django.views.decorators.http import require_POST
 
-# ... (HomePageView, SignUpView كما هي من قبل) ...
 class HomePageView(TemplateView):
-    template_name = 'core/home.html'
+    template_name = 'core/home.html' # تأكد أن هذا هو القالب الصحيح
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # يمكنك إضافة أي بيانات سياقية تحتاجها هنا لصفحة الهبوط
+        return context
 
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('core:dashboard')
     template_name = 'registration/signup.html'
     def form_valid(self, form):
-        user = form.save(); login(self.request, user)
+        user = form.save()
+        login(self.request, user)
         messages.success(self.request, "تم إنشاء حسابك بنجاح!")
         return redirect(self.success_url)
 
@@ -102,7 +107,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         for day in days_range_raw:
             count = Task.objects.filter(user=user, status='completed', updated_at__date=day).count()
             completed_tasks_per_day_raw.append(count)
-        context['tasks_completion_labels_raw'] = [d.strftime('%Y-%m-%d') for d in days_range_raw]  # تنسيق صريح
+        context['tasks_completion_labels_raw'] = [d.strftime('%Y-%m-%d') for d in days_range_raw]
         context['tasks_completion_data_raw'] = completed_tasks_per_day_raw
         tasks_by_subject_raw = list(Task.objects.filter(user=user, status='completed', subject__isnull=False).values('subject__name').annotate(count=Count('id')).order_by('-count'))
         context['tasks_by_subject_raw'] = tasks_by_subject_raw

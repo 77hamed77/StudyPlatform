@@ -1,335 +1,350 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرحباً بك في المنصة المساعدة للدراسة</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-        .hero-bg {
-            background: linear-gradient(135deg, #3a2f01ff 0%, #252d6eff 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff05" points="0,0 1000,300 1000,1000 0,700"/></svg>');
-            background-size: cover;
-        }
-        .floating-card {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        .gradient-text {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .feature-card {
-            transition: all 0.3s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .pulse-slow {
-            animation: pulse 3s infinite;
-        }
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-up {
-            animation: slideInUp 0.8s ease-out;
-        }
-        .animate-delay-1 { animation-delay: 0.2s; }
-        .animate-delay-2 { animation-delay: 0.4s; }
-        .animate-delay-3 { animation-delay: 0.6s; }
-        
-        .dark-mode {
-            background: #0f172a;
-            color: #e2e8f0;
-        }
-        .dark-mode .hero-bg {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        }
-        .dark-mode .glass-card {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .dark-mode .feature-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-        }
-        .dark-mode .feature-card:hover {
-            background: #334155;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-900 transition-colors duration-300">
-    <!-- Theme Toggle -->
-    <div class="fixed top-4 left-4 z-50">
-        <button id="themeToggle" class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300">
-            <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
-            <i class="fas fa-moon text-gray-300 hidden dark:inline"></i>
-        </button>
-    </div>
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 
+{% block title %}{% translate "مرحباً بك في المنصة المساعدة للدراسة" %} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+    /* Custom styles for the landing page, integrated with existing theme variables */
+    body { font-family: 'Cairo', sans-serif; }
+
+    /* Hero Section Background */
+    .hero-bg {
+        background: var(--hero-gradient-light, linear-gradient(135deg, #3a2f01ff 0%, #252d6eff 100%));
+        position: relative;
+        overflow: hidden;
+    }
+    body.dark-mode .hero-bg {
+        background: var(--hero-gradient-dark, linear-gradient(135deg, #1e293b 0%, #334155 100%));
+    }
+    .hero-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff05" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+        background-size: cover;
+        opacity: 0.1; /* Adjust opacity for better visibility */
+    }
+
+    /* Floating Card Animation */
+    .floating-card {
+        animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+        background: var(--gradient-text-light, linear-gradient(45deg, #667eea, #764ba2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    body.dark-mode .gradient-text {
+        background: var(--gradient-text-dark, linear-gradient(45deg, #e4c975, #f0e68c)); /* Adjusted for dark mode */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Glass Card Effect */
+    .glass-card {
+        background: var(--glass-card-bg-light, rgba(255, 255, 255, 0.1));
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-card-border-light, rgba(255, 255, 255, 0.2));
+    }
+    body.dark-mode .glass-card {
+        background: var(--glass-card-bg-dark, rgba(30, 41, 59, 0.3));
+        border: 1px solid var(--glass-card-border-dark, rgba(255, 255, 255, 0.1));
+    }
+
+    /* Feature Card Hover Effect */
+    .feature-card {
+        transition: all 0.3s ease;
+        background-color: var(--card-bg, #fff); /* Use existing card background */
+        border: 1px solid var(--border-color, #eee); /* Use existing border color */
+        box-shadow: var(--shadow-sm, 0 .125rem .25rem rgba(0,0,0,.075));
+    }
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg, 0 1rem 3rem rgba(0,0,0,.175)); /* Use Bootstrap shadow */
+    }
+    body.dark-mode .feature-card {
+        background-color: var(--dark-card-bg, #1d2c3b);
+        border-color: var(--dark-border-color, #3b4d66);
+    }
+    body.dark-mode .feature-card:hover {
+        background-color: var(--dark-hover-bg, #293b54);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.3);
+    }
+
+    /* Pulse Animation */
+    .pulse-slow {
+        animation: pulse 3s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Slide In Up Animation */
+    .animate-slide-up {
+        opacity: 0; /* Start invisible */
+        transform: translateY(30px);
+    }
+    .animate-slide-up.visible { /* Class added by JS when in view */
+        animation: slideInUp 0.8s ease-out forwards;
+    }
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-delay-1 { animation-delay: 0.2s; }
+    .animate-delay-2 { animation-delay: 0.4s; }
+    .animate-delay-3 { animation-delay: 0.6s; }
+
+    /* Bootstrap overrides for consistency */
+    .btn-custom-primary {
+        background: linear-gradient(to right, #28a745, #007bff); /* Green to Blue */
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    .btn-custom-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+        color: white; /* Ensure text color remains white on hover */
+    }
+
+    .btn-custom-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+    .btn-custom-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+        color: white; /* Ensure text color remains white on hover */
+    }
+
+    .btn-custom-accent {
+        background: white;
+        color: #1abc9c; /* Emerald color */
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
+        transition: all 0.3s ease;
+    }
+    .btn-custom-accent:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(26, 188, 156, 0.5);
+        color: #1abc9c;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 576px) {
+        .hero-section h1 {
+            font-size: 3rem;
+        }
+        .hero-section p {
+            font-size: 1rem;
+        }
+        .btn-group-vertical {
+            flex-direction: column;
+            width: 100%;
+        }
+        .btn-group-vertical .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
     <!-- Hero Section -->
-    <section class="hero-bg min-h-screen flex items-center justify-center relative">
-        <div class="container mx-auto px-4 text-center relative z-10">
+    <section class="hero-bg min-vh-100 d-flex align-items-center justify-content-center position-relative">
+        <div class="container text-center position-relative z-1">
             <!-- Floating Icon -->
-            <div class="floating-card mb-8">
-                <div class="w-24 h-24 mx-auto bg-white/20 rounded-full flex items-center justify-center glass-card">
-                    <i class="fas fa-graduation-cap text-4xl text-white"></i>
+            <div class="floating-card mb-4">
+                <div class="d-flex align-items-center justify-content-center mx-auto bg-white bg-opacity-25 rounded-circle glass-card" style="width: 96px; height: 96px;">
+                    <i class="fas fa-graduation-cap text-white fs-1"></i>
                 </div>
             </div>
             
             <!-- Main Title -->
-            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-slide-up">
-                المنصة المساعدة
-                <span class="block gradient-text bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                    للدراسة
+            <h1 class="display-3 fw-bold text-white mb-3 animate-slide-up">
+                {% translate "المنصة المساعدة" %}
+                <span class="d-block gradient-text">
+                    {% translate "للدراسة" %}
                 </span>
             </h1>
             
             <!-- Subtitle -->
-            <p class="text-xl md:text-2xl text-gray-200 max-w-4xl mx-auto mb-12 leading-relaxed animate-slide-up animate-delay-1">
-                مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة.
-                <span class="block mt-2 text-yellow-300">انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!</span>
+            <p class="lead text-white-75 mx-auto mb-5 animate-slide-up animate-delay-1" style="max-width: 700px;">
+                {% translate "مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة." %}
+                <span class="d-block mt-2 text-warning">{% translate "انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!" %}</span>
             </p>
             
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animate-delay-2">
-                <button class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    <i class="fas fa-user-plus ml-2"></i>
-                    أنشئ حساباً مجانياً
-                </button>
-                <button class="bg-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg glass-card hover:bg-white/30 transform hover:scale-105 transition-all duration-300">
-                    <i class="fas fa-sign-in-alt ml-2"></i>
-                    تسجيل الدخول
-                </button>
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 animate-slide-up animate-delay-2">
+                <a href="{% url 'core:signup' %}" class="btn btn-custom-primary">
+                    <i class="fas fa-user-plus me-2"></i>
+                    {% translate "أنشئ حساباً مجانياً" %}
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-custom-secondary">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    {% translate "تسجيل الدخول" %}
+                </a>
             </div>
         </div>
         
         <!-- Background Decorations -->
-        <div class="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-20 left-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
+        <div class="position-absolute top-25 end-25 w-75 h-75 bg-white bg-opacity-5 rounded-circle blur-3"></div>
+        <div class="position-absolute bottom-25 start-25 w-100 h-100 bg-info bg-opacity-10 rounded-circle blur-3"></div>
     </section>
 
     <!-- Features Section -->
-    <section class="py-20 bg-white dark:bg-gray-900 relative overflow-hidden">
-        <div class="container mx-auto px-4">
+    <section class="py-5 bg-white text-dark position-relative overflow-hidden">
+        <div class="container">
             <!-- Section Header -->
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                    ميزات المنصة
+            <div class="text-center mb-5">
+                <h2 class="display-4 fw-bold text-dark mb-3">
+                    {% translate "ميزات المنصة" %}
                 </h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto mb-6"></div>
-                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                    اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية
+                <div class="w-25 mx-auto mb-4" style="height: 5px; background: linear-gradient(90deg, #007bff, #6f42c1);"></div>
+                <p class="lead text-muted mx-auto" style="max-width: 600px;">
+                    {% translate "اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية" %}
                 </p>
             </div>
             
             <!-- Features Grid -->
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
                 <!-- Feature 1 -->
-                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up">
-                    <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-folder-open text-2xl text-white"></i>
+                <div class="col">
+                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up">
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-primary rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #007bff, #0056b3) !important;">
+                            <i class="fas fa-folder-open text-white fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                            {% translate "مكتبة ملفات شاملة" %}
+                        </h3>
+                        <p class="text-muted lh-base">
+                            {% translate "وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد" %}
+                        </p>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                        مكتبة ملفات شاملة
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد
-                    </p>
                 </div>
                 
                 <!-- Feature 2 -->
-                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up animate-delay-1">
-                    <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-bullhorn text-2xl text-white"></i>
+                <div class="col">
+                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up animate-delay-1">
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-success rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #28a745, #1e7e34) !important;">
+                            <i class="fas fa-bullhorn text-white fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                            {% translate "أخبار وإعلانات فورية" %}
+                        </h3>
+                        <p class="text-muted lh-base">
+                            {% translate "كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة" %}
+                        </p>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                        أخبار وإعلانات فورية
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة
-                    </p>
                 </div>
                 
                 <!-- Feature 3 -->
-                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up animate-delay-2">
-                    <div class="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-tasks text-2xl text-white"></i>
+                <div class="col">
+                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up animate-delay-2">
+                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-purple rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #6f42c1, #563d7c) !important;">
+                            <i class="fas fa-tasks text-white fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                            {% translate "إدارة مهام ذكية" %}
+                        </h3>
+                        <p class="text-muted lh-base">
+                            {% translate "نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة" %}
+                        </p>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                        إدارة مهام ذكية
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة
-                    </p>
                 </div>
             </div>
         </div>
         
         <!-- Background Decorations -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl -z-10"></div>
-        <div class="absolute bottom-0 left-0 w-80 h-80 bg-purple-100 dark:bg-purple-900/20 rounded-full blur-3xl -z-10"></div>
+        <div class="position-absolute top-0 end-0 w-50 h-50 bg-info bg-opacity-10 rounded-circle blur-3" style="transform: translate(20%, -20%);"></div>
+        <div class="position-absolute bottom-0 start-0 w-75 h-75 bg-purple bg-opacity-10 rounded-circle blur-3" style="transform: translate(-20%, 20%);"></div>
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-emerald-400 to-cyan-400 relative overflow-hidden">
-        <div class="container mx-auto px-4 text-center relative z-10">
-            <div class="max-w-3xl mx-auto">
-                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-8 floating-card">
-                    <i class="fas fa-rocket text-3xl text-white"></i>
+    <section class="py-5 bg-gradient-to-r from-emerald-400 to-cyan-400 position-relative overflow-hidden">
+        <div class="container text-center position-relative z-1">
+            <div class="mx-auto" style="max-width: 700px;">
+                <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-white bg-opacity-25 rounded-circle floating-card" style="width: 80px; height: 80px;">
+                    <i class="fas fa-rocket text-white fs-3"></i>
                 </div>
                 
-                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
-                    جاهز لتبدأ رحلتك نحو النجاح؟
+                <h2 class="display-4 fw-bold text-white mb-3">
+                    {% translate "جاهز لتبدأ رحلتك نحو النجاح؟" %}
                 </h2>
                 
-                <p class="text-xl text-white/90 mb-10 leading-relaxed">
-                    انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة
+                <p class="lead text-white-75 mb-5 lh-base">
+                    {% translate "انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة" %}
                 </p>
                 
-                <button class="bg-white text-emerald-600 px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 pulse-slow">
-                    <i class="fas fa-play ml-2"></i>
-                    ابدأ الآن!
-                </button>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-custom-accent pulse-slow">
+                    <i class="fas fa-play me-2"></i>
+                    {% translate "ابـدأ الآن!" %}
+                </a>
             </div>
         </div>
         
         <!-- Background Decorations -->
-        <div class="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full"></div>
-        <div class="absolute bottom-10 left-10 w-48 h-48 bg-white/5 rounded-full"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <div class="position-absolute top-0 end-0 w-25 h-25 bg-white bg-opacity-10 rounded-circle" style="transform: translate(50%, -50%);"></div>
+        <div class="position-absolute bottom-0 start-0 w-50 h-50 bg-white bg-opacity-5 rounded-circle" style="transform: translate(-50%, 50%);"></div>
+        <div class="position-absolute top-50 start-50 w-75 h-75 bg-white bg-opacity-5 rounded-circle blur-3" style="transform: translate(-50%, -50%);"></div>
     </section>
+</main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-2xl font-bold mb-4">المنصة المساعدة</h3>
-                    <p class="text-gray-400">
-                        مكانك المتكامل للتعلم والتفوق الأكاديمي
-                    </p>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">روابط سريعة</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">الملفات</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">الأخبار</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">المهام</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">الدعم</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition-colors">مركز المساعدة</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">اتصل بنا</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">الأسئلة الشائعة</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">تابعنا</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 المنصة المساعدة للدراسة. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            
-            // Store theme preference
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible'); // Add 'visible' class
+                observer.unobserve(entry.target); // Stop observing once animated
+            }
         });
-        
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            body.classList.add('dark-mode');
-        }
-        
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-        
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-slide-up');
-                }
-            });
-        }, observerOptions);
-        
-        // Observe all feature cards
-        document.querySelectorAll('.feature-card').forEach(card => {
-            observer.observe(card);
-        });
-        
-        // Add loading animation
-        window.addEventListener('load', () => {
-            document.body.classList.add('loaded');
-        });
-    </script>
-</body>
-</html>
+    }, observerOptions);
+    
+    // Observe all elements with animate-slide-up class
+    document.querySelectorAll('.animate-slide-up').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+{% endblock %}
