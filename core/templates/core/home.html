@@ -1,146 +1,335 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}مرحباً بك في المنصة المساعدة للدراسة - {{ block.super }}{% endblock %}
-
-{% block extra_head %}
-{{ block.super }}
-<style>
-    .hero-section {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url("{% static 'images/backgrounds/background.png' %}");
-        background-size: cover;
-        background-position: center center;
-        color: #fff;
-        padding: 6rem 1rem; /* تعديل الحشو للشاشات الصغيرة */
-        text-align: center;
-    }
-    body.dark-mode .hero-section {
-        background: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.8)), url("{% static 'images/backgrounds/back_night.png' %}");
-        /* تأكد من وجود study_hero_dark.jpg أو استخدم نفس الصورة مع تعتيم مختلف */
-    }
-    .hero-section h1 {
-        font-size: 2.8rem; /* تعديل حجم الخط للشاشات المختلفة */
-        font-weight: 700;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-    .hero-section .lead {
-        font-size: 1.2rem; /* تعديل حجم الخط */
-        margin-bottom: 2rem;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .features-section {
-        padding: 4rem 1rem; /* تعديل الحشو */
-    }
-    .features-section .feature-icon {
-        font-size: 2.8rem; /* تعديل حجم الأيقونة */
-        color: var(--bs-primary);
-        margin-bottom: 1rem;
-    }
-    body.dark-mode .features-section .feature-icon {
-        color: var(--bs-primary-dark);
-    }
-    .features-section h4 {
-        font-size: 1.3rem; /* تعديل حجم العنوان الفرعي */
-        margin-bottom: 0.5rem;
-    }
-    .features-section p {
-        font-size: 0.95rem; /* تعديل حجم النص */
-    }
-    .cta-section {
-        background-color: var(--bs-light);
-        padding: 4rem 1rem; /* تعديل الحشو */
-    }
-    body.dark-mode .cta-section {
-        background-color: var(--card-bg-dark);
-    }
-
-    @media (min-width: 768px) { /* تعديلات للشاشات الأكبر */
-        .hero-section { padding: 8rem 0; }
-        .hero-section h1 { font-size: 3.5rem; }
-        .hero-section .lead { font-size: 1.3rem; }
-        .features-section { padding: 5rem 0; }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="hero-section">
-    <div class="container">
-        <i class="fas fa-graduation-cap fa-3x mb-3 animate__animated animate__fadeInDown"></i> {# مثال لإضافة حركة بسيطة #}
-        <h1 class="display-4 animate__animated animate__fadeInUp animate__delay-0.5s">المنصة المساعدة للدراسة</h1>
-        <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
-            مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة.
-            انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!
-        </p>
-        <div class="mt-4 animate__animated animate__fadeInUp animate__delay-1.5s">
-            {% if not user.is_authenticated %}
-            <a href="{% url 'core:signup' %}" class="btn btn-primary btn-lg px-4 me-sm-2 mb-2 mb-sm-0 shadow">
-                <i class="fas fa-user-plus me-2"></i>أنشئ حساباً مجانياً
-            </a>
-            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4 shadow">
-                <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
-            </a>
-            {% else %}
-            <a href="{% url 'core:dashboard' %}" class="btn btn-success btn-lg px-5 shadow">
-                <i class="fas fa-tachometer-alt me-2"></i>الذهاب إلى لوحة التحكم
-            </a>
-            {% endif %}
-        </div>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرحباً بك في المنصة المساعدة للدراسة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .hero-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff05" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+            background-size: cover;
+        }
+        .floating-card {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideInUp 0.8s ease-out;
+        }
+        .animate-delay-1 { animation-delay: 0.2s; }
+        .animate-delay-2 { animation-delay: 0.4s; }
+        .animate-delay-3 { animation-delay: 0.6s; }
+        
+        .dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        .dark-mode .hero-bg {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        .dark-mode .glass-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark-mode .feature-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        .dark-mode .feature-card:hover {
+            background: #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 transition-colors duration-300">
+    <!-- Theme Toggle -->
+    <div class="fixed top-4 left-4 z-50">
+        <button id="themeToggle" class="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300">
+            <i class="fas fa-sun text-yellow-500 dark:hidden"></i>
+            <i class="fas fa-moon text-gray-300 hidden dark:inline"></i>
+        </button>
     </div>
-</div>
 
-<section class="features-section py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title-underline"><span>ميزات المنصة</span></h2> {# عنوان قسم مع خط تحته #}
-            <p class="text-muted" style="color:rgb(209 209 209 / 75%)">اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية.</p>
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center relative">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <!-- Floating Icon -->
+            <div class="floating-card mb-8">
+                <div class="w-24 h-24 mx-auto bg-white/20 rounded-full flex items-center justify-center glass-card">
+                    <i class="fas fa-graduation-cap text-4xl text-white"></i>
+                </div>
+            </div>
+            
+            <!-- Main Title -->
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-slide-up">
+                المنصة المساعدة
+                <span class="block gradient-text bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                    للدراسة
+                </span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl text-gray-200 max-w-4xl mx-auto mb-12 leading-relaxed animate-slide-up animate-delay-1">
+                مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة.
+                <span class="block mt-2 text-yellow-300">انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!</span>
+            </p>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animate-delay-2">
+                <button class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-user-plus ml-2"></i>
+                    أنشئ حساباً مجانياً
+                </button>
+                <button class="bg-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg glass-card hover:bg-white/30 transform hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-sign-in-alt ml-2"></i>
+                    تسجيل الدخول
+                </button>
+            </div>
         </div>
-        <div class="row text-center">
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">
-                    <i class="fas fa-folder-open"></i>
-                </div>
-                <h4>مكتبة ملفات شاملة</h4>
-                <p class="text-muted">وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد.</p>
+        
+        <!-- Background Decorations -->
+        <div class="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 left-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white dark:bg-gray-900 relative overflow-hidden">
+        <div class="container mx-auto px-4">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    ميزات المنصة
+                </h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto mb-6"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية
+                </p>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">
-                    <i class="fas fa-bullhorn"></i>
+            
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-folder-open text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                        مكتبة ملفات شاملة
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد
+                    </p>
                 </div>
-                <h4>أخبار وإعلانات فورية</h4>
-                <p class="text-muted">كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-icon">
-                    <i class="fas fa-tasks"></i>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up animate-delay-1">
+                    <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-bullhorn text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                        أخبار وإعلانات فورية
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة
+                    </p>
                 </div>
-                <h4>إدارة مهام ذكية</h4>
-                <p class="text-muted">نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة.</p>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg text-center animate-slide-up animate-delay-2">
+                    <div class="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-tasks text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                        إدارة مهام ذكية
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                        نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+        
+        <!-- Background Decorations -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl -z-10"></div>
+        <div class="absolute bottom-0 left-0 w-80 h-80 bg-purple-100 dark:bg-purple-900/20 rounded-full blur-3xl -z-10"></div>
+    </section>
 
-{% if not user.is_authenticated %}
-<section class="cta-section text-center">
-    <div class="container">
-        <i class="fas fa-rocket fa-2x text-success mb-3"></i>
-        <h2 class="mb-3">جاهز لتبدأ رحلتك نحو النجاح؟</h2>
-        <p class="lead text-muted mb-4">انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة.</p>
-        <a href="{% url 'core:signup' %}" class="btn btn-success btn-lg px-5 shadow">
-            ابدأ الآن!
-        </a>
-    </div>
-</section>
-{% endif %}
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-emerald-400 to-cyan-400 relative overflow-hidden">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="max-w-3xl mx-auto">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-8 floating-card">
+                    <i class="fas fa-rocket text-3xl text-white"></i>
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    جاهز لتبدأ رحلتك نحو النجاح؟
+                </h2>
+                
+                <p class="text-xl text-white/90 mb-10 leading-relaxed">
+                    انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة
+                </p>
+                
+                <button class="bg-white text-emerald-600 px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 pulse-slow">
+                    <i class="fas fa-play ml-2"></i>
+                    ابدأ الآن!
+                </button>
+            </div>
+        </div>
+        
+        <!-- Background Decorations -->
+        <div class="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full"></div>
+        <div class="absolute bottom-10 left-10 w-48 h-48 bg-white/5 rounded-full"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+    </section>
 
-{% endblock %}
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">المنصة المساعدة</h3>
+                    <p class="text-gray-400">
+                        مكانك المتكامل للتعلم والتفوق الأكاديمي
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">الملفات</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الأخبار</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">المهام</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">الدعم</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">مركز المساعدة</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">اتصل بنا</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">الأسئلة الشائعة</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">تابعنا</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 المنصة المساعدة للدراسة. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
 
-{% block extra_scripts %}
-{{ block.super }}
-{% comment %} إذا كنت تستخدم Animate.css، قم بتضمينها في base.html أو هنا {% endcomment %}
-{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/> {% endcomment %}
-{% endblock %}
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Store theme preference
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    </script>
+</body>
+</html>
