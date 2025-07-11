@@ -1,189 +1,341 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}لوحة التحكم - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
 <style>
-    .stat-card {
-        transition: all 0.3s ease-in-out;
-        border-left: 5px solid transparent;
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
     }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    body.dark-mode .dashboard-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
     }
-    .stat-card .card-body {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .stat-card .stat-icon {
+    .dashboard-header h2 {
         font-size: 2.5rem;
-        opacity: 0.6;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
     }
-    .stat-card.border-primary { border-left-color: var(--bs-primary) !important; }
-    .stat-card.border-success { border-left-color: var(--bs-success) !important; }
-    .stat-card.border-info   { border-left-color: var(--bs-info) !important; }
-    .stat-card.border-warning { border-left-color: var(--bs-warning) !important; }
+    body.dark-mode .dashboard-header h2 {
+        color: #e4c975;
+    }
+    .welcome-message {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .welcome-message {
+        color: #e8ecf1;
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    .card-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease-in-out;
+        text-align: right; /* لتنسيق المحتوى من اليمين لليسار */
+    }
+    body.dark-mode .card-item {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .card-item:hover {
+        transform: translateY(-5px);
+    }
+    .card-item h3 {
+        font-size: 1.6rem;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    body.dark-mode .card-item h3 {
+        color: #e4c975;
+    }
+    .card-item p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .card-item p {
+        color: #e8ecf1;
+    }
+    .card-item .btn {
+        margin-top: 15px;
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.dark-mode .card-item .btn {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .card-item .btn:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .card-item .btn:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+    .quote-card {
+        background-color: var(--accent-color-light, #e0f7fa);
+        border: 1px solid var(--accent-color, #00bcd4);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+        font-style: italic;
+        color: var(--accent-color-dark, #00798a);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    body.dark-mode .quote-card {
+        background-color: #2a4f5d;
+        border-color: #00bcd4;
+        color: #a7d9e4;
+    }
+    .quote-card p {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+    .quote-card footer {
+        font-size: 1rem;
+        color: var(--accent-color-dark, #00798a);
+    }
+    body.dark-mode .quote-card footer {
+        color: #a7d9e4;
+    }
 
-    body.dark-mode .stat-card.border-primary { border-left-color: var(--bs-primary-dark) !important; }
-    body.dark-mode .stat-card.border-success { border-left-color: var(--bs-success-dark) !important; }
-    body.dark-mode .stat-card.border-info   { border-left-color: var(--bs-info-dark) !important; }
-    body.dark-mode .stat-card.border-warning { border-left-color: var(--bs-warning-dark) !important; }
-
-    .quick-links .btn {
-        margin: 0.25rem;
+    /* Styles for Recommended Resources */
+    .recommendations-section {
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 1px solid var(--border-color, #eee);
+        text-align: right;
+    }
+    body.dark-mode .recommendations-section {
+        border-color: #3b4d66;
+    }
+    .recommendations-section h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    body.dark-mode .recommendations-section h3 {
+        color: #e4c975;
+    }
+    .recommended-resource-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease-in-out;
+        text-align: right;
+        margin-bottom: 20px;
+    }
+    body.dark-mode .recommended-resource-item {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .recommended-resource-item:hover {
+        transform: translateY(-5px);
+    }
+    .recommended-resource-item h4 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 10px;
+    }
+    body.dark-mode .recommended-resource-item h4 {
+        color: #e4c975;
+    }
+    .recommended-resource-item p {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text-color, #333);
+        margin-bottom: 15px;
+    }
+    body.dark-mode .recommended-resource-item p {
+        color: #e8ecf1;
+    }
+    .recommended-resource-item .btn {
+        background-color: var(--success-color, #28a745);
+        border-color: var(--success-color, #28a745);
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.dark-mode .recommended-resource-item .btn {
+        background-color: #8bc34a;
+        border-color: #8bc34a;
+        color: #1d2c3b;
+    }
+    .recommended-resource-item .btn:hover {
+        background-color: var(--success-color-dark, #218838);
+        border-color: var(--success-color-dark, #218838);
+    }
+    body.dark-mode .recommended-resource-item .btn:hover {
+        background-color: #7cb342;
+        border-color: #7cb342;
+    }
+    .recommended-resource-item .resource-rating {
+        font-size: 0.9rem;
+        color: var(--text-muted, #6c757d);
+        margin-top: 5px;
+        text-align: right;
+    }
+    body.dark-mode .recommended-resource-item .resource-rating {
+        color: #b1bdd1;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-        <h1 class="h2 mb-0"><i class="fas fa-tachometer-alt me-2"></i>لوحة التحكم</h1>
-        <span class="text-muted small">مرحباً بعودتك، {{ user.username }}!</span>
-    </div>
+<div class="container my-4">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>مرحباً بك في لوحة التحكم، {{ user.username }}!</h2>
+        </div>
 
-    {% if daily_quote %}
-    <div class="alert alert-dismissible shadow-sm" role="alert" style="background-color: #e9ecef; border-color: #ced4da;"> {# لون مخصص للاقتباس #}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <div class="d-flex align-items-center">
-            <i class="fas fa-lightbulb fa-2x text-warning me-3"></i>
-            <div>
-                <h5 class="alert-heading mb-1">اقتباس / نصيحة اليوم</h5>
-                <em class="d-block">"{{ daily_quote.quote_text }}"</em>
-                {% if daily_quote.author_or_source %}
-                <small class="text-muted">- {{ daily_quote.author_or_source }}</small>
+        {% if daily_quote %}
+        <div class="quote-card">
+            <p>"{{ daily_quote.quote_text }}"</p>
+            {% if daily_quote.author_or_source %}
+                <footer>— {{ daily_quote.author_or_source }}</footer>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            <div class="card-item">
+                <h3><i class="fas fa-tasks me-2"></i> مهامك القادمة</h3>
+                {% if upcoming_tasks %}
+                    <ul class="list-unstyled">
+                        {% for task in upcoming_tasks %}
+                            <li>
+                                <strong>{{ task.title }}</strong> -
+                                <span class="text-muted">الموعد: {{ task.due_date|date:"d M Y" }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'tasks:task_list' %}" class="btn btn-primary">عرض كل المهام</a>
+                {% else %}
+                    <p>لا توجد مهام قادمة حالياً. استمتع بوقتك أو أضف مهمة جديدة!</p>
+                    <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">إضافة مهمة جديدة</a>
                 {% endif %}
             </div>
-        </div>
-    </div>
-    {% endif %}
 
-    <!-- قسم الإحصائيات السريعة -->
-    <div class="row mb-4">
-        <div class="col-md-6 col-xl-3 mb-3">
-            <div class="card shadow-sm stat-card border-primary">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title mb-0">{{ total_tasks_pending_or_inprogress|default:0 }}</h5>
-                        <p class="card-text text-muted small mb-0">مهام حالية/قادمة</p>
-                    </div>
-                    <i class="fas fa-tasks stat-icon text-primary"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3 mb-3">
-            <div class="card shadow-sm stat-card border-success">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title mb-0">{{ total_tasks_completed|default:0 }}</h5>
-                        <p class="card-text text-muted small mb-0">مهام منجزة</p>
-                    </div>
-                    <i class="fas fa-check-double stat-icon text-success"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3 mb-3">
-            <div class="card shadow-sm stat-card border-info">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title mb-0">{{ unread_notifications_count|default:0 }}</h5>
-                        <p class="card-text text-muted small mb-0">إشعارات جديدة</p>
-                    </div>
-                    <i class="fas fa-bell stat-icon text-info"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3 mb-3">
-            <div class="card shadow-sm stat-card border-warning">
-                <div class="card-body">
-                    <div>
-                        <h5 class="card-title mb-0">{{ files_marked_as_read_count|default:0 }}</h5>
-                        <p class="card-text text-muted small mb-0">ملفات تمت قراءتها</p>
-                    </div>
-                    <i class="fas fa-book-reader stat-icon text-warning"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-lg-7 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white"><h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>أحدث الأخبار الهامة</h5></div>
-                <div class="card-body">
-                    {% if latest_news %}
-                        <ul class="list-group list-group-flush">
-                        {% for news_item_dash in latest_news %} {# اسم متغير مختلف #}
-                            <li class="list-group-item px-0">
-                                <a href="{{ news_item_dash.get_absolute_url }}">{{ news_item_dash.title|truncatechars:60 }}</a>
-                                <br><small class="text-muted">{{ news_item_dash.publication_date|date:"d M Y" }}</small>
+            <div class="card-item">
+                <h3><i class="fas fa-bullhorn me-2"></i> آخر الأخبار الهامة</h3>
+                {% if latest_news %}
+                    <ul class="list-unstyled">
+                        {% for news in latest_news %}
+                            <li>
+                                <strong>{{ news.title }}</strong> -
+                                <span class="text-muted">{{ news.publication_date|date:"d M Y" }}</span>
                             </li>
-                        {% empty %}
-                            <li class="list-group-item px-0 text-muted">لا توجد أخبار هامة حالياً.</li>
                         {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">لا توجد أخبار لعرضها.</p>
-                    {% endif %}
-                    {% if latest_news|length > 0 %}
-                    <div class="text-center mt-3">
-                        <a href="{% url 'news:news_list' %}" class="btn btn-sm btn-outline-primary">عرض كل الأخبار</a>
-                    </div>
-                    {% endif %}
-                </div>
+                    </ul>
+                    <a href="{% url 'news:news_list' %}" class="btn btn-primary">عرض كل الأخبار</a>
+                {% else %}
+                    <p>لا توجد أخبار هامة حالياً.</p>
+                {% endif %}
             </div>
-        </div>
-        <div class="col-lg-5 mb-4">
-             <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-tasks me-2"></i>مهامك ذات الأولوية</h5></div>
-                <div class="card-body">
-                     {% if upcoming_tasks %}
-                        <ul class="list-group list-group-flush">
-                        {% for task_item_dash in upcoming_tasks %} {# اسم متغير مختلف #}
-                            <li class="list-group-item px-0">
-                                <a href="{{ task_item_dash.get_absolute_url|default:'#' }}">{{ task_item_dash.title|truncatechars:40 }}</a>
-                                <span class="badge float-end 
-                                    {% if task_item_dash.status == 'pending' %}bg-warning text-dark
-                                    {% elif task_item_dash.status == 'in_progress' %}bg-info text-dark
-                                    {% endif %}">{{ task_item_dash.get_status_display }}</span>
-                                <br>
-                                {% if task_item_dash.due_date %}
-                                    <small class="text-danger">
-                                        <i class="far fa-calendar-alt"></i> مستحقة: {{ task_item_dash.due_date|date:"d M" }}
-                                        {% if task_item_dash.is_overdue %} <span class="fw-bold">(متأخرة!)</span>{% endif %}
-                                    </small>
-                                {% endif %}
-                             </li>
-                        {% empty %}
-                            <li class="list-group-item px-0 text-muted">ليس لديك مهام حالية أو قادمة.</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">لا توجد مهام لعرضها.</p>
-                    {% endif %}
-                    {% if upcoming_tasks|length > 0 or user.tasks_set.all.count > 0 %}
-                    <div class="text-center mt-3">
-                        <a href="{% url 'tasks:task_list' %}" class="btn btn-sm btn-outline-primary">عرض كل المهام</a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="mt-4 p-3 bg-white shadow-sm rounded quick-links">
-        <h5 class="mb-3 border-bottom pb-2"><i class="fas fa-link me-2"></i>روابط سريعة:</h5>
-        <a href="{% url 'tasks:task_create' %}" class="btn btn-success"><i class="fas fa-plus-circle"></i> إضافة مهمة</a>
-        <a href="{% url 'files_manager:main_file_list' %}" class="btn btn-info text-white"><i class="fas fa-folder-open"></i> تصفح الملفات</a>
-        <a href="{% url 'notes:note_list' %}" class="btn btn-secondary"><i class="fas fa-sticky-note"></i> ملاحظاتي</a>
-        <a href="{% url 'exam_prep:exam_resources' %}" class="btn btn-warning text-dark"><i class="fas fa-book-reader"></i> ركن الامتحانات</a>
-        <a href="{% url 'core:profile' %}" class="btn btn-purple"><i class="fas fa-user-circle"></i> ملفي الشخصي</a> {# افترض أن لديك فئة .btn-purple #}
+            <div class="card-item">
+                <h3><i class="fas fa-chart-line me-2"></i> تقدمك الأكاديمي</h3>
+                <p>تتبع درجاتك وتقدمك في المواد الدراسية المختلفة.</p>
+                <a href="{% url 'core:academic_progress' %}" class="btn btn-primary">عرض التقدم</a>
+            </div>
+
+            <div class="card-item">
+                <h3><i class="fas fa-book-open me-2"></i> الموارد التعليمية</h3>
+                <p>استكشف مجموعة واسعة من الكورسات والمصادر التعليمية.</p>
+                <a href="{% url 'core:educational_resources' %}" class="btn btn-primary">تصفح الموارد</a>
+            </div>
+            
+            <div class="card-item">
+                <h3><i class="fas fa-comments me-2"></i> لوحة المناقشات</h3>
+                <p>شارك في المناقشات واطرح أسئلتك وتفاعل مع زملائك.</p>
+                <a href="{% url 'core:discussion_board' %}" class="btn btn-primary">انتقل للمناقشات</a>
+            </div>
+
+            <div class="card-item">
+                <h3><i class="fas fa-tools me-2"></i> أدوات مفيدة</h3>
+                <p>استخدم الآلة الحاسبة، محول الوحدات، والأسئلة الشائعة.</p>
+                <a href="{% url 'core:scientific_calculator' %}" class="btn btn-primary">الآلة الحاسبة</a>
+                <a href="{% url 'core:unit_converter' %}" class="btn btn-primary ms-2">محول الوحدات</a>
+            </div>
+        </div>
+
+        {# قسم الموارد الموصى بها #}
+        <div class="recommendations-section">
+            <h3><i class="fas fa-lightbulb me-2"></i> موارد موصى بها لك</h3>
+            {% if recommended_resources %}
+                <div class="row">
+                    {% for resource in recommended_resources %}
+                    <div class="col-md-6 col-lg-3 mb-4"> {# 4 أعمدة في الشاشات الكبيرة، 2 في المتوسطة #}
+                        <div class="recommended-resource-item h-100 d-flex flex-column">
+                            <h4>{{ resource.title }}</h4>
+                            {% if resource.description %}
+                                <p>{{ resource.description|truncatechars:100 }}</p>
+                            {% endif %}
+                            <div class="resource-rating mt-auto">
+                                متوسط التقييم:
+                                {% if resource.average_rating %}
+                                    {{ resource.average_rating|floatformat:1 }} من 5 ({{ resource.total_ratings }} تقييم)
+                                {% else %}
+                                    لا يوجد تقييمات بعد.
+                                {% endif %}
+                            </div>
+                            <a href="{{ resource.link }}" target="_blank" class="btn btn-success mt-3">
+                                <i class="fas fa-external-link-alt me-1"></i> الانتقال للمورد
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <p>لا توجد توصيات متاحة حالياً. تفاعل مع المزيد من الموارد لكي تظهر لك التوصيات!</p>
+                    <a href="{% url 'core:educational_resources' %}" class="btn btn-info">تصفح الموارد التعليمية</a>
+                </div>
+            {% endif %}
+        </div>
+
     </div>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    // أي سكريبتات خاصة بلوحة التحكم يمكن وضعها هنا
+</script>
+{% endblock extra_scripts %}

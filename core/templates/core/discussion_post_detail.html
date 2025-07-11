@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .post-detail-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right;
+    }
+    body.dark-mode .post-detail-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .post-detail-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 10px;
+    }
+    body.dark-mode .post-detail-header h2 {
+        color: #e4c975;
+    }
+    .post-detail-meta {
+        font-size: 0.95rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border-color, #eee);
+        padding-bottom: 10px;
+    }
+    body.dark-mode .post-detail-meta {
+        color: #b1bdd1;
+        border-color: #3b4d66;
+    }
+    .post-detail-content {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        margin-bottom: 30px;
+        color: var(--text-color, #333);
+        text-align: justify;
+    }
+    body.dark-mode .post-detail-content {
+        color: #e8ecf1;
+    }
+    .comments-section h3 {
+        font-size: 2rem;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--primary-color, #007bff);
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+    body.dark-mode .comments-section h3 {
+        color: #e4c975;
+        border-color: #e4c975;
+    }
+    .comment-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    body.dark-mode .comment-item {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .comment-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 5px;
+    }
+    body.dark-mode .comment-meta {
+        color: #b1bdd1;
+    }
+    .comment-content {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-color, #333);
+        text-align: justify;
+    }
+    body.dark-mode .comment-content {
+        color: #e8ecf1;
+    }
+    .comment-form-section {
+        margin-top: 30px;
+        background-color: var(--bg-light, #f8f9fa);
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 12px;
+        padding: 20px;
+    }
+    body.dark-mode .comment-form-section {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .comment-form-section h4 {
+        color: var(--primary-color, #007bff);
+        margin-bottom: 15px;
+    }
+    body.dark-mode .comment-form-section h4 {
+        color: #e4c975;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="post-detail-container">
+        <div class="post-detail-header">
+            <h2>{{ post.title }}</h2>
+            <p class="post-detail-meta">
+                بواسطة: {% if post.is_anonymous %}مجهول{% else %}{{ post.author.username }}{% endif %}
+                في {{ post.created_at|date:"d F Y, H:i" }}
+            </p>
+        </div>
+
+        <div class="post-detail-content">
+            {{ post.content|linebreaksbr }}
+        </div>
+
+        <div class="comments-section">
+            <h3>التعليقات ({{ comments.count }})</h3>
+            {% if comments %}
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <p class="comment-meta">
+                        بواسطة: {% if comment.is_anonymous %}مجهول{% else %}{{ comment.author.username }}{% endif %}
+                        في {{ comment.created_at|date:"d F Y, H:i" }}
+                    </p>
+                    <div class="comment-content">
+                        {{ comment.content|linebreaksbr }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <p>لا توجد تعليقات على هذا المنشور بعد. كن أول من يعلق!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="comment-form-section">
+            <h4>أضف تعليقاً</h4>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ comment_form.content.id_for_label }}" class="form-label">تعليقك:</label>
+                    {{ comment_form.content }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ comment_form.is_anonymous }}
+                    <label class="form-check-label" for="{{ comment_form.is_anonymous.id_for_label }}">
+                        نشر كمجهول
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">إضافة تعليق</button>
+            </form>
+            {% if comment_form.errors %}
+                <div class="alert alert-danger mt-3">
+                    {% for field in comment_form %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p>{{ field.label }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if comment_form.non_field_errors %}
+                        {% for error in comment_form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

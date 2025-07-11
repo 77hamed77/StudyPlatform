@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}الآلة الحاسبة العلمية المتقدمة جداً - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    /* Basic Calculator Styles */
+    .calculator-container {
+        max-width: 700px; /* Increased max-width for more buttons */
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .calculator-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .calculator-header h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+    }
+    body.dark-mode .calculator-header h2 {
+        color: #e4c975;
+    }
+    .calculator-display {
+        background-color: var(--bg-light, #e9ecef);
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 2.5rem;
+        text-align: right;
+        font-family: 'monospace', sans-serif;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        overflow-x: auto;
+        white-space: nowrap; /* Prevent wrapping */
+    }
+    body.dark-mode .calculator-display {
+        background-color: #2a3d52;
+        border-color: #3b4d66;
+        color: #e8ecf1;
+    }
+    .calculator-buttons {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* 6 columns for even more scientific layout */
+        gap: 10px;
+    }
+    .calculator-buttons button {
+        padding: 15px;
+        font-size: 1.0rem; /* Even smaller font for more buttons */
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        background-color: var(--btn-secondary-bg, #f0f4fa);
+        color: var(--text-color, #333);
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+    }
+    body.dark-mode .calculator-buttons button {
+        background-color: #3b4d66;
+        color: #e8ecf1;
+    }
+    .calculator-buttons button:hover {
+        background-color: var(--hover-bg, #e2e6ea);
+        transform: translateY(-2px);
+    }
+    body.dark-mode .calculator-buttons button:hover {
+        background-color: #4a5d76;
+    }
+    .calculator-buttons button.operator {
+        background-color: var(--primary-color-light, #cfe2ff);
+        color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .calculator-buttons button.operator {
+        background-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .calculator-buttons button.scientific {
+        background-color: var(--info-color-light, #d1ecf1);
+        color: var(--info-color-dark, #0c5460);
+        font-size: 0.85rem; /* Smaller font for scientific functions */
+    }
+    body.dark-mode .calculator-buttons button.scientific {
+        background-color: #5c6c7b;
+        color: #e8ecf1;
+    }
+    .calculator-buttons button.equals {
+        background-color: var(--success-color, #28a745);
+        color: #fff;
+        grid-column: span 2; /* Make equals button span 2 columns */
+    }
+    body.dark-mode .calculator-buttons button.equals {
+        background-color: #218838;
+    }
+    .calculator-buttons button.clear {
+        background-color: var(--danger-color, #dc3545);
+        color: #fff;
+    }
+    body.dark-mode .calculator-buttons button.clear {
+        background-color: #c82333;
+    }
+    .calculator-buttons button.backspace {
+        background-color: var(--warning-color, #ffc107);
+        color: var(--warning-color-dark, #664d03);
+    }
+    body.dark-mode .calculator-buttons button.backspace {
+        background-color: #e0a800;
+        color: #1d2c3b;
+    }
+    .mode-toggle {
+        margin-bottom: 15px;
+        text-align: right;
+    }
+    .mode-toggle label {
+        font-weight: 500;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .mode-toggle label {
+        color: #e8ecf1;
+    }
+    .mode-toggle input[type="checkbox"] {
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <h2><i class="fas fa-calculator me-2"></i> الآلة الحاسبة العلمية المتقدمة جداً</h2>
+            <p class="text-muted">أداة قوية لإجراء العمليات الحسابية الأساسية والعلمية المتقدمة.</p>
+        </div>
+
+        <div class="mode-toggle">
+            <input type="checkbox" id="degree-mode-toggle" onchange="toggleDegreeMode()">
+            <label for="degree-mode-toggle">وضع الدرجات (Degrees)</label>
+        </div>
+
+        <div class="calculator-display" id="calculator-display">0</div>
+
+        <div class="calculator-buttons">
+            <!-- Advanced Scientific Functions -->
+            <button class="scientific" onclick="appendToDisplay('Math.asin(')">asin</button>
+            <button class="scientific" onclick="appendToDisplay('Math.acos(')">acos</button>
+            <button class="scientific" onclick="appendToDisplay('Math.atan(')">atan</button>
+            <button class="scientific" onclick="appendToDisplay('Math.sinh(')">sinh</button>
+            <button class="scientific" onclick="appendToDisplay('Math.cosh(')">cosh</button>
+            <button class="scientific" onclick="appendToDisplay('Math.tanh(')">tanh</button>
+
+            <!-- Basic Scientific Functions -->
+            <button class="scientific" onclick="appendToDisplay('Math.sin(')">sin</button>
+            <button class="scientific" onclick="appendToDisplay('Math.cos(')">cos</button>
+            <button class="scientific" onclick="appendToDisplay('Math.tan(')">tan</button>
+            <button class="scientific" onclick="appendToDisplay('Math.log10(')">log</button>
+            <button class="scientific" onclick="appendToDisplay('Math.log(')">ln</button>
+            <button class="scientific" onclick="appendToDisplay('Math.abs(')">abs</button>
+
+            <!-- Exponentiation & Roots -->
+            <button class="scientific" onclick="appendToDisplay('Math.pow(')">x<sup>y</sup></button>
+            <button class="scientific" onclick="appendToDisplay('Math.sqrt(')">√</button>
+            <button class="scientific" onclick="appendToDisplay('Math.cbrt(')"><sup>3</sup>√</button>
+            <button class="scientific" onclick="appendToDisplay('Math.exp(')">e<sup>x</sup></button>
+            <button class="scientific" onclick="appendToDisplay('Math.pow(10,')">10<sup>x</sup></button>
+            <button class="scientific" onclick="calculateFactorial()">x!</button>
+
+            <!-- Constants & Rounding -->
+            <button class="scientific" onclick="appendToDisplay('Math.PI')">π</button>
+            <button class="scientific" onclick="appendToDisplay('Math.E')">e</button>
+            <button class="scientific" onclick="appendToDisplay('Math.floor(')">floor</button>
+            <button class="scientific" onclick="appendToDisplay('Math.ceil(')">ceil</button>
+            <button class="scientific" onclick="appendToDisplay('Math.round(')">round</button>
+            <button class="scientific" onclick="appendToDisplay('%')">mod</button>
+
+            <!-- Control Buttons -->
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="backspace" onclick="backspace()">DEL</button>
+            <button class="operator" onclick="appendToDisplay('(')">(</button>
+            <button class="operator" onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+
+            <!-- Numbers and Basic Operators -->
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equals" onclick="calculateResult()">=</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    let currentInput = '0';
+    const display = document.getElementById('calculator-display');
+    let isDegreeMode = false; // Default to radians
+
+    function updateDisplay() {
+        display.textContent = currentInput;
+    }
+
+    function toggleDegreeMode() {
+        isDegreeMode = document.getElementById('degree-mode-toggle').checked;
+        // You might want to re-evaluate the current display if it contains trig functions
+        // For simplicity, we'll just toggle the mode for future calculations.
+        console.log("Degree Mode:", isDegreeMode);
+    }
+
+    function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    function toDegrees(radians) {
+        return radians * (180 / Math.PI);
+    }
+
+    function appendToDisplay(value) {
+        if (currentInput === '0' && value !== '.' && !isOperator(value) && !value.includes('Math.')) {
+            currentInput = value;
+        } else {
+            currentInput += value;
+        }
+        updateDisplay();
+    }
+
+    function isOperator(char) {
+        return ['+', '-', '*', '/', '(', ')', '%'].includes(char);
+    }
+
+    function clearDisplay() {
+        currentInput = '0';
+        updateDisplay();
+    }
+
+    function backspace() {
+        if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+        } else {
+            currentInput = '0';
+        }
+        updateDisplay();
+    }
+
+    function calculateFactorial() {
+        try {
+            const num = parseFloat(currentInput); // Use parseFloat to handle potential decimal input, then check if integer
+            if (isNaN(num) || num < 0 || !Number.isInteger(num)) {
+                currentInput = 'خطأ: قيمة غير صحيحة للعامل';
+                updateDisplay();
+                return;
+            }
+            let result = 1;
+            for (let i = 2; i <= num; i++) {
+                result *= i;
+            }
+            currentInput = result.toString();
+        } catch (e) {
+            currentInput = 'خطأ';
+        }
+        updateDisplay();
+    }
+
+    function calculateResult() {
+        try {
+            let expression = currentInput;
+
+            // Handle degree mode for trigonometric functions
+            if (isDegreeMode) {
+                expression = expression.replace(/sin\(([^)]+)\)/g, (match, p1) => `Math.sin(toRadians(${p1}))`);
+                expression = expression.replace(/cos\(([^)]+)\)/g, (match, p1) => `Math.cos(toRadians(${p1}))`);
+                expression = expression.replace(/tan\(([^)]+)\)/g, (match, p1) => `Math.tan(toRadians(${p1}))`);
+                // Inverse trig functions will return radians, so convert to degrees for display
+                expression = expression.replace(/asin\(([^)]+)\)/g, (match, p1) => `toDegrees(Math.asin(${p1}))`);
+                expression = expression.replace(/acos\(([^)]+)\)/g, (match, p1) => `toDegrees(Math.acos(${p1}))`);
+                expression = expression.replace(/atan\(([^)]+)\)/g, (match, p1) => `toDegrees(Math.atan(${p1}))`);
+            }
+
+            // Replace common math functions and constants for evaluation
+            expression = expression
+                .replace(/π/g, 'Math.PI')
+                .replace(/e/g, 'Math.E')
+                .replace(/log/g, 'Math.log10') // Base 10 log
+                .replace(/ln/g, 'Math.log')    // Natural log
+                .replace(/abs/g, 'Math.abs')
+                .replace(/sinh/g, 'Math.sinh')
+                .replace(/cosh/g, 'Math.cosh')
+                .replace(/tanh/g, 'Math.tanh')
+                .replace(/sqrt/g, 'Math.sqrt')
+                .replace(/cbrt/g, 'Math.cbrt')
+                .replace(/exp/g, 'Math.exp')
+                .replace(/floor/g, 'Math.floor')
+                .replace(/ceil/g, 'Math.ceil')
+                .replace(/round/g, 'Math.round')
+                .replace(/mod/g, '%') // Replace 'mod' with actual modulo operator
+                .replace(/\^/g, '**'); // For x^y using ** operator in JS
+
+            // Basic validation to prevent arbitrary code execution with eval
+            // This is a simplified approach, for a production app, a dedicated parser is recommended.
+            // This regex is more permissive but still tries to limit non-math characters
+            if (!/^[0-9+\-*/().\sPIMathelogsqrtcbrt\%]+$/.test(expression)) {
+                throw new Error("تعبير غير صالح");
+            }
+            
+            // Evaluate the expression
+            currentInput = eval(expression).toString();
+
+            // Handle potential floating point inaccuracies
+            if (parseFloat(currentInput) % 1 !== 0) {
+                currentInput = parseFloat(currentInput).toFixed(10); // Limit decimal places
+            }
+
+        } catch (e) {
+            currentInput = 'خطأ';
+            console.error("Calculator Error:", e);
+        }
+        updateDisplay();
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function(event) {
+        const key = event.key;
+        if ((key >= '0' && key <= '9') || key === '.') {
+            appendToDisplay(key);
+        } else if (['+', '-', '*', '/', '(', ')', '%'].includes(key)) {
+            appendToDisplay(key);
+        } else if (key === 'Enter' || key === '=') {
+            calculateResult();
+            event.preventDefault(); // Prevent default Enter key behavior (e.g., form submission)
+        } else if (key === 'Escape' || key === 'c' || key === 'C') {
+            clearDisplay();
+        } else if (key === 'Backspace') {
+            backspace();
+        }
+        // Add more keyboard shortcuts for scientific functions if desired
+        // e.g., if (key === 's') { appendToDisplay('Math.sin('); }
+    });
+
+</script>
+{% endblock extra_scripts %}

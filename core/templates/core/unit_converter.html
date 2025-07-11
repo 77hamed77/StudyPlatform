@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}محول الوحدات العلمية - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .converter-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .converter-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .converter-header h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+    }
+    body.dark-mode .converter-header h2 {
+        color: #e4c975;
+    }
+    .converter-form .form-label {
+        font-weight: 500;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .converter-form .form-label {
+        color: #e8ecf1;
+    }
+    .converter-form .form-control,
+    .converter-form .form-select {
+        border-radius: 8px;
+        border: 1px solid var(--input-border, #ced4da);
+        background-color: var(--input-bg, #fff);
+        color: var(--text-color, #333);
+        padding: 10px 15px;
+    }
+    body.dark-mode .converter-form .form-control,
+    body.dark-mode .converter-form .form-select {
+        background-color: #20304a;
+        border-color: #293b54;
+        color: #e8ecf1;
+    }
+    .converter-form .btn-primary {
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-weight: 600;
+    }
+    body.dark-mode .converter-form .btn-primary {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .converter-form .btn-primary:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .converter-form .btn-primary:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+    .conversion-result {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: var(--bg-secondary, #e6f7ff);
+        border-radius: 12px;
+        border: 1px solid var(--highlight-border, #b3d9ff);
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--highlight-text, #0056b3);
+    }
+    body.dark-mode .conversion-result {
+        background-color: #2a3d52;
+        border-color: #3b4d66;
+        color: #e4c975;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="converter-container">
+        <div class="converter-header">
+            <h2><i class="fas fa-exchange-alt me-2"></i> محول الوحدات العلمية</h2>
+            <p class="text-muted">قم بتحويل القيم بين الوحدات المختلفة.</p>
+        </div>
+
+        <div class="converter-form">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="value-input" class="form-label">القيمة:</label>
+                    <input type="number" id="value-input" class="form-control" placeholder="أدخل القيمة" value="1">
+                </div>
+                <div class="col-md-4">
+                    <label for="from-unit" class="form-label">من وحدة:</label>
+                    <select id="from-unit" class="form-select"></select>
+                </div>
+                <div class="col-md-4">
+                    <label for="to-unit" class="form-label">إلى وحدة:</label>
+                    <select id="to-unit" class="form-select"></select>
+                </div>
+                <div class="col-12 mt-4">
+                    <button type="button" class="btn btn-primary" onclick="convertUnit()">تحويل</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="conversion-result mt-4" id="conversion-result">
+            النتيجة: 0
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    const units = {
+        "length": {
+            "meter": 1, "kilometer": 1000, "centimeter": 0.01, "millimeter": 0.001,
+            "mile": 1609.34, "yard": 0.9144, "foot": 0.3048, "inch": 0.0254
+        },
+        "mass": {
+            "kilogram": 1, "gram": 0.001, "milligram": 0.000001, "ton": 1000,
+            "pound": 0.453592, "ounce": 0.0283495
+        },
+        "temperature": { // Special handling for temperature
+            "celsius": { toBase: (c) => c, fromBase: (b) => b },
+            "fahrenheit": { toBase: (f) => (f - 32) * 5/9, fromBase: (b) => (b * 9/5) + 32 },
+            "kelvin": { toBase: (k) => k - 273.15, fromBase: (b) => b + 273.15 }
+        },
+        "time": {
+            "second": 1, "minute": 60, "hour": 3600, "day": 86400, "week": 604800
+        },
+        "volume": {
+            "liter": 1, "milliliter": 0.001, "cubic_meter": 1000, "gallon": 3.78541
+        }
+    };
+
+    const unitCategories = {
+        "length": "الطول",
+        "mass": "الكتلة",
+        "temperature": "درجة الحرارة",
+        "time": "الوقت",
+        "volume": "الحجم"
+    };
+
+    const unitNames = {
+        "meter": "متر", "kilometer": "كيلومتر", "centimeter": "سنتيمتر", "millimeter": "مليمتر",
+        "mile": "ميل", "yard": "ياردة", "foot": "قدم", "inch": "بوصة",
+        "kilogram": "كيلوغرام", "gram": "غرام", "milligram": "مليغرام", "ton": "طن",
+        "pound": "رطل", "ounce": "أونصة",
+        "celsius": "مئوية", "fahrenheit": "فهرنهايت", "kelvin": "كلفن",
+        "second": "ثانية", "minute": "دقيقة", "hour": "ساعة", "day": "يوم", "week": "أسبوع",
+        "liter": "لتر", "milliliter": "مليلتر", "cubic_meter": "متر مكعب", "gallon": "غالون"
+    };
+
+    const fromUnitSelect = document.getElementById('from-unit');
+    const toUnitSelect = document.getElementById('to-unit');
+    const valueInput = document.getElementById('value-input');
+    const resultDisplay = document.getElementById('conversion-result');
+
+    function populateUnits() {
+        fromUnitSelect.innerHTML = '';
+        toUnitSelect.innerHTML = '';
+
+        for (const category in units) {
+            const optgroupFrom = document.createElement('optgroup');
+            optgroupFrom.label = unitCategories[category];
+            const optgroupTo = document.createElement('optgroup');
+            optgroupTo.label = unitCategories[category];
+
+            for (const unit in units[category]) {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = `${category}:${unit}`;
+                optionFrom.textContent = unitNames[unit];
+                optgroupFrom.appendChild(optionFrom);
+
+                const optionTo = document.createElement('option');
+                optionTo.value = `${category}:${unit}`;
+                optionTo.textContent = unitNames[unit];
+                optgroupTo.appendChild(optionTo);
+            }
+            fromUnitSelect.appendChild(optgroupFrom);
+            toUnitSelect.appendChild(optgroupTo);
+        }
+        // Set default selections
+        fromUnitSelect.value = 'length:meter';
+        toUnitSelect.value = 'length:kilometer';
+    }
+
+    function convertUnit() {
+        const value = parseFloat(valueInput.value);
+        if (isNaN(value)) {
+            resultDisplay.textContent = "النتيجة: قيمة غير صالحة";
+            return;
+        }
+
+        const [fromCategory, fromUnit] = fromUnitSelect.value.split(':');
+        const [toCategory, toUnit] = toUnitSelect.value.split(':');
+
+        if (fromCategory !== toCategory) {
+            resultDisplay.textContent = "النتيجة: لا يمكن التحويل بين فئات وحدات مختلفة.";
+            return;
+        }
+
+        let convertedValue;
+
+        if (fromCategory === "temperature") {
+            const tempUnit = units[fromCategory];
+            // Convert 'from' unit to Celsius (base for temperature)
+            const valueInCelsius = tempUnit[fromUnit].toBase(value);
+            // Convert Celsius to 'to' unit
+            convertedValue = tempUnit[toUnit].fromBase(valueInCelsius);
+        } else {
+            // Convert 'from' unit to base unit (e.g., meter for length)
+            const valueInBase = value * units[fromCategory][fromUnit];
+            // Convert base unit to 'to' unit
+            convertedValue = valueInBase / units[toCategory][toUnit];
+        }
+
+        resultDisplay.textContent = `النتيجة: ${convertedValue.toFixed(4)} ${unitNames[toUnit]}`;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', populateUnits);
+</script>
+{% endblock extra_scripts %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}الأسئلة الشائعة - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .faq-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .faq-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .faq-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+    }
+    body.dark-mode .faq-header h2 {
+        color: #e4c975;
+    }
+    .faq-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 12px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+    body.dark-mode .faq-item {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .faq-question {
+        padding: 15px 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-color, #333);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-light, #f8f9fa);
+        transition: background-color 0.2s;
+        text-align: right; /* لضمان النص من اليمين لليسار */
+    }
+    body.dark-mode .faq-question {
+        color: #e8ecf1;
+        background-color: #293b54;
+    }
+    .faq-question:hover {
+        background-color: var(--hover-bg, #e9ecef);
+    }
+    body.dark-mode .faq-question:hover {
+        background-color: #3b4d66;
+    }
+    .faq-question i {
+        transition: transform 0.3s ease;
+        margin-right: 10px; /* مسافة بين الأيقونة والنص */
+    }
+    .faq-question.collapsed i {
+        transform: rotate(0deg);
+    }
+    .faq-question:not(.collapsed) i {
+        transform: rotate(90deg);
+    }
+    .faq-answer {
+        padding: 0 20px 15px 20px;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--text-muted, #555);
+        text-align: justify;
+        display: none; /* مخفي افتراضيا */
+    }
+    body.dark-mode .faq-answer {
+        color: #b1bdd1;
+    }
+    .faq-answer.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="faq-container">
+        <div class="faq-header">
+            <h2><i class="fas fa-question-circle me-2"></i> الأسئلة الشائعة</h2>
+            <p class="text-muted">إجابات على الأسئلة الشائعة حول استخدام المنصة.</p>
+        </div>
+
+        {% if faqs %}
+            <div class="faq-list mt-4">
+                {% for faq in faqs %}
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        {{ faq.question }}
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="faq-answer">
+                        {{ faq.answer|linebreaksbr }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Pagination links if needed #}
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-4">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابق</a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">التالي</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info mt-4">
+                <p>لا توجد أسئلة شائعة متاحة حالياً.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    function toggleFAQ(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('i');
+        
+        if (answer.classList.contains('show')) {
+            answer.classList.remove('show');
+            element.classList.add('collapsed');
+        } else {
+            // Close all other open answers
+            document.querySelectorAll('.faq-answer.show').forEach(openAnswer => {
+                openAnswer.classList.remove('show');
+                openAnswer.previousElementSibling.classList.add('collapsed');
+            });
+            
+            answer.classList.add('show');
+            element.classList.remove('collapsed');
+        }
+    }
+
+    // Initialize all questions as collapsed on load
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.classList.add('collapsed');
+        });
+    });
+</script>
+{% endblock extra_scripts %}

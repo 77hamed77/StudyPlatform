@@ -37,6 +37,7 @@
         border: 1px solid var(--border-color, #eee);
         text-align: right;
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        position: relative; /* لإضافة زر المفضلة */
     }
     body.dark-mode .resource-item {
         background-color: #293b54;
@@ -87,6 +88,108 @@
         background-color: #d1b66a;
         border-color: #d1b66a;
     }
+
+    /* Rating Stars */
+    .rating-stars {
+        display: flex;
+        justify-content: flex-end; /* لضمان النجوم من اليمين لليسار */
+        direction: rtl; /* لترتيب النجوم من اليمين لليسار */
+        margin-bottom: 10px;
+    }
+    .rating-stars input[type="radio"] {
+        display: none;
+    }
+    .rating-stars label {
+        font-size: 1.8rem;
+        color: #ccc;
+        cursor: pointer;
+        padding: 0 2px;
+        transition: color 0.2s;
+    }
+    .rating-stars label:hover,
+    .rating-stars label:hover ~ label,
+    .rating-stars input[type="radio"]:checked ~ label {
+        color: #ffc107; /* لون النجمة عند التحديد أو التحويم */
+    }
+    .current-avg-rating {
+        font-size: 1rem;
+        color: var(--text-muted, #6c757d);
+        margin-top: 5px;
+        text-align: right;
+    }
+    body.dark-mode .current-avg-rating {
+        color: #b1bdd1;
+    }
+
+    /* Favorite Button */
+    .favorite-button {
+        position: absolute;
+        top: 15px;
+        left: 15px; /* وضع الزر في الزاوية اليسرى العلوية */
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-muted, #ccc);
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .favorite-button.favorited {
+        color: #ffda00; /* لون ذهبي للمفضلة */
+    }
+    .favorite-button:hover {
+        color: #ffc107;
+    }
+    body.dark-mode .favorite-button {
+        color: #b1bdd1;
+    }
+    body.dark-mode .favorite-button.favorited {
+        color: #ffeb3b;
+    }
+
+    /* Review Section */
+    .review-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color, #eee);
+        text-align: right;
+    }
+    body.dark-mode .review-section {
+        border-color: #3b4d66;
+    }
+    .review-section h4 {
+        font-size: 1.4rem;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 15px;
+    }
+    body.dark-mode .review-section h4 {
+        color: #e4c975;
+    }
+    .user-review-item {
+        background-color: var(--bg-secondary, #f0f4fa);
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        text-align: right;
+    }
+    body.dark-mode .user-review-item {
+        background-color: #2a3d52;
+    }
+    .user-review-item .review-meta {
+        font-size: 0.9rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 5px;
+    }
+    body.dark-mode .user-review-item .review-meta {
+        color: #b1bdd1;
+    }
+    .user-review-item .review-text {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .user-review-item .review-text {
+        color: #e8ecf1;
+    }
 </style>
 {% endblock %}
 
@@ -102,13 +205,95 @@
             <div class="resources-list mt-4">
                 {% for resource in resources %}
                 <div class="resource-item">
+                    {% if user.is_authenticated %}
+                        <button class="favorite-button {% if resource.id in user_favorite_resources %}favorited{% endif %}"
+                                data-resource-id="{{ resource.id }}"
+                                onclick="toggleFavorite(this)">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    {% endif %}
+
                     <h3>{{ resource.title }}</h3>
                     {% if resource.description %}
                         <p>{{ resource.description }}</p>
                     {% endif %}
+
+                    <div class="current-avg-rating">
+                        متوسط التقييم:
+                        {% if resource.avg_rating %}
+                            {{ resource.avg_rating|floatformat:1 }} من 5 ({{ resource.num_ratings }} تقييم)
+                        {% else %}
+                            لا يوجد تقييمات بعد.
+                        {% endif %}
+                    </div>
+
                     <a href="{{ resource.link }}" target="_blank" class="btn btn-primary">
                         <i class="fas fa-external-link-alt me-1"></i> الانتقال للمورد
                     </a>
+
+                    {% if user.is_authenticated %}
+                    <div class="review-section">
+                        <h4>قيم هذا المورد واكتب مراجعة</h4>
+                        <form method="post" action="{% url 'core:rate_resource' %}" class="rating-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="resource_id" value="{{ resource.id }}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label d-block text-end">تقييمك:</label>
+                                <div class="rating-stars">
+                                    <input type="radio" id="star5_{{ resource.id }}" name="rating" value="5" {% if user_ratings_map|get_item:resource.id and user_ratings_map|get_item:resource.id.rating == 5 %}checked{% endif %}>
+                                    <label for="star5_{{ resource.id }}"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="star4_{{ resource.id }}" name="rating" value="4" {% if user_ratings_map|get_item:resource.id and user_ratings_map|get_item:resource.id.rating == 4 %}checked{% endif %}>
+                                    <label for="star4_{{ resource.id }}"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="star3_{{ resource.id }}" name="rating" value="3" {% if user_ratings_map|get_item:resource.id and user_ratings_map|get_item:resource.id.rating == 3 %}checked{% endif %}>
+                                    <label for="star3_{{ resource.id }}"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="star2_{{ resource.id }}" name="rating" value="2" {% if user_ratings_map|get_item:resource.id and user_ratings_map|get_item:resource.id.rating == 2 %}checked{% endif %}>
+                                    <label for="star2_{{ resource.id }}"><i class="fas fa-star"></i></label>
+                                    <input type="radio" id="star1_{{ resource.id }}" name="rating" value="1" {% if user_ratings_map|get_item:resource.id and user_ratings_map|get_item:resource.id.rating == 1 %}checked{% endif %}>
+                                    <label for="star1_{{ resource.id }}"><i class="fas fa-star"></i></label>
+                                </div>
+                                {% if rating_form.rating.errors %}
+                                    <div class="text-danger text-end">{{ rating_form.rating.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="review_text_{{ resource.id }}" class="form-label">مراجعتك (اختياري):</label>
+                                <textarea name="review_text" id="review_text_{{ resource.id }}" class="form-control" rows="3" placeholder="اكتب مراجعتك هنا...">{% if user_ratings_map|get_item:resource.id %}{{ user_ratings_map|get_item:resource.id.review_text }}{% endif %}</textarea>
+                                {% if rating_form.review_text.errors %}
+                                    <div class="text-danger text-end">{{ rating_form.review_text.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-success">إرسال التقييم</button>
+                        </form>
+                        
+                        {# عرض مراجعات المستخدمين الآخرين (يمكنك إضافة تصفية أو ترقيم صفحات هنا) #}
+                        <h5 class="mt-4">مراجعات المستخدمين الآخرين:</h5>
+                        {% with other_ratings=resource.ratings.exclude(user=user).order_by('-created_at') %}
+                            {% if other_ratings %}
+                                {% for r in other_ratings %}
+                                    <div class="user-review-item mt-2">
+                                        <p class="review-meta">
+                                            بواسطة: {{ r.user.username }} - تقييم: {{ r.rating }} نجوم
+                                            <br>
+                                            في: {{ r.created_at|date:"d F Y, H:i" }}
+                                        </p>
+                                        {% if r.review_text %}
+                                            <p class="review-text">{{ r.review_text|linebreaksbr }}</p>
+                                        {% else %}
+                                            <p class="review-text text-muted">لا توجد مراجعة نصية لهذا التقييم.</p>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted text-end">لا توجد مراجعات أخرى لهذا المورد بعد.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    {% else %}
+                        <div class="alert alert-info mt-4 text-center">
+                            <p>الرجاء <a href="{% url 'login' %}">تسجيل الدخول</a> لتقييم هذا المورد وإضافته للمفضلة.</p>
+                        </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -137,3 +322,93 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    // Helper to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Toggle Favorite function
+    function toggleFavorite(button) {
+        const resourceId = button.dataset.resourceId;
+        const csrfToken = getCookie('csrftoken');
+
+        fetch('{% url "core:toggle_favorite_resource" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            },
+            body: `resource_id=${resourceId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'added') {
+                button.classList.add('favorited');
+                alert(data.message); // Use a custom modal in production
+            } else if (data.status === 'removed') {
+                button.classList.remove('favorited');
+                alert(data.message); // Use a custom modal in production
+            } else {
+                alert('حدث خطأ: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling favorite:', error);
+            alert('حدث خطأ غير متوقع أثناء تبديل المفضلة.');
+        });
+    }
+
+    // Function to handle rating form submission (can be improved with AJAX)
+    // For now, it's a standard form submission, but the backend is ready for AJAX.
+    document.querySelectorAll('.rating-form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            // Optional: You can prevent default submission and use AJAX here
+            // event.preventDefault();
+            // const formData = new FormData(form);
+            // fetch(form.action, {
+            //     method: 'POST',
+            //     headers: {
+            //         'X-CSRFToken': getCookie('csrftoken')
+            //     },
+            //     body: formData
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     if (data.status === 'success') {
+            //         alert(data.message);
+            //         location.reload(); // Reload to see updated ratings
+            //     } else {
+            //         alert('خطأ: ' + data.message);
+            //     }
+            // })
+            // .catch(error => {
+            //     console.error('Error submitting rating:', error);
+            //     alert('حدث خطأ غير متوقع أثناء إرسال التقييم.');
+            // });
+        });
+    });
+
+</script>
+{% endblock extra_scripts %}
+
+{% comment %}
+    Helper filter to get dictionary item by key.
+    Usage: {{ my_dict|get_item:my_key }}
+{% endcomment %}
+{% load custom_filters %}
