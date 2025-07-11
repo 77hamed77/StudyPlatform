@@ -1,310 +1,382 @@
 /* static/css/dark_mode.css */
+/* مطوّر ليحاكي هوية شام الجامعية في الوضع الليلي، ألوان غامقة، كحلي غني، حواف ناعمة، ظل واضح، ونصوص ذهبية/زرقاء */
 
+/* --- أساس المتغيرات اللونية --- */
 body.dark-mode {
-    /* --- Dark Mode Color Palette --- */
-    --text-color: #e0e1e6; /* Light gray for main text */
-    --text-muted-color: #989ea8; /* Muted light gray for secondary text */
-    --body-bg: #1a1b26; /* Very dark blue/gray - main background, inspired by Sham Uni dark areas */
-    --card-bg: #24283b; /* Darker element background (cards, navbar inner), for contrast */
-    --card-border-color: #3b3f51; /* Subtle borders for cards and elements */
-    --card-header-bg: #2a2f42; /* Slightly lighter dark bg for headers/footers */
-    --card-footer-bg: var(--card-header-bg);
-    --link-color: #7aa2f7; /* Bright blue for links, stands out well */
-    --link-hover-color: #9eceff; /* Lighter blue for hover effect */
-    --hr-color: rgba(255,255,255,0.15); /* Lighter and slightly more visible HR */
+    /* لوحة ألوان شام داكنة */
+    --su-primary: #20304a;       /* كحلي غامق أساسي */
+    --su-primary-dark: #131c2c;  /* أزرق كحلي داكن جدًا */
+    --su-accent: #e4c975;        /* ذهبي */
+    --su-accent-light: #3a2f1a;  /* ذهبي/بني داكن */
+    --su-secondary: #5b6f8e;     /* أزرق ثانوي غامق */
+    --su-bg: #161e2f;            /* خلفية عامة داكنة جدًا */
+    --su-card-bg: #222e43;       /* خلفية البطاقات */
+    --su-border: #32405a;        /* حدود داكنة ناعمة */
+    --su-table-header-bg: #232f47; /* رأس الجدول */
+    --su-table-row-hover: #1d263c; /* هوفر الجدول */
+    --su-link: #e4c975;          /* روابط ذهبية */
+    --su-link-hover: #fff7c7;    /* روابط ذهبية فاتحة */
+    --su-success: #62c185;       /* أخضر فاتح */
+    --su-danger: #e87475;
+    --su-warning: #eec75a;
+    --su-info: #5db0e5;
+    --su-muted: #aab6c9;
 
-    /* Bootstrap color overrides for dark mode - adapted for better dark mode contrast */
-    --bs-primary-rgb: 122, 162, 247; /* Based on --link-color */
-    --bs-primary: rgb(var(--bs-primary-rgb));
-    --bs-secondary-rgb: 152, 158, 168; /* Based on --text-muted-color */
-    --bs-secondary: rgb(var(--bs-secondary-rgb));
-    --bs-success-rgb: 110, 203, 133; /* Bright green for success */
-    --bs-success: rgb(var(--bs-success-rgb));
-    --bs-info-rgb: 63, 187, 237; /* Bright cyan for info */
-    --bs-info: rgb(var(--bs-info-rgb));
-    --bs-warning-rgb: 255, 198, 102; /* Bright yellow/orange for warning */
-    --bs-warning: rgb(var(--bs-warning-rgb));
-    --bs-danger-rgb: 247, 100, 119; /* Bright red/pink for danger */
-    --bs-danger: rgb(var(--bs-danger-rgb));
-    --bs-light-rgb: 42, 47, 66;    /* Darker "light" color, for backgrounds of light-themed elements */
-    --bs-light: rgb(var(--bs-light-rgb));
-    --bs-dark-rgb: 26, 27, 38; /* Even darker "dark" color, almost black */
-    --bs-dark: rgb(var(--bs-dark-rgb));
-    --bs-white-rgb: 224, 225, 230; /* Lighter "white" for text contrast */
-    --bs-white: rgb(var(--bs-white-rgb));
-    --bs-black-rgb: 26, 27, 38; /* Darkest color for true black-like elements */
-    --bs-black: rgb(var(--bs-black-rgb));
+    /* خطوط */
+    --custom-font: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-    /* Shadows for dark mode to maintain depth */
-    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.2);
-    --shadow-md: 0 .25rem .5rem rgba(0,0,0,.3);
-    --shadow-lg: 0 .5rem 1rem rgba(0,0,0,.4);
+    --text-color: #e2e5ee;
+    --text-muted-color: #b1bdd1;
+    --body-bg: var(--su-bg);
+    --navbar-bg: var(--su-primary-dark);
+    --navbar-link-color: #e4c975;
+    --navbar-link-hover-color: #fff7c7;
+    --navbar-brand-color: #e4c975;
+    --card-bg: var(--su-card-bg);
+    --card-header-bg: var(--su-table-header-bg);
+    --card-footer-bg: #232f47;
+    --card-border-color: var(--su-border);
+    --form-control-bg: #1b2336;
+    --form-control-color: #e2e5ee;
+    --form-control-border-color: #3b4662;
+    --form-control-placeholder-color: #7687a3;
+    --link-color: var(--su-link);
+    --link-hover-color: var(--su-link-hover);
+    --table-hover-bg: var(--su-table-row-hover);
+    --table-header-bg: var(--su-table-header-bg);
+    --table-header-color: var(--su-accent);
+    --shadow-sm: 0 .125rem .25rem rgba(10,18,27,.18);
+    --shadow-md: 0 .25rem .75rem rgba(10,18,27,.28);
+    --shadow-lg: 0 .5rem 1.5rem rgba(10,18,27,.32);
+    --hr-color: #35415b;
 
-
-    /* Form specific dark variables */
-    --form-control-bg: #2e344e; /* Darker input background */
-    --form-control-color: var(--text-color);
-    --form-control-border-color: var(--card-border-color);
-    --form-control-placeholder-color: #7a8299; /* Lighter placeholder text */
-
-    /* Navbar dark variables */
-    --navbar-bg: var(--card-bg); /* Navbar background consistent with cards */
-    --navbar-link-color: var(--text-muted-color);
-    --navbar-link-hover-color: var(--link-color);
-    --navbar-brand-color: var(--text-color);
-    --button-outline-light-color: var(--text-muted-color);
-    --button-outline-light-hover-bg: var(--text-muted-color);
-    --button-outline-light-hover-color: var(--body-bg); /* Dark text on light hover for toggle */
-
-    /* Other component specific dark variables */
-    --table-hover-bg: rgba(255,255,255,0.06); /* Slightly more prominent hover for tables */
-    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.15) !important; /* Brighter for unread notifications */
-    --blockquote-footer-color: var(--text-muted-color);
+    /* --- Landing Page Specific Variables (Dark Mode) --- */
+    --hero-gradient-dark: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    --gradient-text-dark: linear-gradient(45deg, #e4c975, #f0e68c); /* Adjusted for dark mode */
+    --glass-card-bg-dark: rgba(30, 41, 59, 0.3);
+    --glass-card-border-dark: rgba(255, 255, 255, 0.1);
+    --dark-card-bg: #1d2c3b; /* Re-using existing dark card bg */
+    --dark-border-color: #3b4d66; /* Re-using existing dark border color */
+    --dark-hover-bg: #293b54; /* Re-using existing dark hover bg */
 }
 
-/* --- Dark Mode: General --- */
 body.dark-mode {
     background-color: var(--body-bg) !important;
-    color: var(--text-color) !important;
+    color: var(--text-color);
+    font-family: var(--custom-font);
+    transition: background 0.3s, color 0.3s;
 }
+
 body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
-    color: #c8cce4; /* Slightly brighter headings for better visibility */
+    color: var(--su-accent);
 }
+
 body.dark-mode a { color: var(--link-color); }
-body.dark-mode a:hover { color: var(--link-hover-color); }
+body.dark-mode a:hover, body.dark-mode a:focus { color: var(--link-hover-color); }
+
 body.dark-mode hr { border-top-color: var(--hr-color); }
 body.dark-mode .text-muted { color: var(--text-muted-color) !important; }
 
-
-/* --- Dark Mode: Navbar --- */
 body.dark-mode .navbar {
-    background-color: var(--navbar-bg) !important;
-    border-bottom: 1px solid var(--card-border-color); /* Clear border at bottom */
-    box-shadow: var(--shadow-sm); /* Consistent shadow */
+    background: var(--navbar-bg) !important;
+    border-bottom: 1.5px solid var(--su-border);
+    box-shadow: var(--shadow-sm);
 }
 body.dark-mode .navbar-brand { color: var(--navbar-brand-color) !important; }
 body.dark-mode .navbar-nav .nav-link { color: var(--navbar-link-color) !important; }
+body.dark-mode .navbar-nav .nav-link.active,
 body.dark-mode .navbar-nav .nav-link:hover,
-body.dark-mode .navbar-nav .nav-link.active { color: var(--navbar-link-hover-color) !important; }
+body.dark-mode .navbar-nav .nav-link:focus { color: var(--navbar-link-hover-color) !important; }
 body.dark-mode .navbar-toggler {
-    border-color: var(--card-border-color);
-    background-color: var(--card-header-bg); /* Match header background */
+    border-color: var(--su-accent);
+    background: var(--card-header-bg);
 }
 body.dark-mode .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(122, 162, 247, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; /* Brighter icon for visibility */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(228,201,117,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 body.dark-mode .dropdown-menu {
-    background-color: var(--card-bg);
-    border-color: var(--card-border-color);
-    box-shadow: var(--shadow-md); /* Clearer shadow */
+    background: var(--card-bg);
+    border: 1px solid var(--card-border-color);
     color: var(--text-color);
+    box-shadow: var(--shadow-md);
 }
 body.dark-mode .dropdown-item { color: var(--text-color); }
 body.dark-mode .dropdown-item:hover,
 body.dark-mode .dropdown-item:focus {
-    background-color: var(--card-header-bg); /* Consistent hover */
-    color: var(--link-hover-color);
-}
-body.dark-mode #theme-toggle-btn.btn-outline-light {
-    color: var(--button-outline-light-color);
-    border-color: var(--button-outline-light-color);
-}
-body.dark-mode #theme-toggle-btn.btn-outline-light:hover {
-    background-color: var(--button-outline-light-hover-bg);
-    color: var(--button-outline-light-hover-color);
+    background: var(--card-header-bg);
+    color: var(--su-accent);
 }
 
-/* --- Dark Mode: Cards & List Groups --- */
+body.dark-mode #theme-toggle-btn.btn-outline-light {
+    color: var(--su-accent);
+    border-color: var(--su-accent);
+}
+body.dark-mode #theme-toggle-btn.btn-outline-light:hover {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+}
+
+/* --- البطاقات والقوائم --- */
 body.dark-mode .card {
-    background-color: var(--card-bg);
-    border: none; /* No border, rely on shadow */
-    box-shadow: var(--shadow-sm); /* Soft shadow */
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border-color);
+    border-radius: 1.15rem;
+    box-shadow: var(--shadow-sm);
 }
 body.dark-mode .card:hover {
-    box-shadow: var(--shadow-md); /* Clearer shadow on hover */
-    transform: translateY(-2px); /* Slight lift */
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px) scale(1.012);
 }
 body.dark-mode .card-header {
-    background-color: var(--card-header-bg);
+    background: var(--card-header-bg);
+    color: var(--su-accent);
     border-bottom-color: var(--card-border-color);
-    color: var(--text-color);
+    font-weight: 700;
 }
 body.dark-mode .card-footer {
-    background-color: var(--card-footer-bg);
+    background: var(--card-footer-bg);
+    color: var(--text-muted-color);
     border-top-color: var(--card-border-color);
 }
 body.dark-mode .list-group-item {
-    background-color: var(--card-bg);
+    background: var(--card-bg);
     border-color: var(--card-border-color);
     color: var(--text-color);
 }
+
 body.dark-mode .list-group-item-light.fw-bold {
-    background-color: var(--list-group-item-light-bg) !important;
+    background: #292e42 !important;
+    color: var(--su-accent) !important;
 }
-body.dark-mode .blockquote-footer { color: var(--blockquote-footer-color); }
 
-
-/* --- Dark Mode: Forms --- */
-body.dark-mode .form-control,
-body.dark-mode .form-select {
-    background-color: var(--form-control-bg);
+/* --- النماذج --- */
+body.dark-mode .form-label { color: var(--su-accent); }
+body.dark-mode .form-control, body.dark-mode .form-select {
+    background: var(--form-control-bg);
     color: var(--form-control-color);
     border-color: var(--form-control-border-color);
 }
 body.dark-mode .form-control::placeholder { color: var(--form-control-placeholder-color); }
 body.dark-mode .form-control:focus,
 body.dark-mode .form-select:focus {
-    background-color: var(--form-control-bg);
-    color: var(--form-control-color);
-    border-color: var(--link-color); /* Highlight border on focus */
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.45); /* Stronger focus shadow */
+    border-color: var(--su-accent);
+    box-shadow: 0 0 0 .23rem rgba(228,201,117,.18);
 }
 body.dark-mode .form-check-input {
-    background-color: var(--form-control-bg);
+    background: var(--form-control-bg);
     border-color: var(--form-control-border-color);
 }
 body.dark-mode .form-check-input:checked {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
+    background: var(--su-accent);
+    border-color: var(--su-accent);
 }
-body.dark-mode .form-range::-webkit-slider-thumb { background: var(--bs-primary); }
-body.dark-mode .form-range::-moz-range-thumb { background: var(--bs-primary); }
-body.dark-mode .form-range::-ms-thumb { background: var(--bs-primary); }
 
-
-/* --- Dark Mode: Buttons --- */
-body.dark-mode .btn-light {
-    background-color: var(--bs-light);
-    border-color: var(--bs-light);
-    color: var(--text-color);
+/* --- الأزرار --- */
+body.dark-mode .btn {
+    border-radius: 0.6rem;
+    font-weight: 800;
+    font-size: 1rem;
+    transition: box-shadow 0.18s, transform 0.15s;
 }
-body.dark-mode .btn-light:hover {
-    background-color: var(--card-header-bg); /* Darker hover for btn-light */
-    border-color: var(--card-header-bg);
+body.dark-mode .btn-primary, body.dark-mode .btn-success {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+    border-color: var(--su-accent);
 }
-body.dark-mode .btn-primary {
-    box-shadow: var(--shadow-sm);
-}
-body.dark-mode .btn-primary:hover {
+body.dark-mode .btn-primary:hover, body.dark-mode .btn-success:hover {
+    background: var(--su-link-hover);
+    color: var(--su-primary-dark);
+    border-color: var(--su-link-hover);
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
 }
-body.dark-mode .btn-warning, body.dark-mode .btn-info {
-    color: #1a1b26 !important; /* Dark text for better contrast on bright backgrounds */
+body.dark-mode .btn-outline-primary {
+    color: var(--su-accent);
+    border-color: var(--su-accent);
+}
+body.dark-mode .btn-outline-primary:hover {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
 }
 body.dark-mode .btn-outline-secondary {
-    color: var(--text-muted-color);
-    border-color: var(--text-muted-color);
+    color: var(--su-secondary);
+    border-color: var(--su-secondary);
 }
 body.dark-mode .btn-outline-secondary:hover {
-    background-color: var(--text-muted-color);
-    color: var(--body-bg); /* Dark background on hover */
+    background: var(--su-secondary);
+    color: var(--su-primary-dark);
 }
 
-
-/* --- Dark Mode: Alerts (Messages) --- */
+/* --- رسائل التنبيه --- */
 body.dark-mode .alert {
-    border-width: 0; /* Remove border for flatter look */
-    box-shadow: var(--shadow-sm); /* Subtle shadow */
+    border-radius: 0.7rem;
+    background: #252f46;
+    color: var(--su-accent);
+    box-shadow: var(--shadow-sm);
+    border: none;
 }
-body.dark-mode .alert-primary { background-color: rgba(var(--bs-primary-rgb), 0.35); color: var(--bs-primary); }
-body.dark-mode .alert-secondary { background-color: rgba(var(--bs-secondary-rgb), 0.35); color: var(--bs-secondary); }
-body.dark-mode .alert-success { background-color: rgba(var(--bs-success-rgb), 0.35); color: var(--bs-success); }
-body.dark-mode .alert-danger { background-color: rgba(var(--bs-danger-rgb), 0.3); color: var(--bs-danger); }
-body.dark-mode .alert-warning { background-color: rgba(var(--bs-warning-rgb), 0.35); color: #b36f00; /* Darker text for yellow */ }
-body.dark-mode .alert-info { background-color: rgba(var(--bs-info-rgb), 0.35); color: var(--bs-info); }
-body.dark-mode .alert-light { background-color: var(--card-header-bg); color: var(--text-color); }
-body.dark-mode .alert-dark { background-color: var(--bs-dark); color: var(--text-muted-color); }
-body.dark-mode .alert .btn-close { filter: invert(1) grayscale(100%) brightness(180%); } /* Make close button more visible */
+body.dark-mode .alert-info { background: #212946; color: #e4c975; }
+body.dark-mode .alert-danger { background: #3d1a22; color: #e87475; }
+body.dark-mode .alert-success { background: #1f3323; color: #62c185; }
 
-
-/* --- Dark Mode: Tables --- */
+/* --- الجداول --- */
 body.dark-mode .table {
+    background: var(--card-bg);
     color: var(--text-color);
-    border: 1px solid var(--card-border-color); /* Subtle border for tables */
+    border: 1.2px solid var(--card-border-color);
+    font-size: 1.01rem;
 }
-body.dark-mode .table th,
-body.dark-mode .table td,
-body.dark-mode .table thead th,
-body.dark-mode .table tfoot th { border-color: var(--card-border-color); }
-body.dark-mode .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255, 255, 255, 0.04); } /* Slightly darker stripe */
-body.dark-mode .table-hover tbody tr:hover { background-color: var(--table-hover-bg); }
-body.dark-mode .table-light {
-    --bs-table-bg: var(--card-header-bg);
-    --bs-table-striped-bg: #31364a;
+body.dark-mode .table th {
+    background: var(--table-header-bg);
+    color: var(--su-accent);
+    border-bottom: 1.5px solid var(--card-border-color);
+    text-align: center;
+    font-weight: 800;
+}
+body.dark-mode .table td {
     color: var(--text-color);
-    border-color: var(--card-border-color);
+    border-top: 1px solid var(--card-border-color);
+    background: transparent;
 }
-body.dark-mode .table-dark {
-    --bs-table-bg: #1f202c; /* Even darker for table-dark */
-    --bs-table-striped-bg: var(--body-bg);
+body.dark-mode .table-hover tbody tr:hover {
+    background: var(--table-hover-bg);
+}
+body.dark-mode .table thead th {
+    border-bottom: 2px solid var(--su-accent);
+}
+body.dark-mode .badge.bg-success, 
+body.dark-mode .badge.bg-danger, 
+body.dark-mode .badge.bg-warning, 
+body.dark-mode .badge.bg-info, 
+body.dark-mode .badge.bg-secondary {
+    color: var(--su-primary-dark) !important;
+    background: var(--su-accent) !important;
+    font-weight: 800;
+    font-size: 0.93em;
 }
 
-/* --- Dark Mode: Pagination --- */
+/* --- Pagination --- */
 body.dark-mode .pagination .page-link {
-    background-color: var(--card-bg);
-    border-color: var(--card-border-color);
-    color: var(--link-color);
-}
-body.dark-mode .pagination .page-item.active .page-link {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: var(--body-bg); /* Dark text on primary bg */
-}
-body.dark-mode .pagination .page-item.disabled .page-link {
-    background-color: var(--card-header-bg);
-    border-color: var(--card-border-color);
-    color: #888; /* Slightly lighter disabled text */
+    background: var(--su-primary-dark);
+    color: var(--su-accent);
+    border-color: var(--su-accent);
 }
 body.dark-mode .pagination .page-link:hover {
-    background-color: var(--card-header-bg);
-    color: var(--link-hover-color);
-    border-color: var(--bs-primary);
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+    border-color: var(--su-accent);
+}
+body.dark-mode .pagination .page-item.active .page-link {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+    font-weight: 700;
 }
 
-/* --- Dark Mode: Footer --- */
+/* --- Footer --- */
 body.dark-mode footer.border-top {
-    background-color: var(--navbar-bg) !important;
-    border-top-color: var(--card-border-color) !important;
-    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.07); /* Slightly stronger shadow */
+    background: var(--su-primary-dark) !important;
+    color: var(--su-accent) !important;
+    border-top: 1.5px solid var(--su-accent) !important;
+    box-shadow: 0 -0.125rem 0.25rem rgba(10,18,27,0.07);
 }
-body.dark-mode footer .text-muted { color: var(--text-muted-color) !important; }
+body.dark-mode footer .text-muted { color: var(--su-accent) !important; }
 
-/* --- Dark Mode: Scroll to Top Button --- */
+/* --- Scroll to Top Button --- */
 body.dark-mode #scrollToTopBtn {
-    background-color: var(--bs-primary);
-    color: var(--body-bg);
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
     box-shadow: var(--shadow-md);
 }
 body.dark-mode #scrollToTopBtn:hover {
-    background-color: var(--link-hover-color);
+    background: #fff7c7;
+    color: var(--su-primary-dark);
 }
 
-/* --- Dark Mode: Pomodoro Timer --- */
-body.dark-mode .pomodoro-timer-container {
-    background-color: var(--card-bg);
-    border: none;
-    box-shadow: var(--shadow-sm);
-    color: var(--text-color);
+/* --- كروت مخصصة --- */
+body.dark-mode .file-card, body.dark-mode .summary-card, body.dark-mode .custom-card-border-left {
+    border-left: 5px solid var(--su-accent) !important;
 }
-body.dark-mode #pomodoro-time-display { color: var(--text-color); }
-body.dark-mode #pomodoro-status { color: var(--text-muted-color); }
+body.dark-mode .summary-card { border-left-color: #9575cd !important; }
 
-/* --- Dark Mode: Specific Card Borders (e.g., task status) --- */
-body.dark-mode .task-card.status-completed { border-left-color: var(--bs-success) !important; }
-body.dark-mode .task-card.status-pending { border-left-color: var(--bs-warning) !important; }
-body.dark-mode .task-card.status-in_progress { border-left-color: var(--bs-info) !important; }
-body.dark-mode .task-card.status-postponed { border-left-color: var(--bs-secondary) !important; }
-body.dark-mode .news-card { border-left-color: var(--bs-info) !important; }
-body.dark-mode .summary-card { border-left-color: #9575cd !important; } /* Custom purple */
-body.dark-mode .prayer-card, body.dark-mode .tips-card { border-left-color: var(--bs-warning) !important; }
+body.dark-mode ::-webkit-scrollbar { width: 8px; background: #232e41; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: #2d3950; border-radius: 5px; }
 
-/* Dark Mode: Badge text color fix for light backgrounds */
-body.dark-mode .badge.bg-warning, body.dark-mode .badge.bg-info { color: #1a1b26 !important; } /* Ensure very dark text for contrast */
-body.dark-mode .badge.bg-primary { color: var(--body-bg) !important; } /* Dark background text for primary badge */
-body.dark-mode .badge.bg-success, body.dark-mode .badge.bg-danger { color: #1a1b26 !important; } /* Dark text for success/danger badges */
+@media (max-width: 767px) {
+    body.dark-mode .card { border-radius: 0.5rem; }
+    body.dark-mode .table, body.dark-mode .table th, body.dark-mode .table td { font-size: 0.96rem; }
+}
 
-/* Custom styling inspired by Sham University website for Dark Mode */
-/* Using darker, richer blues and grays for background and card elements,
-   with bright, clear primary colors and text for excellent contrast.
-   Subtle shadows provide depth. */
+/* --- Landing Page Specific Styles (Dark Mode) --- */
+body.dark-mode .hero-bg {
+    background: var(--hero-gradient-dark);
+}
+
+body.dark-mode .gradient-text {
+    background: var(--gradient-text-dark);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .glass-card {
+    background: var(--glass-card-bg-dark);
+    border: 1px solid var(--glass-card-border-dark);
+}
+
+body.dark-mode .feature-card {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border-color);
+    color: var(--text-color); /* Use general text color for dark mode */
+}
+body.dark-mode .feature-card:hover {
+    background-color: var(--dark-hover-bg);
+}
+
+/* Ensure text colors are correct in dark mode for landing page elements */
+body.dark-mode .text-white {
+    color: #e2e5ee !important; /* Lighter white for dark mode */
+}
+body.dark-mode .text-gray-200 {
+    color: #b1bdd1 !important;
+}
+body.dark-mode .text-yellow-300 {
+    color: #f0e68c !important; /* Adjusted yellow for dark mode */
+}
+body.dark-mode .text-gray-900 {
+    color: #e2e5ee !important;
+}
+body.dark-mode .text-gray-600 {
+    color: #b1bdd1 !important;
+}
+body.dark-mode .bg-white {
+    background-color: var(--su-card-bg) !important; /* Ensure card bg is correct */
+}
+body.dark-mode .bg-gray-50 { /* This will be the body background in dark mode */
+    background-color: var(--su-bg) !important;
+}
+body.dark-mode .bg-gray-800 { /* Feature card background in dark mode */
+    background-color: var(--su-card-bg) !important;
+}
+body.dark-mode .bg-gray-900 { /* Footer background in dark mode */
+    background-color: var(--su-primary-dark) !important;
+}
+body.dark-mode .bg-blue-100 {
+    background-color: rgba(0, 123, 255, 0.1) !important; /* Bootstrap primary with opacity */
+}
+body.dark-mode .bg-purple-100 {
+    background-color: rgba(111, 66, 193, 0.1) !important; /* Bootstrap purple with opacity */
+}
+body.dark-mode .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.dark-mode .bg-white\/5 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+body.dark-mode .bg-blue-400\/10 {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+body.dark-mode .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+body.dark-mode .bg-white\/30 {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}

@@ -1,388 +1,976 @@
-/* static/css/style.css */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap'); /* Added more weights */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
-/* --- Variables --- */
+/* --- متغيرات الألوان الرئيسية --- */
 :root {
-    /* Bootstrap's default (can be overridden by theme variables if desired) */
-    --bs-primary-rgb: 13, 110, 253;
-    --bs-secondary-rgb: 108, 117, 125;
-    --bs-success-rgb: 25, 135, 84;
-    --bs-info-rgb: 13, 202, 240;
-    --bs-warning-rgb: 255, 193, 7;
-    --bs-danger-rgb: 220, 53, 69;
-    --bs-light-rgb: 248, 249, 250;
-    --bs-dark-rgb: 33, 37, 41;
+    /* ألوان شام الافتراضية */
+    --su-primary: #1f3558;
+    /* كحلي رئيسي */
+    --su-primary-dark: #16223a;
+    /* أزرق داكن شديد */
+    --su-accent: #e4c975;
+    /* أصفر ذهبي للشعار والروابط */
+    --su-accent-light: #f9eec8;
+    /* ذهبي فاتح للخلفيات */
+    --su-secondary: #6a84a7;
+    /* أزرق رمادي ثانوي */
+    --su-bg: #f6f8fa;
+    /* خلفية نهارية رئيسية */
+    --su-card-bg: #fff;
+    /* خلفية البطاقات */
+    --su-border: #dee2e6;
+    /* حدود فاتحة */
+    --su-table-header-bg: #e9eef5;
+    /* خلفية رؤوس الجداول */
+    --su-table-row-hover: #f2f7fd;
+    /* خلفية صف الجدول عند المرور */
+    --su-link: #274160;
+    /* لون الروابط */
+    --su-link-hover: #e4c975;
+    /* لون الروابط عند المرور */
+    --su-success: #1aaf5d;
+    --su-danger: #b72e3a;
+    --su-warning: #e1ac1a;
+    --su-info: #2e8dd1;
+    --su-muted: #6c757d;
 
-    --bs-primary: rgb(var(--bs-primary-rgb));
-    --bs-secondary: rgb(var(--bs-secondary-rgb));
-    --bs-success: rgb(var(--bs-success-rgb));
-    --bs-info: rgb(var(--bs-info-rgb));
-    --bs-warning: rgb(var(--bs-warning-rgb));
-    --bs-danger: rgb(var(--bs-danger-rgb));
-    --bs-light: rgb(var(--bs-light-rgb));
-    --bs-dark: rgb(var(--bs-dark-rgb));
-    --bs-white: #fff;
-    --bs-black: #000;
-
-    /* Custom Theme Variables - Light Mode Defaults */
+    /* خطوط */
     --custom-font: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --text-color: #343a40; /* Slightly darker for better readability */
-    --text-muted-color: #6c757d;
-    --body-bg: #f8f9fa; /* Light gray background */
-    --card-bg: var(--bs-white);
-    --card-border-color: #e9ecef; /* Lighter, subtle border */
-    --card-header-bg: #f0f2f5; /* Light header bg */
-    --card-footer-bg: var(--card-header-bg);
-    --link-color: #0d6efd; /* Bootstrap primary blue */
-    --link-hover-color: #0a58ca; /* Darker blue on hover */
-    --navbar-bg: var(--bs-white); /* White navbar for light mode */
-    --navbar-link-color: #495057; /* Dark gray for links */
-    --navbar-link-hover-color: var(--link-color);
-    --navbar-brand-color: #212529; /* Dark brand color */
-    --form-control-bg: var(--bs-white);
-    --form-control-color: var(--text-color);
-    --form-control-border-color: #ced4da;
-    --button-outline-light-color: var(--navbar-link-color);
-    --button-outline-light-hover-bg: var(--navbar-link-hover-color);
-    --button-outline-light-hover-color: var(--bs-white); /* Text color on hover for toggle button */
 
-    /* Specific component colors that might need dark mode override */
-    --blockquote-footer-color: #6c757d;
-    --table-hover-bg: rgba(0,0,0,0.03); /* Lighter hover for tables */
-    --list-group-item-light-bg: rgba(var(--bs-info-rgb), 0.08);
-    --hr-color: rgba(0,0,0,0.1);
-    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
-    --shadow-md: 0 .25rem .5rem rgba(0,0,0,.1);
-    --shadow-lg: 0 .5rem 1rem rgba(0,0,0,.15);
+    /* Bootstrap compatibility for custom palette */
+    --bs-primary: var(--su-primary);
+    --bs-primary-rgb: 31, 53, 88;
+    --bs-secondary: var(--su-secondary);
+    --bs-success: var(--su-success);
+    --bs-danger: var(--su-danger);
+    --bs-warning: var(--su-warning);
+    --bs-info: var(--su-info);
+    --bs-light: #f8f9fa;
+    --bs-dark: #232d3b;
+    --bs-white: #fff;
+
+    /* أخرى */
+    --text-color: #1f3558;
+    --text-muted-color: var(--su-muted);
+    --body-bg: var(--su-bg);
+    --navbar-bg: var(--su-primary);
+    --navbar-link-color: #fff;
+    --navbar-link-hover-color: var(--su-accent);
+    --navbar-brand-color: var(--su-accent);
+    --card-bg: var(--su-card-bg);
+    --card-header-bg: var(--su-table-header-bg);
+    --card-footer-bg: #f5f7fa;
+    --card-border-color: var(--su-border);
+    --form-control-bg: #fff;
+    --form-control-color: var(--su-primary);
+    --form-control-border-color: var(--su-border);
+    --link-color: var(--su-link);
+    --link-hover-color: var(--su-link-hover);
+    --table-hover-bg: var(--su-table-row-hover);
+    --table-header-bg: var(--su-table-header-bg);
+    --table-header-color: var(--su-primary);
+    --shadow-sm: 0 .125rem .25rem rgba(31, 53, 88, .10);
+    --shadow-md: 0 .25rem .75rem rgba(31, 53, 88, .08);
+    --shadow-lg: 0 .5rem 1.5rem rgba(31, 53, 88, .13);
+    --hr-color: #e4e9ef;
+
+    /* --- Landing Page Specific Variables (Light Mode) --- */
+    --hero-gradient-light: linear-gradient(135deg, #3a2f01ff 0%, #252d6eff 100%);
+    --gradient-text-light: linear-gradient(45deg, #667eea, #764ba2);
+    --glass-card-bg-light: rgba(255, 255, 255, 0.1);
+    --glass-card-border-light: rgba(255, 255, 255, 0.2);
 }
 
-/* --- General Styles --- */
 body {
     font-family: var(--custom-font);
-    background-color: var(--body-bg);
+    background: var(--body-bg);
     color: var(--text-color);
-    display: flex;
-    flex-direction: column;
+    font-size: 1.05rem;
+    transition: background 0.3s, color 0.3s;
     min-height: 100vh;
-    font-size: 0.95rem; /* Slightly smaller base font */
-    line-height: 1.6;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+    direction: rtl;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700; /* Bolder headings */
-    margin-top: 2rem; /* More spacing */
-    margin-bottom: 1rem;
-    color: #343a40; /* Consistent dark gray */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--custom-font);
+    font-weight: 800;
+    color: var(--su-primary);
+    margin-bottom: 0.7em;
 }
-
-h1 { font-size: 2.2rem; }
-h2 { font-size: 1.8rem; }
-h3 { font-size: 1.5rem; }
 
 a {
     color: var(--link-color);
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
+    transition: color 0.18s;
 }
-a:hover {
+
+a:hover,
+a:focus {
     color: var(--link-hover-color);
     text-decoration: underline;
 }
 
 hr {
-    border-top-width: 1px;
-    border-top-style: solid;
-    border-top-color: var(--hr-color);
-    margin: 2rem 0; /* More vertical space */
+    border-top: 1.5px solid var(--hr-color);
+    margin: 2rem 0;
 }
 
-/* --- Navbar --- */
 .navbar {
-    background-color: var(--navbar-bg) !important;
-    box-shadow: var(--shadow-sm); /* Soft shadow */
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    background: var(--navbar-bg) !important;
+    box-shadow: var(--shadow-sm);
 }
+
 .navbar-brand {
-    font-weight: 800; /* Extra bold brand */
-    font-size: 1.4rem; /* Slightly larger brand text */
+    font-weight: 900;
+    font-size: 1.35rem;
     color: var(--navbar-brand-color) !important;
+    letter-spacing: 0.5px;
 }
+
 .navbar .nav-link {
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
     color: var(--navbar-link-color) !important;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 1.08rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    margin-right: 0.5rem;
 }
+
+.navbar .nav-link.active,
 .navbar .nav-link:hover,
-.navbar .nav-link.active {
+.navbar .nav-link:focus {
     color: var(--navbar-link-hover-color) !important;
 }
-.navbar-toggler {
-    border-color: rgba(0,0,0,0.1);
-    background-color: rgba(0,0,0,0.03); /* Light background for toggler */
-}
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* Darker icon for light mode */
-}
+
 .dropdown-menu {
-    border-radius: 0.5rem; /* More rounded */
-    box-shadow: var(--shadow-md); /* Clearer shadow */
-    font-size: 0.9rem;
-    background-color: var(--card-bg); /* Consistent with card bg */
-    border: 1px solid var(--card-border-color);
-    padding: 0.5rem 0; /* Padding inside menu */
-}
-.dropdown-item {
-    padding: 0.6rem 1.2rem; /* More padding */
-    color: var(--text-color);
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-.dropdown-item:hover, .dropdown-item:focus {
-    background-color: var(--card-header-bg); /* Use header bg for hover */
-    color: var(--link-hover-color); /* Highlight text */
-}
-#theme-toggle-btn.btn-outline-light {
-    color: var(--button-outline-light-color);
-    border-color: var(--button-outline-light-color);
-    font-size: 0.9rem;
-    padding: 0.4rem 0.75rem;
-}
-#theme-toggle-btn.btn-outline-light:hover {
-    background-color: var(--button-outline-light-hover-bg);
-    color: var(--button-outline-light-hover-color);
-}
-
-
-/* --- Main Content & Containers --- */
-main.container {
-    flex-grow: 1;
-    padding-top: 2rem; /* More top padding */
-    padding-bottom: 2.5rem; /* More bottom padding */
-}
-
-/* --- Cards --- */
-.card {
-    background-color: var(--card-bg);
-    border: none; /* Remove default border, rely on shadow */
-    border-radius: 0.75rem; /* More rounded corners */
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-sm); /* Soft shadow for cards */
-    overflow: hidden; /* Ensure content respects border-radius */
-    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
-}
-.card:hover {
-    box-shadow: var(--shadow-md); /* Slightly larger shadow on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-.card-header {
-    background-color: var(--card-header-bg);
-    border-bottom: 1px solid var(--card-border-color);
-    font-weight: 600; /* Slightly bolder header text */
-    padding: 1rem 1.5rem; /* More padding */
-    color: var(--text-color);
-    font-size: 1.05rem; /* Slightly larger header font */
-}
-.card-body { padding: 1.5rem; } /* More padding */
-.card-footer {
-    background-color: var(--card-footer-bg);
-    border-top: 1px solid var(--card-border-color);
-    padding: 1rem 1.5rem; /* More padding */
-    font-size: 0.9rem;
-    color: var(--text-muted-color);
-}
-.list-group-item {
-    background-color: var(--card-bg);
-    border-color: var(--card-border-color);
-    color: var(--text-color);
-    padding: 0.85rem 1.25rem; /* Increased padding for list items */
-}
-.list-group-item-light {
-    background-color: var(--list-group-item-light-bg) !important;
-}
-
-/* --- Forms --- */
-.form-label {
-    font-weight: 600; /* Bolder labels */
-    margin-bottom: 0.4rem;
-    font-size: 0.95rem;
-}
-.form-control, .form-select {
-    background-color: var(--form-control-bg);
-    color: var(--form-control-color);
-    border: 1px solid var(--form-control-border-color);
-    border-radius: 0.375rem; /* Slightly more rounded */
-    padding: 0.75rem 1rem; /* More vertical padding */
-    font-size: 0.95rem;
-}
-.form-control:focus, .form-select:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.35); /* Stronger focus shadow */
-}
-.form-check-input {
-    border-color: var(--form-control-border-color);
-    width: 1.25em; /* Larger checkbox */
-    height: 1.25em;
-    margin-top: 0.25em; /* Adjust alignment */
-}
-.form-check-input:checked {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-
-
-/* --- Buttons --- */
-.btn {
-    border-radius: 0.5rem; /* More rounded buttons */
-    font-weight: 600; /* Bolder button text */
-    padding: 0.6rem 1.2rem; /* More padding */
-    font-size: 0.95rem;
-    transition: all 0.2s ease-in-out; /* Smooth transition */
-}
-.btn-primary {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    box-shadow: var(--shadow-sm); /* Add shadow to primary button */
-}
-.btn-primary:hover {
-    background-color: var(--link-hover-color);
-    border-color: var(--link-hover-color);
-    box-shadow: var(--shadow-md); /* Larger shadow on hover */
-    transform: translateY(-1px); /* Slight lift */
-}
-/* Ensure consistency for other Bootstrap buttons */
-.btn-outline-primary {
-    color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-.btn-outline-primary:hover {
-    background-color: var(--bs-primary);
-    color: var(--bs-white);
-    box-shadow: var(--shadow-sm);
-}
-.btn-success, .btn-danger, .btn-info, .btn-warning, .btn-secondary {
-    box-shadow: var(--shadow-sm);
-}
-.btn-success:hover, .btn-danger:hover, .btn-info:hover, .btn-warning:hover, .btn-secondary:hover {
+    background: var(--card-bg);
+    border-radius: 0.55rem;
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    border: 1px solid var(--card-border-color);
+    font-size: 0.97rem;
 }
 
-
-/* --- Alerts (Messages) --- */
-.alert {
-    border-radius: 0.5rem; /* More rounded alerts */
-    padding: 1.25rem 1.5rem; /* More padding */
-    font-size: 0.95rem;
-    box-shadow: var(--shadow-sm); /* Subtle shadow for alerts */
-}
-.alert-heading { font-weight: 700; font-size: 1.1rem; } /* Bolder heading */
-
-/* --- Tables --- */
-.table {
-    margin-bottom: 1.5rem;
-    border-radius: 0.5rem; /* Rounded corners for table container/border if it has one */
-    overflow: hidden; /* Important for border-radius on tables */
-    border: 1px solid var(--card-border-color); /* Added a subtle border */
-}
-.table thead {
-    background-color: var(--card-header-bg); /* Header background for table */
+.dropdown-item {
     color: var(--text-color);
+    padding: 0.7rem 1.4rem;
 }
-.table th {
-    font-weight: 600; /* Bolder table headers */
-    padding: 1rem 1.25rem; /* More padding */
-    border-bottom: 1px solid var(--card-border-color);
-}
-.table td {
-    padding: 0.85rem 1.25rem; /* More padding for cells */
-    border-top: 1px solid var(--card-border-color);
-}
-.table-hover tbody tr:hover { background-color: var(--table-hover-bg); }
 
-/* --- Pagination --- */
-.pagination {
-    --bs-pagination-border-radius: 0.5rem; /* More rounded pagination */
-    --bs-pagination-border-color: var(--card-border-color);
-    --bs-pagination-bg: var(--card-bg);
-}
-.pagination .page-item .page-link {
-    transition: all 0.2s ease-in-out;
-    color: var(--link-color);
-    padding: 0.6rem 1rem; /* Consistent padding */
-    font-size: 0.95rem;
-    border: 1px solid var(--bs-pagination-border-color);
-    background-color: var(--bs-pagination-bg);
-}
-.pagination .page-link:hover {
-    background-color: var(--card-header-bg); /* Use header bg for hover */
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--card-header-bg);
     color: var(--link-hover-color);
-    border-color: var(--bs-primary);
 }
+
+#theme-toggle-btn.btn-outline-light {
+    color: var(--su-accent);
+    border-color: var(--su-accent);
+}
+
+#theme-toggle-btn.btn-outline-light:hover {
+    background: var(--su-accent);
+    color: var(--bs-primary);
+}
+
+main.container {
+    padding-top: 2.6rem;
+    padding-bottom: 2.4rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 1.15rem;
+    border: 1px solid var(--card-border-color);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s, transform 0.16s;
+    margin-bottom: 1.7rem;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px) scale(1.012);
+}
+
+.card-header {
+    background: var(--card-header-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--card-border-color);
+    font-weight: 700;
+    font-size: 1.09rem;
+}
+
+.card-footer {
+    background: var(--card-footer-bg);
+    color: var(--su-secondary);
+    border-top: 1px solid var(--card-border-color);
+    font-size: 1rem;
+}
+
+.form-label {
+    font-weight: 700;
+    color: var(--su-primary);
+}
+
+.form-control,
+.form-select {
+    background: var(--form-control-bg);
+    color: var(--form-control-color);
+    border: 1.3px solid var(--form-control-border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    padding: 0.77rem 1.1rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--su-accent);
+    box-shadow: 0 0 0 .25rem rgba(228, 201, 117, .13);
+}
+
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    font-size: 1rem;
+    padding: 0.7rem 1.3rem;
+    transition: box-shadow 0.18s, transform 0.15s;
+}
+
+.btn-primary,
+.btn-success {
+    background: var(--su-primary);
+    border-color: var(--su-primary);
+}
+
+.btn-primary:hover,
+.btn-success:hover {
+    background: var(--su-accent);
+    color: var(--su-primary);
+    border-color: var(--su-accent);
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-primary {
+    color: var(--su-primary);
+    border-color: var(--su-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--su-primary);
+    color: var(--bs-white);
+}
+
+.btn-outline-secondary {
+    color: var(--su-secondary);
+    border-color: var(--su-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--su-secondary);
+    color: var(--bs-white);
+}
+
+.alert {
+    border-radius: 0.7rem;
+    font-size: 1.04rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-info {
+    background: var(--su-accent-light);
+    color: var(--su-primary);
+    border-color: var(--su-accent);
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: var(--su-danger);
+}
+
+.alert-success {
+    background: #e6fff1;
+    color: var(--su-success);
+}
+
+.table {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--card-border-color);
+    font-size: 1.01rem;
+}
+
+.table th {
+    background: var(--table-header-bg);
+    color: var(--table-header-color);
+    font-weight: 700;
+    font-size: 1.01rem;
+    border-bottom: 1.5px solid var(--card-border-color);
+    text-align: center;
+}
+
+.table td {
+    text-align: center;
+    border-top: 1px solid var(--card-border-color);
+    padding: 0.85rem 1.1rem;
+}
+
+.table-hover tbody tr:hover {
+    background: var(--table-hover-bg);
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--su-primary);
+}
+
+.pagination .page-link {
+    border-radius: 0.45rem !important;
+    color: var(--su-primary);
+    border: 1.2px solid var(--su-border);
+    background: var(--card-bg);
+}
+
+.pagination .page-link:hover {
+    background: var(--su-accent-light);
+    color: var(--su-primary);
+    border-color: var(--su-accent);
+}
+
 .pagination .page-item.active .page-link {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: var(--bs-white);
-    font-weight: 600;
-}
-.pagination .page-item.disabled .page-link {
-    color: var(--text-muted-color);
-    background-color: var(--card-bg);
-    border-color: var(--card-border-color);
+    background: var(--su-accent);
+    border-color: var(--su-accent);
+    color: var(--su-primary);
+    font-weight: 700;
 }
 
-/* --- Footer --- */
 footer.border-top {
-    background-color: var(--navbar-bg); /* Use same as navbar for consistency */
-    padding-top: 2rem; /* Increased padding */
-    padding-bottom: 2rem;
-    border-top: 1px solid var(--card-border-color) !important; /* Ensure consistent border */
-    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.03); /* Subtle top shadow */
+    background: var(--su-primary-dark);
+    color: #fff !important;
+    border-top: 1.5px solid var(--su-accent);
+    box-shadow: 0 -0.125rem 0.35rem rgba(31, 53, 88, 0.07);
+    padding-top: 2.2rem;
+    padding-bottom: 2.2rem;
 }
-footer .text-muted { color: var(--text-muted-color) !important; }
 
-/* --- Scroll to Top Button --- */
+footer .text-muted {
+    color: #e4c975 !important;
+}
+
 #scrollToTopBtn {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+    box-shadow: var(--shadow-md);
+}
+
+#scrollToTopBtn:hover {
+    background: var(--su-primary);
+    color: var(--su-accent);
+}
+
+.file-card,
+.summary-card,
+.custom-card-border-left {
+    border-left: 5px solid var(--su-accent);
+}
+
+.summary-card {
+    border-left-color: #9575cd;
+}
+
+.file-card:hover,
+.summary-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px) scale(1.012);
+}
+
+.badge.bg-success,
+.badge.bg-danger,
+.badge.bg-warning,
+.badge.bg-info,
+.badge.bg-secondary {
+    font-size: 0.92em;
+    font-weight: 700;
+    padding: 0.49em 0.80em;
+    border-radius: 0.7em;
+    letter-spacing: 0.01em;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    background: #eaeaea;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c0c7d1;
+    border-radius: 5px;
+}
+
+@media (max-width: 767px) {
+    .card {
+        border-radius: 0.5rem;
+    }
+
+    .table,
+    .table th,
+    .table td {
+        font-size: 0.97rem;
+    }
+
+    main.container {
+        padding-top: 1.1rem;
+        padding-bottom: 1.3rem;
+    }
+}
+
+/* --- Landing Page Specific Styles (Light Mode) --- */
+.hero-bg {
+    background: var(--hero-gradient-light);
+}
+
+.hero-bg::before {
+    opacity: 0.1;
+    /* Adjust opacity for better visibility */
+}
+
+.floating-card {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.gradient-text {
+    background: var(--gradient-text-light);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-card {
+    background: var(--glass-card-bg-light);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-card-border-light);
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.pulse-slow {
+    animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-slide-up {
     opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s, transform 0.2s ease;
+    transform: translateY(30px);
+}
+
+.animate-slide-up.visible {
+    animation: slideInUp 0.8s ease-out forwards;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-delay-1 {
+    animation-delay: 0.2s;
+}
+
+.animate-delay-2 {
+    animation-delay: 0.4s;
+}
+
+.animate-delay-3 {
+    animation-delay: 0.6s;
+}
+
+/* Custom Bootstrap-like button styles for landing page */
+.btn-custom-primary {
+    background: linear-gradient(to right, #28a745, #007bff);
+    /* Green to Blue */
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-custom-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+    color: white;
+}
+
+.btn-custom-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.btn-custom-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    color: white;
+}
+
+.btn-custom-accent {
+    background: white;
+    color: #1abc9c;
+    /* Emerald color */
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-custom-accent:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(26, 188, 156, 0.5);
+    color: #1abc9c;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 576px) {
+    .hero-section h1 {
+        font-size: 3rem;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .btn-group-vertical {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group-vertical .btn {
+        width: 100%;
+    }
+}
+
+/* أضف هذه الستايلات إلى ملف static/css/style.css */
+
+/* Custom Navbar Styles */
+.custom-navbar {
+    background: var(--navbar-bg) !important;
+    box-shadow: var(--shadow-sm);
+    /* Glass effect, if desired, uncomment and adjust: */
+    /* background: rgba(255, 255, 255, 0.95); */
+    /* backdrop-filter: blur(10px); */
+    /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
+}
+
+.navbar-brand {
+    font-weight: 900;
+    font-size: 1.35rem;
+    color: var(--navbar-brand-color) !important;
+    letter-spacing: 0.5px;
+}
+
+.navbar-nav .nav-link {
+    color: var(--navbar-link-color) !important;
+    font-weight: 600;
+    font-size: 1.08rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    margin-right: 0.5rem;
+    /* For RTL, this will be margin-left */
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 50%;
+    /* For RTL */
+    width: 0;
+    height: 2px;
+    background: linear-gradient(45deg, var(--bs-primary), #8b5cf6);
+    /* Using Bootstrap primary and a custom purple */
+    transition: all 0.3s ease;
+    transform: translateX(50%);
+    /* For RTL */
+}
+
+.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link.active::after {
+    width: 100%;
+}
+
+/* Dropdown Menu Animations */
+.dropdown-menu-animated {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: var(--shadow-md);
+    /* Using existing shadow variable */
+    border-radius: 0.55rem;
+    /* Match other dropdowns */
+    background: var(--card-bg);
+    /* Use card background */
+    border: 1px solid var(--card-border-color);
+    /* Use card border */
+}
+
+.dropdown-menu-animated.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    color: var(--text-color);
+    /* Use general text color */
+    padding: 0.7rem 1.4rem;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--card-header-bg);
+    /* Use card header bg for hover */
+    color: var(--link-hover-color);
+    /* Use link hover color */
+}
+
+/* Notification Badge Pulse Animation */
+.notification-badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Scroll to Top Button */
+#scrollToTopBtn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    /* Adjusted for RTL */
+    z-index: 1030;
+    /* Higher than Bootstrap modals */
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+    box-shadow: var(--shadow-md);
     border-radius: 50%;
-    box-shadow: var(--shadow-md); /* Clearer shadow */
-    background-color: var(--bs-primary);
-    color: var(--bs-white);
-    width: 45px; /* Slightly larger button */
+    width: 45px;
     height: 45px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     font-size: 1.2rem;
 }
-#scrollToTopBtn:hover {
-    transform: scale(1.1); /* More prominent lift */
-    background-color: var(--link-hover-color);
-}
+
 #scrollToTopBtn.show {
     opacity: 1;
-    visibility: visible;
-    transition-delay: 0s;
+    transform: scale(1);
 }
 
-/* --- Utility/Custom Classes --- */
-.container-fluid {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-}
-.text-primary-emphasis {
-    color: var(--bs-primary) !important;
+#scrollToTopBtn:hover {
+    background: var(--su-primary);
+    color: var(--su-accent);
 }
 
-/* Placeholder for custom component styling if needed later (e.g. Pomodoro timer, specific cards) */
-/* Example for custom cards */
-.custom-card-border-left {
-    border-left: 5px solid; /* Placeholder, specific color will be defined for each type */
+
+/* Mobile Offcanvas Customization */
+.custom-offcanvas {
+    background: var(--card-bg);
+    /* Use card background for consistency */
+    color: var(--text-color);
+    border-right: 1px solid var(--card-border-color);
+    /* For RTL */
 }
 
-/* Custom styling inspired by Sham University website */
-/* Overall theme: Clean, modern, good use of dark background (in dark mode) and clear cards.
-   Emphasis on typography and subtle shadows. */
+.custom-offcanvas .offcanvas-header {
+    border-bottom: 1px solid var(--card-border-color);
+}
+
+.custom-offcanvas .offcanvas-title {
+    color: var(--su-primary);
+    /* Primary color for title */
+    font-weight: 700;
+}
+
+.custom-offcanvas .btn-close {
+    filter: invert(0);
+    /* Ensure close button is visible in light mode */
+}
+
+body.dark-mode .custom-offcanvas .btn-close {
+    filter: invert(1);
+    /* Invert for dark mode */
+}
+
+/* Messages (Alerts) */
+.alert-modern {
+    border-left: 4px solid;
+    /* Use border-left for RTL */
+    border-radius: 0.5rem;
+    background: var(--card-bg);
+    /* Use card background */
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 1.25rem;
+}
+
+.alert-modern .flex-shrink-0 {
+    margin-right: 0.75rem;
+    /* For RTL */
+}
+
+.alert-success {
+    border-left-color: var(--su-success);
+}
+
+.alert-danger {
+    border-left-color: var(--su-danger);
+}
+
+.alert-warning {
+    border-left-color: var(--su-warning);
+}
+
+.alert-info {
+    border-left-color: var(--su-info);
+}
+
+/* User Avatar in Navbar */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--bs-primary), #8b5cf6);
+    /* Blue/Purple gradient */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Light blue background for unread notifications in dropdown */
+.bg-light-blue {
+    background-color: #e0f2f7 !important;
+    /* A light blue */
+}
+
+/* أضف هذه الستايلات إلى ملف static/css/dark_mode.css */
+
+
+/* Custom Navbar Styles in Dark Mode */
+.custom-navbar {
+    background: var(--navbar-bg) !important;
+    border-bottom: 1.5px solid var(--su-border);
+    box-shadow: var(--shadow-sm);
+    /* Glass effect in dark mode, if desired: */
+    /* background: rgba(30, 41, 59, 0.95); */
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+}
+
+.navbar-brand {
+    color: var(--navbar-brand-color) !important;
+}
+
+.navbar-nav .nav-link {
+    color: var(--navbar-link-color) !important;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--navbar-link-hover-color) !important;
+}
+
+.navbar-nav .nav-link::after {
+    background: linear-gradient(45deg, var(--su-accent), #f0e68c);
+    /* Gold/Yellow gradient for dark mode */
+}
+
+/* Dropdown Menu Animations in Dark Mode */
+.dropdown-menu-animated {
+    background: var(--card-bg);
+    /* Use dark card background */
+    border: 1px solid var(--card-border-color);
+    /* Use dark card border */
+    box-shadow: var(--shadow-md);
+}
+
+.dropdown-item {
+    color: var(--text-color);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--card-header-bg);
+    /* Use dark card header bg for hover */
+    color: var(--su-accent);
+    /* Use accent color for hover text */
+}
+
+/* Theme Toggle Button in Dark Mode */
+#theme-toggle-btn.btn-outline-light {
+    color: var(--su-accent);
+    border-color: var(--su-accent);
+    background: var(--card-bg);
+    /* Match other elements */
+}
+
+#theme-toggle-btn.btn-outline-light:hover {
+    background: var(--su-accent);
+    color: var(--su-primary-dark);
+}
+
+.light-mode-icon {
+    display: none;
+}
+
+.dark-mode-icon {
+    display: inline-block;
+    color: var(--su-accent);
+}
+
+/* Ensure icon color is right */
+
+/* Notification Badge in Dark Mode */
+.notification-badge {
+    background-color: var(--su-danger) !important;
+    /* Use dark mode danger color */
+    color: var(--text-color) !important;
+    /* Ensure text is visible */
+}
+
+/* Mobile Offcanvas Customization in Dark Mode */
+.custom-offcanvas {
+    background: var(--card-bg);
+    /* Use dark card background */
+    color: var(--text-color);
+    border-right: 1px solid var(--card-border-color);
+}
+
+.custom-offcanvas .offcanvas-title {
+    color: var(--su-accent);
+    /* Accent color for title */
+}
+
+.custom-offcanvas .btn-close {
+    filter: invert(1);
+    /* Invert for dark mode */
+}
+
+/* Messages (Alerts) in Dark Mode */
+.alert-modern {
+    background: var(--card-bg);
+    /* Use dark card background */
+    color: var(--text-color);
+    border: none;
+    /* Remove default border */
+}
+
+.alert-success {
+    border-left-color: var(--su-success);
+    background-color: rgba(98, 193, 133, 0.15) !important;
+}
+
+.alert-danger {
+    border-left-color: var(--su-danger);
+    background-color: rgba(232, 116, 117, 0.15) !important;
+}
+
+.alert-warning {
+    border-left-color: var(--su-warning);
+    background-color: rgba(238, 199, 90, 0.15) !important;
+}
+
+.alert-info {
+    border-left-color: var(--su-info);
+    background-color: rgba(93, 176, 229, 0.15) !important;
+}
+
+.alert-modern .flex-shrink-0 .fas {
+    color: inherit !important;
+    /* Inherit color from alert text */
+}
+
+/* User Avatar in Navbar in Dark Mode */
+.user-avatar {
+    background: linear-gradient(45deg, var(--su-accent), #f0e68c);
+    /* Gold/Yellow gradient for dark mode */
+    color: var(--su-primary-dark);
+    /* Dark text on light avatar */
+}
+
+/* Light blue background for unread notifications in dropdown */
+.bg-light-blue {
+    background-color: rgba(93, 176, 229, 0.1) !important;
+    /* A light blue with opacity for dark mode */
+}

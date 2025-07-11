@@ -323,6 +323,7 @@
         <div class="position-absolute top-50 start-50 w-75 h-75 bg-white bg-opacity-5 rounded-circle blur-3" style="transform: translate(-50%, -50%);"></div>
     </section>
 </main>
+{% endblock content %} {# تم إضافة وسم الإغلاق هنا #}
 
 {% block extra_scripts %}
 {{ block.super }}
@@ -347,4 +348,4 @@
         observer.observe(el);
     });
 </script>
-{% endblock %}
+{% endblock extra_scripts %} {# تم إضافة وسم الإغلاق هنا #}
