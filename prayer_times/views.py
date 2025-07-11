@@ -430,7 +430,7 @@ class AdhkarView(LoginRequiredMixin, TemplateView):
 
         adhkar_files = {
             _("أذكار الصباح"): "morning.json",
-            _("أذكار المساء"): "evening.json", # تم التصحيح هنا ليتوقع evening.json
+            _("أذكار المساء"): "evining.json", # تم التصحيح هنا ليتوقع evining.json
             _("أذكار الصلاة"): "athkar_alsalah.json",
             _("أذكار من القرآن"): "athkar_from_qurain.json",
             # أضف هنا أي ملفات أخرى للأذكار التي تريد تضمينها
