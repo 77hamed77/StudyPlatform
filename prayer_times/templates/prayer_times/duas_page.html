@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %}
 
-{% block title %}{% translate "الأدعية" %} - {{ block.super }}{% endblock %}
+
+{% block title %}الأدعية - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -104,8 +104,8 @@
 
     <div class="duas-container">
         <div class="duas-header">
-            <h2><i class="fas fa-book-open me-2"></i> {% translate "الأدعية" %}</h2>
-            <p class="text-muted">{% translate "مجموعة من الأدعية من القرآن والسنة." %}</p>
+            <h2><i class="fas fa-book-open me-2"></i> الأدعية</h2>
+            <p class="text-muted">مجموعة من الأدعية من القرآن والسنة.</p>
         </div>
 
         {% if duas_data %}
@@ -117,10 +117,10 @@
                 <div class="dua-item">
                     <p class="dua-text">{{ dua.arabic }}</p>
                     {% if dua.translation %}
-                        <p class="dua-description">{% translate "المعنى" %}: {{ dua.translation }}</p>
+                        <p class="dua-description">المعنى: {{ dua.translation }}</p>
                     {% endif %}
                     {% if dua.reference %}
-                        <p class="dua-reference">{% translate "المرجع" %}: {{ dua.reference }}</p>
+                        <p class="dua-reference">المرجع: {{ dua.reference }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -128,8 +128,8 @@
             {% endfor %}
         {% else %}
             <div class="alert alert-info mt-4">
-                <p>{% translate "تعذر جلب الأدعية حالياً." %}</p>
-                <p>{% translate "يرجى المحاولة لاحقاً." %}</p>
+                <p>تعذر جلب الأدعية حالياً.</p>
+                <p>يرجى المحاولة لاحقاً.</p>
             </div>
         {% endif %}
     </div>

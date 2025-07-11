@@ -1,29 +1,29 @@
- <div class="islamic-resources-nav card shadow-sm mb-4">
+<div class="islamic-resources-nav card shadow-sm mb-4">
     <div class="card-body p-2">
         <ul class="nav nav-pills nav-fill flex-column flex-md-row">
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'prayer_times_list' %}active{% endif %}" href="{% url 'prayer_times:prayer_times_list' %}">
-                    <i class="fas fa-mosque me-1"></i> {% translate "أوقات الصلاة" %}
+                    <i class="fas fa-mosque me-1"></i> أوقات الصلاة
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'quran_page' %}active{% endif %}" href="{% url 'prayer_times:quran_page' %}">
-                    <i class="fas fa-quran me-1"></i> {% translate "القرآن الكريم" %}
+                    <i class="fas fa-quran me-1"></i> القرآن الكريم
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'adhkar_page' %}active{% endif %}" href="{% url 'prayer_times:adhkar_page' %}">
-                    <i class="fas fa-hands-praying me-1"></i> {% translate "الأذكار" %}
+                    <i class="fas fa-hands-praying me-1"></i> الأذكار
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'duas_page' %}active{% endif %}" href="{% url 'prayer_times:duas_page' %}">
-                    <i class="fas fa-book-open me-1"></i> {% translate "الأدعية" %}
+                    <i class="fas fa-book-open me-1"></i> الأدعية
                 </a>
             </li>
             <li class="nav-item"> {# <--- رابط جديد للأحاديث #}
                 <a class="nav-link {% if request.resolver_match.url_name == 'hadith_page' %}active{% endif %}" href="{% url 'prayer_times:hadith_page' %}">
-                    <i class="fas fa-book me-1"></i> {% translate "الأحاديث" %}
+                    <i class="fas fa-book me-1"></i> الأحاديث
                 </a>
             </li>
         </ul>

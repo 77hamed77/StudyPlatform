@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %}
 
-{% block title %}{% translate "مرحباً بك في المنصة المساعدة للدراسة" %} - {{ block.super }}{% endblock %}
+
+{% block title %}"مرحباً بك في المنصة المساعدة للدراسة"- {{ block.super }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -302,27 +302,27 @@
             
             <!-- Main Title -->
             <h1 class="display-3 fw-bold mb-3 animate-slide-up animate-delay-1">
-                {% translate "المنصة المساعدة" %}
+                المنصة المساعدة
                 <span class="d-block gradient-text">
-                    {% translate "للدراسة" %}
+                للدراسة
                 </span>
             </h1>
             
             <!-- Subtitle -->
             <p class="lead mx-auto mb-5 animate-slide-up animate-delay-2" style="max-width: 700px;">
-                {% translate "مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة." %}
-                <span class="d-block mt-2 text-warning">{% translate "انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!" %}</span>
+                مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة.
+                <span class="d-block mt-2 text-warning">انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!</span>
             </p>
             
             <!-- CTA Buttons -->
             <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 animate-slide-up animate-delay-3">
                 <a href="{% url 'core:signup' %}" class="btn btn-hero-primary">
                     <i class="fas fa-user-plus me-2"></i>
-                    {% translate "أنشئ حساباً مجانياً" %}
+                    أنشئ حساباً مجانياً
                 </a>
                 <a href="{% url 'login' %}" class="btn btn-hero-secondary">
                     <i class="fas fa-sign-in-alt me-2"></i>
-                    {% translate "تسجيل الدخول" %}
+                    تسجيل الدخول
                 </a>
             </div>
         </div>
@@ -338,11 +338,11 @@
             <!-- Section Header -->
             <div class="text-center mb-5 animate-slide-up">
                 <h2 class="display-4 fw-bold mb-3">
-                    {% translate "ميزات المنصة" %}
+                    ميزات المنصة
                 </h2>
                 <div class="w-25 mx-auto mb-4" style="height: 5px; background: linear-gradient(90deg, #007bff, #6f42c1);"></div>
                 <p class="lead text-muted mx-auto" style="max-width: 600px;">
-                    {% translate "اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية" %}
+                    اكتشف كيف يمكن لمنصتنا مساعدتك في تحقيق أهدافك الدراسية
                 </p>
             </div>
             
@@ -355,10 +355,10 @@
                             <i class="fas fa-folder-open"></i>
                         </div>
                         <h3 class="fs-4 fw-bold mb-3">
-                            {% translate "مكتبة ملفات شاملة" %}
+                            مكتبة ملفات شاملة
                         </h3>
                         <p class="text-muted lh-base">
-                            {% translate "وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد" %}
+                            وصول سهل ومنظم لجميع محاضراتك وملخصاتك الدراسية في مكان واحد
                         </p>
                     </div>
                 </div>
@@ -370,10 +370,10 @@
                             <i class="fas fa-bullhorn"></i>
                         </div>
                         <h3 class="fs-4 fw-bold mb-3">
-                            {% translate "أخبار وإعلانات فورية" %}
+                            أخبار وإعلانات فورية
                         </h3>
                         <p class="text-muted lh-base">
-                            {% translate "كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة" %}
+                            كن على اطلاع دائم بآخر مواعيد الامتحانات، الفعاليات، والإعلانات الهامة
                         </p>
                     </div>
                 </div>
@@ -385,10 +385,10 @@
                             <i class="fas fa-tasks"></i>
                         </div>
                         <h3 class="fs-4 fw-bold mb-3">
-                            {% translate "إدارة مهام ذكية" %}
+                            إدارة مهام ذكية
                         </h3>
                         <p class="text-muted lh-base">
-                            {% translate "نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة" %}
+                            نظم مهامك الدراسية، اضبط مؤقتات التركيز، وحقق أهدافك بكفاءة
                         </p>
                     </div>
                 </div>
@@ -411,16 +411,16 @@
                 </div>
                 
                 <h2 class="display-4 fw-bold mb-3 animate-slide-up animate-delay-2">
-                    {% translate "جاهز لتبدأ رحلتك نحو النجاح؟" %}
+                    جاهز لتبدأ رحلتك نحو النجاح؟
                 </h2>
                 
                 <p class="lead text-white-75 mb-5 lh-base animate-slide-up animate-delay-3">
-                    {% translate "انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة" %}
+                    انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة
                 </p>
                 
                 <a href="{% url 'core:dashboard' %}" class="btn btn-cta-accent pulse-slow animate-slide-up animate-delay-4">
                     <i class="fas fa-play me-2"></i>
-                    {% translate "ابـدأ الآن!" %}
+                    ابـدأ الآن!
                 </a>
             </div>
         </div>

@@ -1,5 +1,5 @@
 {% load static %}
-{% load i18n %}
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -165,7 +165,7 @@
                                                         <div class="flex-grow-1">
                                                             <p class="mb-0 fw-bold">{{ notification_item_nav.verb }}</p>
                                                             <small class="text-muted">{{ notification_item_nav.description|truncatechars:60 }}</small><br>
-                                                            <small class="text-secondary">{{ notification_item_nav.timestamp|timesince }} {% translate "مضت" %}</small>
+                                                            <small class="text-secondary">{{ notification_item_nav.timestamp|timesince }} مضت</small>
                                                         </div>
                                                         {% if notification_item_nav.unread %}
                                                             <span class="badge bg-primary rounded-circle p-1 ms-2"></span>

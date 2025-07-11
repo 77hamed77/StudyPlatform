@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %}
-{% block title %}{% translate "الأذكار" %} - {{ block.super }}{% endblock %}
+
+{% block title %}الأذكار - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -111,8 +111,8 @@
 
     <div class="adhkar-container">
         <div class="adhkar-header">
-            <h2><i class="fas fa-hands-praying me-2"></i> {% translate "الأذكار" %}</h2>
-            <p class="text-muted">{% translate "مجموعة من الأذكار اليومية للمسلم." %}</p>
+            <h2><i class="fas fa-hands-praying me-2"></i> الأذكار</h2>
+            <p class="text-muted">مجموعة من الأذكار اليومية للمسلم.</p>
         </div>
 
         {% if adhkar_data %}
@@ -131,13 +131,13 @@
                 <div class="dhikr-item">
                     <p class="dhikr-text">{{ dhikr.arabic }}</p>
                     {% if dhikr.translation %}
-                        <p class="dhikr-description">{% translate "المعنى" %}: {{ dhikr.translation }}</p>
+                        <p class="dhikr-description">المعنى: {{ dhikr.translation }}</p>
                     {% endif %}
                     {% if dhikr.count %}
-                        <p class="dhikr-count">{% translate "العدد" %}: {{ dhikr.count }}</p>
+                        <p class="dhikr-count">العدد: {{ dhikr.count }}</p>
                     {% endif %}
                     {% if dhikr.reference %}
-                        <p class="dhikr-reference">{% translate "المرجع" %}: {{ dhikr.reference }}</p>
+                        <p class="dhikr-reference">المرجع: {{ dhikr.reference }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -145,8 +145,8 @@
             {% endfor %}
         {% else %}
             <div class="alert alert-info mt-4">
-                <p>{% translate "تعذر جلب الأذكار حالياً." %}</p>
-                <p>{% translate "يرجى المحاولة لاحقاً." %}</p>
+                <p>تعذر جلب الأذكار حالياً.</p>
+                <p>يرجى المحاولة لاحقاً.</p>
             </div>
         {% endif %}
     </div>

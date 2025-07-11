@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %}
 
-{% block title %}{% translate "أوقات الصلاة" %} - {{ block.super }}{% endblock %}
+
+{% block title %}أوقات الصلاة - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -249,15 +249,17 @@
 
 {% block content %}
 <div class="prayer-times-container">
+    {% include "prayer_times/partials/islamic_resources_nav.html" %}
+
     <div class="prayer-header">
-        <h2><i class="fas fa-mosque"></i> {% translate "أوقات الصلاة" %}</h2>
-        <p>{% translate "لـ" %} {{ location.name }} - {% translate "المنطقة الزمنية" %}: {{ location.timezone }}</p>
+        <h2><i class="fas fa-mosque"></i> أوقات الصلاة</h2>
+        <p>لـ {{ location.name }} - المنطقة الزمنية: {{ location.timezone }}</p>
     </div>
 
     <div class="date-navigation">
-        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ prev_day|date:'Y-m-d' }}" class="btn btn-outline-primary">{% translate "اليوم السابق" %}</a>
+        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ prev_day|date:'Y-m-d' }}" class="btn btn-outline-primary">اليوم السابق</a>
         <span class="date-display">{{ current_date|date:"l, d F Y" }}</span>
-        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ next_day|date:'Y-m-d' }}" class="btn btn-outline-primary">{% translate "اليوم التالي" %}</a>
+        <a href="{% url 'prayer_times:prayer_times_list' %}?date={{ next_day|date:'Y-m-d' }}" class="btn btn-outline-primary">اليوم التالي</a>
     </div>
 
     {% if prayer_times %}
@@ -276,41 +278,41 @@
             {% endif %}
         {% endfor %}
     </ul>
-    <p id="next-prayer-countdown">{% translate "جاري حساب الصلاة التالية..." %}</p>
+    <p id="next-prayer-countdown">جاري حساب الصلاة التالية...</p>
     {% else %}
     <div class="alert-message">
-        <p>{% translate "تعذر جلب أوقات الصلاة لهذا التاريخ والموقع." %}</p>
-        <p>{% translate "يرجى التأكد من اتصالك بالإنترنت أو محاولة تحديث الصفحة." %}</p>
+        <p>تعذر جلب أوقات الصلاة لهذا التاريخ والموقع.</p>
+        <p>يرجى التأكد من اتصالك بالإنترنت أو محاولة تحديث الصفحة.</p>
     </div>
     {% endif %}
 
     <!-- إعداد التذكير -->
     <div class="reminder-settings-section">
-        <h4><i class="fas fa-bell"></i> {% translate "إعداد التذكير بالصلاة" %}</h4>
+        <h4><i class="fas fa-bell"></i> إعداد التذكير بالصلاة</h4>
         <form method="post" action="{% url 'prayer_times:prayer_times_list' %}{% if request.GET.date %}?date={{ request.GET.date }}{% endif %}">
             {% csrf_token %}
             <div class="row g-3 align-items-end">
                 <div class="col-md-6">
-                    <label for="notification_time_before" class="form-label">{% translate "التذكير قبل الصلاة (بالدقائق):" %}</label>
+                    <label for="notification_time_before" class="form-label">التذكير قبل الصلاة (بالدقائق):</label>
                     <input type="number" name="notification_time_before" id="notification_time_before" class="form-control" value="{{ reminder_setting.notification_time_before|default:'5' }}" min="0" max="60" step="1">
-                    <div class="form-text text-muted">{% translate "كم دقيقة قبل وقت الصلاة ترغب في تلقي التذكير؟ (0 لعدم التذكير المسبق)." %}</div>
+                    <div class="form-text text-muted">كم دقيقة قبل وقت الصلاة ترغب في تلقي التذكير؟ (0 لعدم التذكير المسبق).</div>
                 </div>
                 <div class="col-md-6">
-                    <label for="enable_notifications" class="form-label">{% translate "تفعيل/تعطيل التذكيرات الصوتية:" %}</label>
+                    <label for="enable_notifications" class="form-label">تفعيل/تعطيل التذكيرات الصوتية:</label>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="enable_notifications" name="enable_notifications" {% if reminder_setting.enabled %}checked{% endif %}>
-                        <label class="form-check-label" for="enable_notifications">{% translate "تفعيل التذكيرات" %}</label>
+                        <label class="form-check-label" for="enable_notifications">تفعيل التذكيرات</label>
                     </div>
-                    <div class="form-text text-muted">{% translate "تفعيل هذا الخيار سيسمح بتشغيل صوت الأذان عند وقت الصلاة." %}</div>
+                    <div class="form-text text-muted">تفعيل هذا الخيار سيسمح بتشغيل صوت الأذان عند وقت الصلاة.</div>
                 </div>
                 <div class="col-12 text-center mt-4">
-                    <button type="submit" class="btn btn-primary">{% translate "حفظ إعدادات التذكير" %}</button>
+                    <button type="submit" class="btn btn-primary">حفظ إعدادات التذكير</button>
                 </div>
             </div>
         </form>
         <p class="mt-3 text-muted text-center">
-            {% translate "ملاحظة: التذكيرات الصوتية تعمل فقط عندما تكون هذه الصفحة مفتوحة في المتصفح." %}
-            {% translate "قد تحتاج إلى منح إذن للمتصفح لتشغيل الصوت." %}
+            ملاحظة: التذكيرات الصوتية تعمل فقط عندما تكون هذه الصفحة مفتوحة في المتصفح.
+            قد تحتاج إلى منح إذن للمتصفح لتشغيل الصوت.
         </p>
     </div>
 </div>
@@ -331,14 +333,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get Arabic prayer names from a hidden element or directly in JS if not passed
     // For now, hardcode if not passed explicitly, or ensure it's in context
     const prayerNamesArabic = {
-        'fajr': '{% translate "الفجر" %}',
-        'sunrise': '{% translate "الشروق" %}',
-        'dhuhr': '{% translate "الظهر" %}',
-        'asr': '{% translate "العصر" %}',
-        'maghrib': '{% translate "المغرب" %}',
-        'isha': '{% translate "العشاء" %}',
-        'imsak': '{% translate "الإمساك" %}',
-        'midnight': '{% translate "منتصف الليل" %}',
+        'fajr': 'الفجر',
+        'sunrise': 'الشروق',
+        'dhuhr': 'الظهر',
+        'asr': 'العصر',
+        'maghrib': 'المغرب',
+        'isha': 'العشاء',
+        'imsak': 'الإمساك',
+        'midnight': 'منتصف الليل',
     };
 
     const locationTimezone = "{{ location.timezone }}";
@@ -404,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!nextPrayer) {
-            nextPrayerCountdownElement.textContent = "{% translate 'جميع صلوات هذا اليوم قد انقضت.' %}";
+            nextPrayerCountdownElement.textContent = "جميع صلوات هذا اليوم قد انقضت.";
             if (adhanTimeout) clearTimeout(adhanTimeout);
             if (prePrayerReminderTimeout) clearTimeout(prePrayerReminderTimeout);
             return;
@@ -419,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        nextPrayerCountdownElement.innerHTML = `{% translate "الصلاة القادمة" %}: ${nextPrayerNameArabic} {% translate "في" %} ${nextPrayerTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}<br>{% translate "العد التنازلي" %}: ${hours}h ${minutes}m ${seconds}s`;
+        nextPrayerCountdownElement.innerHTML = `الصلاة القادمة: ${nextPrayerNameArabic} في ${nextPrayerTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}<br>العد التنازلي: ${hours}h ${minutes}m ${seconds}s`;
 
         // Set Adhan reminder
         if (adhanTimeout) clearTimeout(adhanTimeout);
@@ -445,15 +447,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     prePrayerReminderTimeout = setTimeout(() => {
                         console.log(`Reminder: ${minutesBefore} minutes until ${nextPrayerNameArabic}`);
                         if (Notification.permission === "granted") {
-                            new Notification(`{% translate "تذكير بالصلاة" %}`, {
-                                body: `{% translate "تبقى" %} ${minutesBefore} {% translate "دقيقة على صلاة" %} ${nextPrayerNameArabic}.`,
+                            new Notification(`تذكير بالصلاة`, {
+                                body: `تبقى ${minutesBefore} دقيقة على صلاة ${nextPrayerNameArabic}.`,
                                 icon: "{% static 'img/logo.png' %}"
                             });
                         } else if (Notification.permission !== "denied") {
                             Notification.requestPermission().then(permission => {
                                 if (permission === "granted") {
-                                    new Notification(`{% translate "تذكير بالصلاة" %}`, {
-                                        body: `{% translate "تبقى" %} ${minutesBefore} {% translate "دقيقة على صلاة" %} ${nextPrayerNameArabic}.`,
+                                    new Notification(`تذكير بالصلاة`, {
+                                        body: `تبقى ${minutesBefore} دقيقة على صلاة ${nextPrayerNameArabic}.`,
                                         icon: "{% static 'img/logo.png' %}"
                                     });
                                 }
@@ -470,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
         countdownInterval = setInterval(updatePrayerTimesDisplay, 1000);
         updatePrayerTimesDisplay(); // Initial call
     } else {
-        nextPrayerCountdownElement.textContent = "{% translate 'تعذر جلب أوقات الصلاة.' %}";
+        nextPrayerCountdownElement.textContent = "تعذر جلب أوقات الصلاة.";
     }
 
     // Request Notification permission
