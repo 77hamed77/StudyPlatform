@@ -124,7 +124,7 @@ class PrayerTimesView(LoginRequiredMixin, View):
             
             target_date_str = request.GET.get('date', timezone.now().strftime('%Y-%m-%d'))
             return redirect(f"{request.path}?date={target_date_str}")
-        
+            
         return redirect(request.path)
 
     def _fetch_prayer_times_from_api(self, location, target_date, method):
@@ -430,7 +430,7 @@ class AdhkarView(LoginRequiredMixin, TemplateView):
 
         adhkar_files = {
             _("أذكار الصباح"): "morning.json",
-            _("أذكار المساء"): "evening.json",
+            _("أذكار المساء"): "evening.json", # تم التصحيح هنا ليتوقع evening.json
             _("أذكار الصلاة"): "athkar_alsalah.json",
             _("أذكار من القرآن"): "athkar_from_qurain.json",
             # أضف هنا أي ملفات أخرى للأذكار التي تريد تضمينها
@@ -473,7 +473,7 @@ class DuasView(LoginRequiredMixin, TemplateView):
         data_dir = os.path.join(settings.BASE_DIR, 'prayer_times', 'static', 'prayer_times', 'data')
         
         duas_files = {
-            _("أدعية عامة"): "adiah.json", # <--- تم التعديل ليظهر adiah.json فقط
+            _("أدعية عامة"): "adiah.json",
         }
 
         all_duas_data = []
@@ -537,4 +537,3 @@ class HadithView(LoginRequiredMixin, TemplateView):
         context['hadith_data'] = hadith_data
         context['page_title'] = _("الأربعون النووية") # عنوان للصفحة
         return context
-
