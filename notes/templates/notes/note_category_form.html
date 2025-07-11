@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %} {# إذا كنت تستخدمه، أو احذفه إذا لم تكن تستخدم crispy-forms نهائيًا #}
-
+{% load i18n %}
 {% block title %}{% if form.instance.pk %}تعديل التصنيف{% else %}إنشاء تصنيف جديد{% endif %} - {{ block.super }}{% endblock %}
 
 {% block content %}

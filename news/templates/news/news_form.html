@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %} {# إذا كنت تستخدمه لعرض النموذج الرئيسي #}
 {% load news_extras %}      {# *** تم إضافة هذا السطر *** #}
+{% load i18n %}
 
 {% block title %}{{ page_title|default:"إدارة الأخبار" }} - {{ block.super }}{% endblock %}
 
