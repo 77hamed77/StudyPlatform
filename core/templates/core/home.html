@@ -6,19 +6,30 @@
 
 {% block extra_head %}
 {{ block.super }}
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-    /* Custom styles for the landing page, integrated with existing theme variables */
-    body { font-family: 'Cairo', sans-serif; }
+    /* Global Font and Base Styles */
+    body { 
+        font-family: 'Cairo', sans-serif; 
+        color: var(--text-color, #333); /* Ensure text color adapts to theme */
+    }
+    body.dark-mode {
+        color: var(--dark-text-color, #e0e0e0);
+    }
 
-    /* Hero Section Background */
+    /* Hero Section Background & Overlays */
     .hero-bg {
-        background: var(--hero-gradient-light, linear-gradient(135deg, #3a2f01ff 0%, #252d6eff 100%));
+        background: var(--hero-gradient-light, linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)); /* Vibrant blue-purple gradient */
         position: relative;
         overflow: hidden;
+        min-height: 100vh; /* Ensure it covers full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 0; /* Add some padding for content */
     }
     body.dark-mode .hero-bg {
-        background: var(--hero-gradient-dark, linear-gradient(135deg, #1e293b 0%, #334155 100%));
+        background: var(--hero-gradient-dark, linear-gradient(135deg, #1f1c2c 0%, #928dab 100%)); /* Darker, sophisticated gradient */
     }
     .hero-bg::before {
         content: '';
@@ -27,81 +38,174 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23ffffff05" points="0,0 1000,300 1000,1000 0,700"/></svg>');
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon fill="%23ffffff05" points="0,0 100,20 100,100 0,80"/><polygon fill="%23ffffff03" points="0,20 100,0 100,80 0,100"/></svg>'); /* More subtle geometric pattern */
         background-size: cover;
-        opacity: 0.1; /* Adjust opacity for better visibility */
+        opacity: 0.15; /* Slightly more visible */
+        z-index: 0; /* Ensure it's behind content */
     }
 
-    /* Floating Card Animation */
-    .floating-card {
+    /* Floating Icon Animation */
+    .floating-icon-wrapper {
         animation: float 6s ease-in-out infinite;
+        z-index: 1;
     }
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
+        50% { transform: translateY(-15px); } /* Slightly less dramatic float */
+    }
+    .floating-icon {
+        width: 80px; /* Slightly smaller */
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2); /* Lighter glass effect */
+        backdrop-filter: blur(8px); /* Softer blur */
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* More pronounced shadow */
+        transition: all 0.3s ease;
+    }
+    .floating-icon i {
+        color: white;
+        font-size: 2.5rem; /* Slightly smaller icon */
     }
 
-    /* Gradient Text */
+    /* Gradient Text for Titles */
     .gradient-text {
-        background: var(--gradient-text-light, linear-gradient(45deg, #667eea, #764ba2));
+        background: var(--gradient-text-light, linear-gradient(45deg, #ff7e5f, #feb47b)); /* Warm, inviting gradient */
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        display: inline-block; /* Ensure gradient applies correctly */
     }
     body.dark-mode .gradient-text {
-        background: var(--gradient-text-dark, linear-gradient(45deg, #e4c975, #f0e68c)); /* Adjusted for dark mode */
+        background: var(--gradient-text-dark, linear-gradient(45deg, #a1c4fd, #c2e9fb)); /* Cool, vibrant gradient for dark mode */
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
 
-    /* Glass Card Effect */
-    .glass-card {
-        background: var(--glass-card-bg-light, rgba(255, 255, 255, 0.1));
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--glass-card-border-light, rgba(255, 255, 255, 0.2));
+    /* CTA Buttons */
+    .btn-hero-primary {
+        background: linear-gradient(to right, #00c6ff, #0072ff); /* Bright blue gradient */
+        border: none;
+        color: white;
+        padding: 15px 35px;
+        border-radius: 30px; /* Slightly less rounded */
+        font-weight: 700; /* Bolder font */
+        font-size: 1.15rem;
+        box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+        transition: all 0.3s ease;
+        text-decoration: none; /* Ensure no underline */
     }
-    body.dark-mode .glass-card {
-        background: var(--glass-card-bg-dark, rgba(30, 41, 59, 0.3));
-        border: 1px solid var(--glass-card-border-dark, rgba(255, 255, 255, 0.1));
+    .btn-hero-primary:hover {
+        transform: translateY(-3px); /* Subtle lift */
+        box-shadow: 0 8px 25px rgba(0, 114, 255, 0.6);
+        color: white;
     }
 
-    /* Feature Card Hover Effect */
-    .feature-card {
+    .btn-hero-secondary {
+        background: rgba(255, 255, 255, 0.15); /* More transparent */
+        border: 1px solid rgba(255, 255, 255, 0.4); /* Stronger border */
+        color: white;
+        padding: 15px 35px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1.15rem;
+        backdrop-filter: blur(5px);
         transition: all 0.3s ease;
-        background-color: var(--card-bg, #fff); /* Use existing card background */
-        border: 1px solid var(--border-color, #eee); /* Use existing border color */
-        box-shadow: var(--shadow-sm, 0 .125rem .25rem rgba(0,0,0,.075));
+        text-decoration: none;
     }
-    .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: var(--shadow-lg, 0 1rem 3rem rgba(0,0,0,.175)); /* Use Bootstrap shadow */
+    .btn-hero-secondary:hover {
+        background: rgba(255, 255, 255, 0.25); /* More opaque on hover */
+        transform: translateY(-3px);
+        color: white;
+    }
+
+    /* Feature Cards */
+    .features-section {
+        background-color: var(--body-bg, #f8f9fa); /* Use theme background */
+        padding: 80px 0;
+    }
+    body.dark-mode .features-section {
+        background-color: var(--dark-body-bg, #1a202c);
+    }
+    .feature-card {
+        background-color: var(--card-bg, #fff);
+        border: none; /* Remove default border, rely on shadow */
+        border-radius: 15px; /* More rounded corners */
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08); /* Softer, larger shadow */
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
+        padding: 30px; /* More internal padding */
+        text-align: center;
     }
     body.dark-mode .feature-card {
-        background-color: var(--dark-card-bg, #1d2c3b);
-        border-color: var(--dark-border-color, #3b4d66);
+        background-color: var(--dark-card-bg, #2d3748);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02); /* Lift and slightly enlarge */
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15); /* More prominent shadow on hover */
     }
     body.dark-mode .feature-card:hover {
-        background-color: var(--dark-hover-bg, #293b54);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,0.3);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.4);
     }
 
-    /* Pulse Animation */
-    .pulse-slow {
-        animation: pulse 3s infinite;
+    .feature-icon-wrapper {
+        width: 70px; /* Consistent icon size */
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px auto; /* Center and space below */
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+    .feature-icon-wrapper i {
+        color: white;
+        font-size: 2.2rem;
     }
 
-    /* Slide In Up Animation */
+    /* Specific Feature Icon Gradients */
+    .feature-icon-primary { background: linear-gradient(to bottom right, #007bff, #0056b3); }
+    .feature-icon-success { background: linear-gradient(to bottom right, #28a745, #1e7e34); }
+    .feature-icon-purple { background: linear-gradient(to bottom right, #6f42c1, #563d7c); }
+    /* Add more specific gradients if needed for other features */
+
+    /* CTA Section (Bottom) */
+    .cta-section {
+        background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%); /* Emerald green gradient */
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    body.dark-mode .cta-section {
+        background: linear-gradient(135deg, #0f4c5c 0%, #00334e 100%); /* Darker teal for dark mode */
+    }
+    .btn-cta-accent {
+        background: white;
+        color: #1abc9c; /* Emerald color */
+        padding: 18px 40px; /* Larger padding */
+        border-radius: 35px; /* More rounded */
+        font-weight: 800; /* Extra bold */
+        font-size: 1.3rem;
+        box-shadow: 0 8px 25px rgba(26, 188, 156, 0.3);
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-cta-accent:hover {
+        transform: scale(1.03) translateY(-3px); /* Scale and lift */
+        box-shadow: 0 12px 35px rgba(26, 188, 156, 0.5);
+        color: #1abc9c;
+    }
+
+    /* Animations */
     .animate-slide-up {
-        opacity: 0; /* Start invisible */
+        opacity: 0;
         transform: translateY(30px);
     }
-    .animate-slide-up.visible { /* Class added by JS when in view */
+    .animate-slide-up.visible {
         animation: slideInUp 0.8s ease-out forwards;
     }
     @keyframes slideInUp {
@@ -111,65 +215,42 @@
     .animate-delay-1 { animation-delay: 0.2s; }
     .animate-delay-2 { animation-delay: 0.4s; }
     .animate-delay-3 { animation-delay: 0.6s; }
+    .animate-delay-4 { animation-delay: 0.8s; }
+    .animate-delay-5 { animation-delay: 1.0s; }
 
-    /* Bootstrap overrides for consistency */
-    .btn-custom-primary {
-        background: linear-gradient(to right, #28a745, #007bff); /* Green to Blue */
-        border: none;
-        color: white;
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-        transition: all 0.3s ease;
-    }
-    .btn-custom-primary:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
-        color: white; /* Ensure text color remains white on hover */
-    }
-
-    .btn-custom-secondary {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        backdrop-filter: blur(5px);
-        transition: all 0.3s ease;
-    }
-    .btn-custom-secondary:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.05);
-        color: white; /* Ensure text color remains white on hover */
-    }
-
-    .btn-custom-accent {
-        background: white;
-        color: #1abc9c; /* Emerald color */
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.2rem;
-        box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
-        transition: all 0.3s ease;
-    }
-    .btn-custom-accent:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(26, 188, 156, 0.5);
-        color: #1abc9c;
-    }
-
-    /* Responsive adjustments for smaller screens */
-    @media (max-width: 576px) {
-        .hero-section h1 {
-            font-size: 3rem;
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .hero-bg {
+            padding: 60px 0;
         }
-        .hero-section p {
+        .hero-bg h1 {
+            font-size: 2.8rem; /* Smaller on tablets */
+        }
+        .hero-bg p {
+            font-size: 1.1rem;
+        }
+        .btn-hero-primary, .btn-hero-secondary {
+            padding: 12px 25px;
             font-size: 1rem;
+        }
+        .feature-card {
+            padding: 25px;
+        }
+        .cta-section h2 {
+            font-size: 2.5rem;
+        }
+        .btn-cta-accent {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-bg h1 {
+            font-size: 2.2rem; /* Even smaller on mobile */
+        }
+        .hero-bg p {
+            font-size: 0.95rem;
         }
         .btn-group-vertical {
             flex-direction: column;
@@ -178,6 +259,31 @@
         .btn-group-vertical .btn {
             width: 100%;
         }
+        .floating-icon {
+            width: 70px;
+            height: 70px;
+        }
+        .floating-icon i {
+            font-size: 2rem;
+        }
+        .feature-card {
+            padding: 20px;
+        }
+        .feature-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+        .feature-icon-wrapper i {
+            font-size: 1.8rem;
+        }
+        .cta-section h2 {
+            font-size: 2rem;
+        }
+        .btn-cta-accent {
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
     }
 </style>
 {% endblock %}
@@ -185,17 +291,17 @@
 {% block content %}
 <main>
     <!-- Hero Section -->
-    <section class="hero-bg min-vh-100 d-flex align-items-center justify-content-center position-relative">
-        <div class="container text-center position-relative z-1">
+    <section class="hero-bg text-white d-flex align-items-center justify-content-center position-relative">
+        <div class="container text-center position-relative z-1 py-5">
             <!-- Floating Icon -->
-            <div class="floating-card mb-4">
-                <div class="d-flex align-items-center justify-content-center mx-auto bg-white bg-opacity-25 rounded-circle glass-card" style="width: 96px; height: 96px;">
-                    <i class="fas fa-graduation-cap text-white fs-1"></i>
+            <div class="floating-icon-wrapper mb-4 animate-slide-up">
+                <div class="floating-icon">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
             </div>
             
             <!-- Main Title -->
-            <h1 class="display-3 fw-bold text-white mb-3 animate-slide-up">
+            <h1 class="display-3 fw-bold mb-3 animate-slide-up animate-delay-1">
                 {% translate "المنصة المساعدة" %}
                 <span class="d-block gradient-text">
                     {% translate "للدراسة" %}
@@ -203,35 +309,35 @@
             </h1>
             
             <!-- Subtitle -->
-            <p class="lead text-white-75 mx-auto mb-5 animate-slide-up animate-delay-1" style="max-width: 700px;">
+            <p class="lead mx-auto mb-5 animate-slide-up animate-delay-2" style="max-width: 700px;">
                 {% translate "مكانك المتكامل لتنظيم دراستك، الوصول للملفات، متابعة الأخبار، وإدارة مهامك بكفاءة." %}
                 <span class="d-block mt-2 text-warning">{% translate "انضم إلينا الآن وابدأ رحلتك نحو التفوق الأكاديمي!" %}</span>
             </p>
             
             <!-- CTA Buttons -->
-            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 animate-slide-up animate-delay-2">
-                <a href="{% url 'core:signup' %}" class="btn btn-custom-primary">
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 animate-slide-up animate-delay-3">
+                <a href="{% url 'core:signup' %}" class="btn btn-hero-primary">
                     <i class="fas fa-user-plus me-2"></i>
                     {% translate "أنشئ حساباً مجانياً" %}
                 </a>
-                <a href="{% url 'login' %}" class="btn btn-custom-secondary">
+                <a href="{% url 'login' %}" class="btn btn-hero-secondary">
                     <i class="fas fa-sign-in-alt me-2"></i>
                     {% translate "تسجيل الدخول" %}
                 </a>
             </div>
         </div>
         
-        <!-- Background Decorations -->
-        <div class="position-absolute top-25 end-25 w-75 h-75 bg-white bg-opacity-5 rounded-circle blur-3"></div>
-        <div class="position-absolute bottom-25 start-25 w-100 h-100 bg-info bg-opacity-10 rounded-circle blur-3"></div>
+        <!-- Background Decorations - subtle, abstract shapes -->
+        <div class="position-absolute top-0 start-0 w-50 h-50 bg-white bg-opacity-5 rounded-circle blur-3" style="transform: translate(-30%, -30%);"></div>
+        <div class="position-absolute bottom-0 end-0 w-75 h-75 bg-info bg-opacity-10 rounded-circle blur-3" style="transform: translate(30%, 30%);"></div>
     </section>
 
     <!-- Features Section -->
-    <section class="py-5 bg-white text-dark position-relative overflow-hidden">
+    <section class="features-section text-dark position-relative overflow-hidden">
         <div class="container">
             <!-- Section Header -->
-            <div class="text-center mb-5">
-                <h2 class="display-4 fw-bold text-dark mb-3">
+            <div class="text-center mb-5 animate-slide-up">
+                <h2 class="display-4 fw-bold mb-3">
                     {% translate "ميزات المنصة" %}
                 </h2>
                 <div class="w-25 mx-auto mb-4" style="height: 5px; background: linear-gradient(90deg, #007bff, #6f42c1);"></div>
@@ -244,11 +350,11 @@
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <!-- Feature 1 -->
                 <div class="col">
-                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up">
-                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-primary rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #007bff, #0056b3) !important;">
-                            <i class="fas fa-folder-open text-white fs-3"></i>
+                    <div class="feature-card animate-slide-up animate-delay-1">
+                        <div class="feature-icon-wrapper feature-icon-primary">
+                            <i class="fas fa-folder-open"></i>
                         </div>
-                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                        <h3 class="fs-4 fw-bold mb-3">
                             {% translate "مكتبة ملفات شاملة" %}
                         </h3>
                         <p class="text-muted lh-base">
@@ -259,11 +365,11 @@
                 
                 <!-- Feature 2 -->
                 <div class="col">
-                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up animate-delay-1">
-                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-success rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #28a745, #1e7e34) !important;">
-                            <i class="fas fa-bullhorn text-white fs-3"></i>
+                    <div class="feature-card animate-slide-up animate-delay-2">
+                        <div class="feature-icon-wrapper feature-icon-success">
+                            <i class="fas fa-bullhorn"></i>
                         </div>
-                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                        <h3 class="fs-4 fw-bold mb-3">
                             {% translate "أخبار وإعلانات فورية" %}
                         </h3>
                         <p class="text-muted lh-base">
@@ -274,11 +380,11 @@
                 
                 <!-- Feature 3 -->
                 <div class="col">
-                    <div class="feature-card p-4 rounded-3 shadow text-center animate-slide-up animate-delay-2">
-                        <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-purple rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(to bottom right, #6f42c1, #563d7c) !important;">
-                            <i class="fas fa-tasks text-white fs-3"></i>
+                    <div class="feature-card animate-slide-up animate-delay-3">
+                        <div class="feature-icon-wrapper feature-icon-purple">
+                            <i class="fas fa-tasks"></i>
                         </div>
-                        <h3 class="fs-4 fw-bold text-dark mb-3">
+                        <h3 class="fs-4 fw-bold mb-3">
                             {% translate "إدارة مهام ذكية" %}
                         </h3>
                         <p class="text-muted lh-base">
@@ -295,22 +401,24 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-5 bg-gradient-to-r from-emerald-400 to-cyan-400 position-relative overflow-hidden">
-        <div class="container text-center position-relative z-1">
+    <section class="cta-section text-white position-relative overflow-hidden">
+        <div class="container text-center position-relative z-1 py-5">
             <div class="mx-auto" style="max-width: 700px;">
-                <div class="d-flex align-items-center justify-content-center mx-auto mb-4 bg-white bg-opacity-25 rounded-circle floating-card" style="width: 80px; height: 80px;">
-                    <i class="fas fa-rocket text-white fs-3"></i>
+                <div class="floating-icon-wrapper mb-4 animate-slide-up animate-delay-1">
+                    <div class="floating-icon" style="background: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.5);">
+                        <i class="fas fa-rocket"></i>
+                    </div>
                 </div>
                 
-                <h2 class="display-4 fw-bold text-white mb-3">
+                <h2 class="display-4 fw-bold mb-3 animate-slide-up animate-delay-2">
                     {% translate "جاهز لتبدأ رحلتك نحو النجاح؟" %}
                 </h2>
                 
-                <p class="lead text-white-75 mb-5 lh-base">
+                <p class="lead text-white-75 mb-5 lh-base animate-slide-up animate-delay-3">
                     {% translate "انضم إلى زملائك في دفعتك واستفد من جميع موارد المنصة" %}
                 </p>
                 
-                <a href="{% url 'core:dashboard' %}" class="btn btn-custom-accent pulse-slow">
+                <a href="{% url 'core:dashboard' %}" class="btn btn-cta-accent pulse-slow animate-slide-up animate-delay-4">
                     <i class="fas fa-play me-2"></i>
                     {% translate "ابـدأ الآن!" %}
                 </a>
@@ -323,7 +431,7 @@
         <div class="position-absolute top-50 start-50 w-75 h-75 bg-white bg-opacity-5 rounded-circle blur-3" style="transform: translate(-50%, -50%);"></div>
     </section>
 </main>
-{% endblock content %} {# تم إضافة وسم الإغلاق هنا #}
+{% endblock content %}
 
 {% block extra_scripts %}
 {{ block.super }}
@@ -338,7 +446,8 @@
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible'); // Add 'visible' class
-                observer.unobserve(entry.target); // Stop observing once animated
+                // Optionally, stop observing once animated if you only want it to animate once
+                // observer.unobserve(entry.target); 
             }
         });
     }, observerOptions);
@@ -348,4 +457,4 @@
         observer.observe(el);
     });
 </script>
-{% endblock extra_scripts %} {# تم إضافة وسم الإغلاق هنا #}
+{% endblock extra_scripts %}
