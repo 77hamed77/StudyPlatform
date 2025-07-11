@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}إشعاراتي - {{ block.super }}{% endblock %}
 
@@ -107,6 +108,7 @@
         </div>
     {% endif %}
 </div>
+{% endblock content %} {# تم إضافة وسم الإغلاق هنا #}
 
 {% block extra_scripts %}
 {{ block.super }}
@@ -152,4 +154,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-{% endblock %}
+{% endblock extra_scripts %}
