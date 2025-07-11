@@ -1,22 +1,22 @@
 /* static/css/dark_mode.css */
 /* مطوّر ليحاكي هوية شام الجامعية في الوضع الليلي، ألوان غامقة، كحلي غني، حواف ناعمة، ظل واضح، ونصوص ذهبية/زرقاء */
 
-/* --- أساس المتغيرات اللونية --- */
+/* --- أساس المتغيرات اللونية (الوضع الليلي) --- */
 body.dark-mode {
     /* لوحة ألوان شام داكنة */
-    --su-primary: #20304a;       /* كحلي غامق أساسي */
-    --su-primary-dark: #131c2c;  /* أزرق كحلي داكن جدًا */
-    --su-accent: #e4c975;        /* ذهبي */
-    --su-accent-light: #3a2f1a;  /* ذهبي/بني داكن */
-    --su-secondary: #5b6f8e;     /* أزرق ثانوي غامق */
-    --su-bg: #161e2f;            /* خلفية عامة داكنة جدًا */
-    --su-card-bg: #222e43;       /* خلفية البطاقات */
+    --su-primary: #20304a;    /* كحلي غامق أساسي */
+    --su-primary-dark: #131c2c;   /* أزرق كحلي داكن جدًا */
+    --su-accent: #e4c975;     /* ذهبي */
+    --su-accent-light: #3a2f1a;   /* ذهبي/بني داكن */
+    --su-secondary: #5b6f8e;    /* أزرق ثانوي غامق */
+    --su-bg: #161e2f;             /* خلفية عامة داكنة جدًا */
+    --su-card-bg: #222e43;      /* خلفية البطاقات */
     --su-border: #32405a;        /* حدود داكنة ناعمة */
     --su-table-header-bg: #232f47; /* رأس الجدول */
     --su-table-row-hover: #1d263c; /* هوفر الجدول */
-    --su-link: #e4c975;          /* روابط ذهبية */
+    --su-link: #e4c975;           /* روابط ذهبية */
     --su-link-hover: #fff7c7;    /* روابط ذهبية فاتحة */
-    --su-success: #62c185;       /* أخضر فاتح */
+    --su-success: #62c185;      /* أخضر فاتح */
     --su-danger: #e87475;
     --su-warning: #eec75a;
     --su-info: #5db0e5;
@@ -24,6 +24,18 @@ body.dark-mode {
 
     /* خطوط */
     --custom-font: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* Bootstrap compatibility for custom palette in dark mode */
+    --bs-primary: var(--su-primary);
+    --bs-primary-rgb: 32, 48, 74; /* Updated RGB for dark primary */
+    --bs-secondary: var(--su-secondary);
+    --bs-success: var(--su-success);
+    --bs-danger: var(--su-danger);
+    --bs-warning: var(--su-warning);
+    --bs-info: var(--su-info);
+    --bs-light: #f8f9fa; /* Remains light for contrast */
+    --bs-dark: #232d3b; /* Remains dark for contrast */
+    --bs-white: #fff; /* Remains white for contrast */
 
     --text-color: #e2e5ee;
     --text-muted-color: #b1bdd1;
@@ -51,17 +63,17 @@ body.dark-mode {
     --hr-color: #35415b;
 
     /* --- Landing Page Specific Variables (Dark Mode) --- */
-    --hero-gradient-dark: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    --gradient-text-dark: linear-gradient(45deg, #e4c975, #f0e68c); /* Adjusted for dark mode */
-    --glass-card-bg-dark: rgba(30, 41, 59, 0.3);
-    --glass-card-border-dark: rgba(255, 255, 255, 0.1);
+    --hero-gradient-dark: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%); /* Corrected and completed */
+    --gradient-text-dark: linear-gradient(45deg, #a1c4fd, #c2e9fb); /* Updated to match new home.html */
+    --glass-card-bg-dark: rgba(30, 41, 59, 0.3); /* Updated to match new home.html */
+    --glass-card-border-dark: rgba(255, 255, 255, 0.1); /* Updated to match new home.html */
     --dark-card-bg: #1d2c3b; /* Re-using existing dark card bg */
     --dark-border-color: #3b4d66; /* Re-using existing dark border color */
     --dark-hover-bg: #293b54; /* Re-using existing dark hover bg */
 }
 
 body.dark-mode {
-    background-color: var(--body-bg) !important;
+    background-color: var(--body-bg); /* Removed !important */
     color: var(--text-color);
     font-family: var(--custom-font);
     transition: background 0.3s, color 0.3s;
@@ -78,15 +90,15 @@ body.dark-mode hr { border-top-color: var(--hr-color); }
 body.dark-mode .text-muted { color: var(--text-muted-color) !important; }
 
 body.dark-mode .navbar {
-    background: var(--navbar-bg) !important;
+    background: var(--navbar-bg); /* Removed !important */
     border-bottom: 1.5px solid var(--su-border);
     box-shadow: var(--shadow-sm);
 }
-body.dark-mode .navbar-brand { color: var(--navbar-brand-color) !important; }
-body.dark-mode .navbar-nav .nav-link { color: var(--navbar-link-color) !important; }
+body.dark-mode .navbar-brand { color: var(--navbar-brand-color); /* Removed !important */ }
+body.dark-mode .navbar-nav .nav-link { color: var(--navbar-link-color); /* Removed !important */ }
 body.dark-mode .navbar-nav .nav-link.active,
 body.dark-mode .navbar-nav .nav-link:hover,
-body.dark-mode .navbar-nav .nav-link:focus { color: var(--navbar-link-hover-color) !important; }
+body.dark-mode .navbar-nav .nav-link:focus { color: var(--navbar-link-hover-color); /* Removed !important */ }
 body.dark-mode .navbar-toggler {
     border-color: var(--su-accent);
     background: var(--card-header-bg);
@@ -115,6 +127,24 @@ body.dark-mode #theme-toggle-btn.btn-outline-light:hover {
     background: var(--su-accent);
     color: var(--su-primary-dark);
 }
+
+.light-mode-icon {
+    display: inline-block; /* Default to showing light icon */
+}
+
+.dark-mode-icon {
+    display: none; /* Default to hiding dark icon */
+}
+
+body.dark-mode .light-mode-icon {
+    display: none; /* Hide light icon in dark mode */
+}
+
+body.dark-mode .dark-mode-icon {
+    display: inline-block; /* Show dark icon in dark mode */
+    color: var(--su-accent); /* Ensure icon color is right */
+}
+
 
 /* --- البطاقات والقوائم --- */
 body.dark-mode .card {
@@ -307,7 +337,11 @@ body.dark-mode ::-webkit-scrollbar-thumb { background: #2d3950; border-radius: 5
 
 /* --- Landing Page Specific Styles (Dark Mode) --- */
 body.dark-mode .hero-bg {
-    background: var(--hero-gradient-dark);
+    background: var(--hero-gradient-dark); /* Completed this line */
+}
+
+body.dark-mode .hero-bg::before {
+    opacity: 0.15; /* Adjusted to match home.html dark mode */
 }
 
 body.dark-mode .gradient-text {
@@ -317,66 +351,55 @@ body.dark-mode .gradient-text {
     background-clip: text;
 }
 
-body.dark-mode .glass-card {
+body.dark-mode .floating-icon { /* This was previously .glass-card, updated to .floating-icon */
     background: var(--glass-card-bg-dark);
+    backdrop-filter: blur(8px);
     border: 1px solid var(--glass-card-border-dark);
 }
 
 body.dark-mode .feature-card {
-    background-color: var(--dark-card-bg);
-    border-color: var(--dark-border-color);
-    color: var(--text-color); /* Use general text color for dark mode */
-}
-body.dark-mode .feature-card:hover {
-    background-color: var(--dark-hover-bg);
+    background-color: var(--dark-card-bg); /* Use specific dark card bg */
+    border: none; /* No border for dark mode feature cards too */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3); /* Darker shadow */
 }
 
-/* Ensure text colors are correct in dark mode for landing page elements */
-body.dark-mode .text-white {
-    color: #e2e5ee !important; /* Lighter white for dark mode */
+body.dark-mode .feature-card:hover {
+    background-color: var(--dark-hover-bg); /* Darker hover bg */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4); /* Darker hover shadow */
 }
-body.dark-mode .text-gray-200 {
-    color: #b1bdd1 !important;
+
+body.dark-mode .cta-section { /* Added style for CTA section in dark mode */
+    background: linear-gradient(135deg, #0f4c5c 0%, #00334e 100%); /* Darker teal for dark mode */
 }
-body.dark-mode .text-yellow-300 {
-    color: #f0e68c !important; /* Adjusted yellow for dark mode */
+
+body.dark-mode .btn-hero-primary {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb); /* Lighter blue gradient for dark mode buttons */
+    color: var(--su-primary-dark);
+    box-shadow: 0 6px 20px rgba(161, 196, 253, 0.4);
 }
-body.dark-mode .text-gray-900 {
-    color: #e2e5ee !important;
+
+body.dark-mode .btn-hero-primary:hover {
+    box-shadow: 0 8px 25px rgba(161, 196, 253, 0.6);
 }
-body.dark-mode .text-gray-600 {
-    color: #b1bdd1 !important;
+
+body.dark-mode .btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
 }
-body.dark-mode .bg-white {
-    background-color: var(--su-card-bg) !important; /* Ensure card bg is correct */
+
+body.dark-mode .btn-hero-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
-body.dark-mode .bg-gray-50 { /* This will be the body background in dark mode */
-    background-color: var(--su-bg) !important;
+
+body.dark-mode .btn-cta-accent {
+    background: var(--su-accent); /* Use gold accent for CTA button */
+    color: var(--su-primary-dark);
+    box-shadow: 0 8px 25px rgba(228, 201, 117, 0.3);
 }
-body.dark-mode .bg-gray-800 { /* Feature card background in dark mode */
-    background-color: var(--su-card-bg) !important;
-}
-body.dark-mode .bg-gray-900 { /* Footer background in dark mode */
-    background-color: var(--su-primary-dark) !important;
-}
-body.dark-mode .bg-blue-100 {
-    background-color: rgba(0, 123, 255, 0.1) !important; /* Bootstrap primary with opacity */
-}
-body.dark-mode .bg-purple-100 {
-    background-color: rgba(111, 66, 193, 0.1) !important; /* Bootstrap purple with opacity */
-}
-body.dark-mode .bg-white\/10 {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-body.dark-mode .bg-white\/5 {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
-body.dark-mode .bg-blue-400\/10 {
-    background-color: rgba(0, 123, 255, 0.1) !important;
-}
-body.dark-mode .bg-white\/20 {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-}
-body.dark-mode .bg-white\/30 {
-    background-color: rgba(255, 255, 255, 0.3) !important;
+
+body.dark-mode .btn-cta-accent:hover {
+    background: var(--su-link-hover); /* Lighter gold on hover */
+    box-shadow: 0 12px 35px rgba(228, 201, 117, 0.5);
+    color: var(--su-primary-dark);
 }

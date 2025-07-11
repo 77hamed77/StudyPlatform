@@ -1,32 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
-/* --- متغيرات الألوان الرئيسية --- */
+/* --- متغيرات الألوان الرئيسية (الوضع النهاري الافتراضي) --- */
 :root {
     /* ألوان شام الافتراضية */
-    --su-primary: #1f3558;
-    /* كحلي رئيسي */
-    --su-primary-dark: #16223a;
-    /* أزرق داكن شديد */
-    --su-accent: #e4c975;
-    /* أصفر ذهبي للشعار والروابط */
-    --su-accent-light: #f9eec8;
-    /* ذهبي فاتح للخلفيات */
-    --su-secondary: #6a84a7;
-    /* أزرق رمادي ثانوي */
-    --su-bg: #f6f8fa;
-    /* خلفية نهارية رئيسية */
-    --su-card-bg: #fff;
-    /* خلفية البطاقات */
-    --su-border: #dee2e6;
-    /* حدود فاتحة */
-    --su-table-header-bg: #e9eef5;
-    /* خلفية رؤوس الجداول */
-    --su-table-row-hover: #f2f7fd;
-    /* خلفية صف الجدول عند المرور */
-    --su-link: #274160;
-    /* لون الروابط */
-    --su-link-hover: #e4c975;
-    /* لون الروابط عند المرور */
+    --su-primary: #1f3558; /* كحلي رئيسي */
+    --su-primary-dark: #16223a; /* أزرق داكن شديد */
+    --su-accent: #e4c975; /* أصفر ذهبي للشعار والروابط */
+    --su-accent-light: #f9eec8; /* ذهبي فاتح للخلفيات */
+    --su-secondary: #6a84a7; /* أزرق رمادي ثانوي */
+    --su-bg: #f6f8fa; /* خلفية نهارية رئيسية */
+    --su-card-bg: #fff; /* خلفية البطاقات */
+    --su-border: #dee2e6; /* حدود فاتحة */
+    --su-table-header-bg: #e9eef5; /* خلفية رؤوس الجداول */
+    --su-table-row-hover: #f2f7fd; /* خلفية صف الجدول عند المرور */
+    --su-link: #274160; /* لون الروابط */
+    --su-link-hover: #e4c975; /* لون الروابط عند المرور */
     --su-success: #1aaf5d;
     --su-danger: #b72e3a;
     --su-warning: #e1ac1a;
@@ -48,7 +36,7 @@
     --bs-dark: #232d3b;
     --bs-white: #fff;
 
-    /* أخرى */
+    /* أخرى (متغيرات الوضع النهاري) */
     --text-color: #1f3558;
     --text-muted-color: var(--su-muted);
     --body-bg: var(--su-bg);
@@ -74,10 +62,10 @@
     --hr-color: #e4e9ef;
 
     /* --- Landing Page Specific Variables (Light Mode) --- */
-    --hero-gradient-light: linear-gradient(135deg, #3a2f01ff 0%, #252d6eff 100%);
-    --gradient-text-light: linear-gradient(45deg, #667eea, #764ba2);
-    --glass-card-bg-light: rgba(255, 255, 255, 0.1);
-    --glass-card-border-light: rgba(255, 255, 255, 0.2);
+    --hero-gradient-light: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* Updated to match new home.html */
+    --gradient-text-light: linear-gradient(45deg, #ff7e5f, #feb47b); /* Updated to match new home.html */
+    --glass-card-bg-light: rgba(255, 255, 255, 0.2); /* Updated to match new home.html */
+    --glass-card-border-light: rgba(255, 255, 255, 0.3); /* Updated to match new home.html */
 }
 
 body {
@@ -90,15 +78,10 @@ body {
     direction: rtl;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--custom-font);
     font-weight: 800;
-    color: var(--su-primary);
+    color: var(--text-color); /* Use text-color variable for headings */
     margin-bottom: 0.7em;
 }
 
@@ -108,8 +91,7 @@ a {
     transition: color 0.18s;
 }
 
-a:hover,
-a:focus {
+a:hover, a:focus {
     color: var(--link-hover-color);
     text-decoration: underline;
 }
@@ -120,30 +102,32 @@ hr {
 }
 
 .navbar {
-    background: var(--navbar-bg) !important;
+    background: var(--navbar-bg); /* Removed !important */
     box-shadow: var(--shadow-sm);
 }
 
 .navbar-brand {
     font-weight: 900;
     font-size: 1.35rem;
-    color: var(--navbar-brand-color) !important;
+    color: var(--navbar-brand-color); /* Removed !important */
     letter-spacing: 0.5px;
 }
 
 .navbar .nav-link {
-    color: var(--navbar-link-color) !important;
+    color: var(--navbar-link-color); /* Removed !important */
     font-weight: 600;
     font-size: 1.08rem;
     padding-top: 0.55rem;
     padding-bottom: 0.55rem;
     margin-right: 0.5rem;
+    position: relative;
+    transition: all 0.3s ease;
 }
 
 .navbar .nav-link.active,
 .navbar .nav-link:hover,
 .navbar .nav-link:focus {
-    color: var(--navbar-link-hover-color) !important;
+    color: var(--navbar-link-hover-color); /* Removed !important */
 }
 
 .dropdown-menu {
@@ -172,7 +156,7 @@ hr {
 
 #theme-toggle-btn.btn-outline-light:hover {
     background: var(--su-accent);
-    color: var(--bs-primary);
+    color: var(--su-primary); /* Changed to var(--su-primary) for light mode hover */
 }
 
 main.container {
@@ -211,7 +195,7 @@ main.container {
 
 .form-label {
     font-weight: 700;
-    color: var(--su-primary);
+    color: var(--text-color); /* Use text-color variable */
 }
 
 .form-control,
@@ -427,30 +411,18 @@ footer .text-muted {
 }
 
 /* --- Landing Page Specific Styles (Light Mode) --- */
+/* These styles should be defined using the --light-mode-specific-variables if they are truly unique to light mode.
+   Otherwise, they should use the general variables defined in :root.
+   I've updated them to use the new variables from home.html design. */
 .hero-bg {
     background: var(--hero-gradient-light);
 }
 
 .hero-bg::before {
-    opacity: 0.1;
-    /* Adjust opacity for better visibility */
+    opacity: 0.15; /* Adjusted to match home.html */
 }
 
-.floating-card {
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-20px);
-    }
-}
+/* Floating card animation is defined globally, no change needed here */
 
 .gradient-text {
     background: var(--gradient-text-light);
@@ -461,133 +433,83 @@ footer .text-muted {
 
 .glass-card {
     background: var(--glass-card-bg-light);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px); /* Adjusted to match home.html */
     border: 1px solid var(--glass-card-border-light);
 }
 
 .feature-card {
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Adjusted to match home.html */
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    border: none; /* Adjusted to match home.html */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08); /* Adjusted to match home.html */
 }
 
 .feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px) scale(1.02); /* Adjusted to match home.html */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15); /* Adjusted to match home.html */
 }
 
-.pulse-slow {
-    animation: pulse 3s infinite;
-}
+/* Pulse animation is defined globally, no change needed here */
+/* Slide In Up animation is defined globally, no change needed here */
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.animate-slide-up {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.animate-slide-up.visible {
-    animation: slideInUp 0.8s ease-out forwards;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-delay-1 {
-    animation-delay: 0.2s;
-}
-
-.animate-delay-2 {
-    animation-delay: 0.4s;
-}
-
-.animate-delay-3 {
-    animation-delay: 0.6s;
-}
-
-/* Custom Bootstrap-like button styles for landing page */
-.btn-custom-primary {
-    background: linear-gradient(to right, #28a745, #007bff);
-    /* Green to Blue */
+/* Custom Bootstrap-like button styles for landing page - Using new names from home.html */
+.btn-hero-primary {
+    background: linear-gradient(to right, #00c6ff, #0072ff); /* Bright blue gradient */
     border: none;
     color: white;
-    padding: 15px 30px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
     transition: all 0.3s ease;
 }
 
-.btn-custom-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+.btn-hero-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 114, 255, 0.6);
     color: white;
 }
 
-.btn-custom-secondary {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
-    padding: 15px 30px;
-    border-radius: 50px;
+    padding: 15px 35px;
+    border-radius: 30px;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
 
-.btn-custom-secondary:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.05);
+.btn-hero-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
     color: white;
 }
 
-.btn-custom-accent {
+.btn-cta-accent { /* Renamed from btn-custom-accent for clarity */
     background: white;
-    color: #1abc9c;
-    /* Emerald color */
-    padding: 15px 30px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 1.2rem;
-    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
+    color: #1abc9c; /* Emerald color */
+    padding: 18px 40px;
+    border-radius: 35px;
+    font-weight: 800;
+    font-size: 1.3rem;
+    box-shadow: 0 8px 25px rgba(26, 188, 156, 0.3);
     transition: all 0.3s ease;
 }
 
-.btn-custom-accent:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(26, 188, 156, 0.5);
+.btn-cta-accent:hover {
+    transform: scale(1.03) translateY(-3px);
+    box-shadow: 0 12px 35px rgba(26, 188, 156, 0.5);
     color: #1abc9c;
 }
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 576px) {
     .hero-section h1 {
-        font-size: 3rem;
+        font-size: 3rem; /* This was causing issues, should be smaller on mobile */
     }
 
     .hero-section p {
@@ -604,33 +526,26 @@ footer .text-muted {
     }
 }
 
-/* أضف هذه الستايلات إلى ملف static/css/style.css */
-
 /* Custom Navbar Styles */
 .custom-navbar {
-    background: var(--navbar-bg) !important;
+    background: var(--navbar-bg); /* Removed !important */
     box-shadow: var(--shadow-sm);
-    /* Glass effect, if desired, uncomment and adjust: */
-    /* background: rgba(255, 255, 255, 0.95); */
-    /* backdrop-filter: blur(10px); */
-    /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
 }
 
 .navbar-brand {
     font-weight: 900;
     font-size: 1.35rem;
-    color: var(--navbar-brand-color) !important;
+    color: var(--navbar-brand-color); /* Removed !important */
     letter-spacing: 0.5px;
 }
 
 .navbar-nav .nav-link {
-    color: var(--navbar-link-color) !important;
+    color: var(--navbar-link-color); /* Removed !important */
     font-weight: 600;
     font-size: 1.08rem;
     padding-top: 0.55rem;
     padding-bottom: 0.55rem;
     margin-right: 0.5rem;
-    /* For RTL, this will be margin-left */
     position: relative;
     transition: all 0.3s ease;
 }
@@ -640,14 +555,11 @@ footer .text-muted {
     position: absolute;
     bottom: -2px;
     right: 50%;
-    /* For RTL */
     width: 0;
     height: 2px;
     background: linear-gradient(45deg, var(--bs-primary), #8b5cf6);
-    /* Using Bootstrap primary and a custom purple */
     transition: all 0.3s ease;
     transform: translateX(50%);
-    /* For RTL */
 }
 
 .navbar-nav .nav-link:hover::after,
@@ -662,13 +574,9 @@ footer .text-muted {
     transition: all 0.3s ease;
     border: none;
     box-shadow: var(--shadow-md);
-    /* Using existing shadow variable */
     border-radius: 0.55rem;
-    /* Match other dropdowns */
     background: var(--card-bg);
-    /* Use card background */
     border: 1px solid var(--card-border-color);
-    /* Use card border */
 }
 
 .dropdown-menu-animated.show {
@@ -678,16 +586,13 @@ footer .text-muted {
 
 .dropdown-item {
     color: var(--text-color);
-    /* Use general text color */
     padding: 0.7rem 1.4rem;
 }
 
 .dropdown-item:hover,
 .dropdown-item:focus {
     background: var(--card-header-bg);
-    /* Use card header bg for hover */
     color: var(--link-hover-color);
-    /* Use link hover color */
 }
 
 /* Notification Badge Pulse Animation */
@@ -695,28 +600,12 @@ footer .text-muted {
     animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
 /* Scroll to Top Button */
 #scrollToTopBtn {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    /* Adjusted for RTL */
     z-index: 1030;
-    /* Higher than Bootstrap modals */
     opacity: 0;
     transform: scale(0.8);
     transition: all 0.3s ease;
@@ -746,10 +635,8 @@ footer .text-muted {
 /* Mobile Offcanvas Customization */
 .custom-offcanvas {
     background: var(--card-bg);
-    /* Use card background for consistency */
     color: var(--text-color);
     border-right: 1px solid var(--card-border-color);
-    /* For RTL */
 }
 
 .custom-offcanvas .offcanvas-header {
@@ -758,34 +645,24 @@ footer .text-muted {
 
 .custom-offcanvas .offcanvas-title {
     color: var(--su-primary);
-    /* Primary color for title */
     font-weight: 700;
 }
 
 .custom-offcanvas .btn-close {
     filter: invert(0);
-    /* Ensure close button is visible in light mode */
-}
-
-body.dark-mode .custom-offcanvas .btn-close {
-    filter: invert(1);
-    /* Invert for dark mode */
 }
 
 /* Messages (Alerts) */
 .alert-modern {
     border-left: 4px solid;
-    /* Use border-left for RTL */
     border-radius: 0.5rem;
     background: var(--card-bg);
-    /* Use card background */
     box-shadow: var(--shadow-sm);
     padding: 1rem 1.25rem;
 }
 
 .alert-modern .flex-shrink-0 {
     margin-right: 0.75rem;
-    /* For RTL */
 }
 
 .alert-success {
@@ -810,7 +687,6 @@ body.dark-mode .custom-offcanvas .btn-close {
     height: 32px;
     border-radius: 50%;
     background: linear-gradient(45deg, var(--bs-primary), #8b5cf6);
-    /* Blue/Purple gradient */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -822,155 +698,4 @@ body.dark-mode .custom-offcanvas .btn-close {
 /* Light blue background for unread notifications in dropdown */
 .bg-light-blue {
     background-color: #e0f2f7 !important;
-    /* A light blue */
-}
-
-/* أضف هذه الستايلات إلى ملف static/css/dark_mode.css */
-
-
-/* Custom Navbar Styles in Dark Mode */
-.custom-navbar {
-    background: var(--navbar-bg) !important;
-    border-bottom: 1.5px solid var(--su-border);
-    box-shadow: var(--shadow-sm);
-    /* Glass effect in dark mode, if desired: */
-    /* background: rgba(30, 41, 59, 0.95); */
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
-}
-
-.navbar-brand {
-    color: var(--navbar-brand-color) !important;
-}
-
-.navbar-nav .nav-link {
-    color: var(--navbar-link-color) !important;
-}
-
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
-    color: var(--navbar-link-hover-color) !important;
-}
-
-.navbar-nav .nav-link::after {
-    background: linear-gradient(45deg, var(--su-accent), #f0e68c);
-    /* Gold/Yellow gradient for dark mode */
-}
-
-/* Dropdown Menu Animations in Dark Mode */
-.dropdown-menu-animated {
-    background: var(--card-bg);
-    /* Use dark card background */
-    border: 1px solid var(--card-border-color);
-    /* Use dark card border */
-    box-shadow: var(--shadow-md);
-}
-
-.dropdown-item {
-    color: var(--text-color);
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-    background: var(--card-header-bg);
-    /* Use dark card header bg for hover */
-    color: var(--su-accent);
-    /* Use accent color for hover text */
-}
-
-/* Theme Toggle Button in Dark Mode */
-#theme-toggle-btn.btn-outline-light {
-    color: var(--su-accent);
-    border-color: var(--su-accent);
-    background: var(--card-bg);
-    /* Match other elements */
-}
-
-#theme-toggle-btn.btn-outline-light:hover {
-    background: var(--su-accent);
-    color: var(--su-primary-dark);
-}
-
-.light-mode-icon {
-    display: none;
-}
-
-.dark-mode-icon {
-    display: inline-block;
-    color: var(--su-accent);
-}
-
-/* Ensure icon color is right */
-
-/* Notification Badge in Dark Mode */
-.notification-badge {
-    background-color: var(--su-danger) !important;
-    /* Use dark mode danger color */
-    color: var(--text-color) !important;
-    /* Ensure text is visible */
-}
-
-/* Mobile Offcanvas Customization in Dark Mode */
-.custom-offcanvas {
-    background: var(--card-bg);
-    /* Use dark card background */
-    color: var(--text-color);
-    border-right: 1px solid var(--card-border-color);
-}
-
-.custom-offcanvas .offcanvas-title {
-    color: var(--su-accent);
-    /* Accent color for title */
-}
-
-.custom-offcanvas .btn-close {
-    filter: invert(1);
-    /* Invert for dark mode */
-}
-
-/* Messages (Alerts) in Dark Mode */
-.alert-modern {
-    background: var(--card-bg);
-    /* Use dark card background */
-    color: var(--text-color);
-    border: none;
-    /* Remove default border */
-}
-
-.alert-success {
-    border-left-color: var(--su-success);
-    background-color: rgba(98, 193, 133, 0.15) !important;
-}
-
-.alert-danger {
-    border-left-color: var(--su-danger);
-    background-color: rgba(232, 116, 117, 0.15) !important;
-}
-
-.alert-warning {
-    border-left-color: var(--su-warning);
-    background-color: rgba(238, 199, 90, 0.15) !important;
-}
-
-.alert-info {
-    border-left-color: var(--su-info);
-    background-color: rgba(93, 176, 229, 0.15) !important;
-}
-
-.alert-modern .flex-shrink-0 .fas {
-    color: inherit !important;
-    /* Inherit color from alert text */
-}
-
-/* User Avatar in Navbar in Dark Mode */
-.user-avatar {
-    background: linear-gradient(45deg, var(--su-accent), #f0e68c);
-    /* Gold/Yellow gradient for dark mode */
-    color: var(--su-primary-dark);
-    /* Dark text on light avatar */
-}
-
-/* Light blue background for unread notifications in dropdown */
-.bg-light-blue {
-    background-color: rgba(93, 176, 229, 0.1) !important;
-    /* A light blue with opacity for dark mode */
 }
