@@ -5,14 +5,14 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),  # روابط تطبيق core هي الرئيسية
+    path('', include('core.urls', namespace='core')),  # <--- تم إضافة namespace='core' هنا
     path('files/', include('files_manager.urls')),
     path('news/', include('news.urls')),
     path('tasks/', include('tasks.urls')),
-    path('chat/', include('chat_assistant.urls')),  # روابط تطبيق المساعد الذكي للدردشة
-    path('prayer/', include('prayer_times.urls')),  # روابط تطبيق أوقات الصلاة
-    path('achievements/', include('achievements.urls')),  # روابط تطبيق الإنجازات
-    path('accounts/', include('django.contrib.auth.urls')),  # تسجيل الدخول/الخروج وتغيير كلمة المرور
+    path('chat/', include('chat_assistant.urls')),
+    path('prayer/', include('prayer_times.urls')),
+    path('achievements/', include('achievements.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('notes/', include('notes.urls', namespace='notes')),
     path('exam-prep/', include('exam_prep.urls', namespace='exam_prep')),
 ]
@@ -34,4 +34,3 @@ if settings.DEBUG:
     if hasattr(settings, 'MEDIA_URL') and hasattr(settings, 'MEDIA_ROOT') and \
        settings.DEFAULT_FILE_STORAGE == 'django.core.files.storage.FileSystemStorage':
         urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
