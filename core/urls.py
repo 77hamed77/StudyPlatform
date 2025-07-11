@@ -12,4 +12,5 @@ urlpatterns = [
     path('notifications/', views.NotificationListView.as_view(), name='notifications_list'),
     path('notifications/mark_all_read/', views.mark_all_notifications_read, name='notification_mark_all_read'),
     path('notifications/mark_read/', views.mark_notification_read, name='notification_mark_read'),
+    path('educational-resources/', views.EducationalResourcesView.as_view(), name='educational_resources'), # مسار جديد
 ]

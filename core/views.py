@@ -6,7 +6,7 @@ from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
-from .models import UserProfile, Notification, DailyQuote
+from .models import UserProfile, Notification, DailyQuote, EducationalResource # استيراد EducationalResource
 from achievements.models import UserBadge
 from tasks.models import Task
 from files_manager.models import UserFileInteraction
@@ -154,3 +154,18 @@ def mark_notification_read(request):
         except Notification.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'}, status=400)
+
+
+class EducationalResourcesView(GenericListView):
+    """
+    عرض قائمة بالموارد التعليمية.
+    """
+    model = EducationalResource
+    template_name = 'core/educational_resources.html'
+    context_object_name = 'resources' # الاسم الذي سيتم استخدامه في القالب للوصول إلى قائمة الموارد
+    paginate_by = 10 # تقسيم النتائج على صفحات، يمكنك تعديل هذا الرقم
+    
+    def get_queryset(self):
+        # جلب الموارد النشطة فقط وترتيبها حسب تاريخ الإضافة (الأحدث أولاً)
+        return EducationalResource.objects.filter(is_active=True).order_by('-created_at')
+

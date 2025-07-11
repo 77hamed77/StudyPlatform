@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import UserProfile, Notification, DailyQuote # تأكد من استيراد كل الموديلات التي تسجلها هنا
+from .models import UserProfile, Notification, DailyQuote, EducationalResource # تأكد من استيراد كل الموديلات التي تسجلها هنا
 from django.utils.translation import gettext_lazy as _
 
 # إلغاء تسجيل UserAdmin الافتراضي أولاً
@@ -36,12 +36,12 @@ class UserAdmin(BaseUserAdmin):
     # def get_form(self, request, obj=None, **kwargs):
     #     form = super().get_form(request, obj, **kwargs)
     #     # يمكنك تعديل الحقول هنا
-    #     return form
+    #     # return form
 
     # def get_fieldsets(self, request, obj=None):
     #     fieldsets = super().get_fieldsets(request, obj)
     #     # يمكنك إضافة أو تعديل fieldsets هنا
-    #     return fieldsets
+    #     # return fieldsets
 
 
 # تسجيل باقي الموديلات الخاصة بتطبيق core
@@ -84,3 +84,14 @@ class DailyQuoteAdmin(admin.ModelAdmin):
     @admin.display(description=_('الاقتباس'), ordering='quote_text')
     def quote_text_snippet(self, obj):
         return obj.quote_text[:70] + "..." if len(obj.quote_text) > 70 else obj.quote_text
+
+
+@admin.register(EducationalResource)
+class EducationalResourceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'link', 'is_active', 'created_at', 'updated_at')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'description', 'link')
+    list_editable = ('is_active',)
+    readonly_fields = ('created_at', 'updated_at')
+    fields = ('title', 'description', 'link', 'is_active')
+

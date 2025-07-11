@@ -42,15 +42,6 @@ class UserProfile(models.Model):
         help_text=_("القيمة الافتراضية هي 4 جلسات. (من 1 إلى 10)")
     )
     
-    # --- حقول إعدادات التذكير بالصلاة (جديد) ---
-    # لقد قمت بتعريف PrayerReminder كنموذج منفصل، لذا لا حاجة لهذه الحقول هنا.
-    # ولكن إذا كنت تفضل دمجها في UserProfile، فهذا هو المكان المناسب.
-    # بما أنك قدمت PrayerReminder في الـ views، سأفترض أنك تريد الاحتفاظ به منفصلاً.
-    # إذا غيرت رأيك وأردت دمجها، أخبرني.
-    # prayer_reminder_enabled = models.BooleanField(default=True, verbose_name=_("تفعيل تذكيرات الصلاة"))
-    # prayer_reminder_minutes_before = models.IntegerField(default=5, verbose_name=_("التذكير قبل الصلاة (دقائق)"))
-    # -------------------------------------------
-
     class Meta:
         verbose_name = _("الملف الشخصي للمستخدم")
         verbose_name_plural = _("الملفات الشخصية للمستخدمين")
@@ -157,4 +148,24 @@ class DailyQuote(models.Model):
 
     def __str__(self):
         return self.quote_text[:70] + "..." if len(self.quote_text) > 70 else self.quote_text
+
+
+class EducationalResource(models.Model):
+    """
+    نموذج لتخزين الموارد التعليمية مثل الكورسات، الروابط، والمصادر.
+    """
+    title = models.CharField(max_length=255, verbose_name="عنوان المورد")
+    description = models.TextField(blank=True, null=True, verbose_name="الوصف")
+    link = models.URLField(verbose_name="الرابط")
+    is_active = models.BooleanField(default=True, verbose_name="نشط (للعرض العام)")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإضافة")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="تاريخ التحديث")
+
+    class Meta:
+        verbose_name = "مورد تعليمي"
+        verbose_name_plural = "الموارد التعليمية"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
 
