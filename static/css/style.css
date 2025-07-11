@@ -41,7 +41,7 @@
     --text-muted-color: var(--su-muted);
     --body-bg: var(--su-bg);
     --navbar-bg: var(--su-primary);
-    --navbar-link-color: #fff;
+    --navbar-link-color: #333;
     --navbar-link-hover-color: var(--su-accent);
     --navbar-brand-color: var(--su-accent);
     --card-bg: var(--su-card-bg);
