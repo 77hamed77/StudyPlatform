@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'notes.apps.NotesConfig',
     'tasks.apps.TasksConfig',
     'prayer_times.apps.PrayerTimesConfig',
+    'community.apps.CommunityConfig',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

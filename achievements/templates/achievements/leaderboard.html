@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .leaderboard-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right; /* RTL */
+    }
+    body.dark-mode .leaderboard-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .leaderboard-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    body.dark-mode .leaderboard-header h2 {
+        color: #e4c975;
+    }
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Space between rows */
+    }
+    .leaderboard-table th {
+        background-color: var(--primary-color, #007bff);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+    body.dark-mode .leaderboard-table th {
+        background-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .leaderboard-table th:first-child {
+        border-top-right-radius: 10px; /* RTL */
+        border-bottom-right-radius: 10px; /* RTL */
+    }
+    .leaderboard-table th:last-child {
+        border-top-left-radius: 10px; /* RTL */
+        border-bottom-left-radius: 10px; /* RTL */
+    }
+    .leaderboard-table td {
+        background-color: var(--bg-light, #f8f9fa);
+        padding: 15px;
+        text-align: center;
+        font-size: 1.05rem;
+        color: var(--text-color, #333);
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    body.dark-mode .leaderboard-table td {
+        background-color: #293b54;
+        color: #e8ecf1;
+    }
+    .leaderboard-table tr:nth-child(1) td {
+        background-color: #ffeb3b; /* Gold for 1st place */
+        color: #333;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(255,235,59,0.4);
+    }
+    body.dark-mode .leaderboard-table tr:nth-child(1) td {
+        background-color: #ffd700; /* Darker gold */
+        color: #1d2c3b;
+    }
+    .leaderboard-table tr:nth-child(2) td {
+        background-color: #c0c0c0; /* Silver for 2nd place */
+        color: #333;
+        font-weight: bold;
+    }
+    body.dark-mode .leaderboard-table tr:nth-child(2) td {
+        background-color: #a8a8a8;
+        color: #1d2c3b;
+    }
+    .leaderboard-table tr:nth-child(3) td {
+        background-color: #cd7f32; /* Bronze for 3rd place */
+        color: white;
+        font-weight: bold;
+    }
+    body.dark-mode .leaderboard-table tr:nth-child(3) td {
+        background-color: #b86e2a;
+        color: white;
+    }
+    .leaderboard-table td.rank {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    .leaderboard-table td.username {
+        text-align: right; /* RTL */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="leaderboard-container">
+        <div class="leaderboard-header">
+            <h2><i class="fas fa-trophy me-2"></i> {{ page_title }}</h2>
+            <p class="text-center lead">تنافس مع زملائك واصعد إلى القمة!</p>
+        </div>
+
+        {% if leaderboard_entries %}
+            <div class="table-responsive">
+                <table class="table leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">الترتيب</th>
+                            <th scope="col">المستخدم</th>
+                            <th scope="col">المستوى</th>
+                            <th scope="col">نقاط الخبرة (XP)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in leaderboard_entries %}
+                            <tr>
+                                <td class="rank">{{ forloop.counter }}</td>
+                                <td class="username">{{ entry.user.username }}</td>
+                                <td>{{ entry.level }}</td>
+                                <td>{{ entry.total_xp }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">السابق</a></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">التالي</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <p>لا توجد بيانات في لوحة الصدارة حالياً.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

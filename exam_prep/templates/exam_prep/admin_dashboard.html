@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}لوحة تحكم المشرف{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 shadow-2xl rounded-xl my-8 transform transition-all duration-300 hover:scale-[1.005]">
+    <h1 class="text-5xl font-extrabold text-center text-gray-900 mb-10 drop-shadow-md">لوحة تحكم المشرف</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        {# بطاقة إحصائيات الإبلاغات #}
+        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-blue-600 transform hover:scale-105 transition duration-300 ease-in-out cursor-pointer">
+            <h2 class="text-3xl font-bold text-blue-800 mb-5 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 mr-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                إحصائيات الإبلاغات
+            </h2>
+            <p class="text-gray-700 text-xl mb-3">إجمالي الإبلاغات: <span class="font-extrabold text-blue-700">{{ total_reports }}</span></p>
+            <p class="text-gray-700 text-xl mb-3">الإبلاغات المعلقة: <span class="font-extrabold text-orange-600">{{ pending_reports }}</span></p>
+            <p class="text-gray-700 text-xl mb-3">الإبلاغات المراجعة: <span class="font-extrabold text-green-600">{{ reviewed_reports }}</span></p>
+            <p class="text-gray-700 text-xl">الإبلاغات المحلولة: <span class="font-extrabold text-purple-600">{{ resolved_reports }}</span></p>
+            <a href="{% url 'exam_prep:report_list' %}" class="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                عرض كل الإبلاغات
+            </a>
+        </div>
+
+        {# بطاقة إحصائيات أنشطة المستخدمين #}
+        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-green-600 transform hover:scale-105 transition duration-300 ease-in-out cursor-pointer">
+            <h2 class="text-3xl font-bold text-green-800 mb-5 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 mr-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                إحصائيات أنشطة المستخدمين
+            </h2>
+            <p class="text-gray-700 text-xl mb-3">إجمالي الأنشطة: <span class="font-extrabold text-green-700">{{ total_activities }}</span></p>
+            {# يمكنك إضافة المزيد من الإحصائيات هنا بناءً على ما قمت بحسابه في views.py #}
+            <a href="{% url 'exam_prep:user_activity_list' %}" class="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                عرض كل الأنشطة
+            </a>
+        </div>
+
+        {# بطاقة إحصائيات المحتوى #}
+        <div class="bg-white p-8 rounded-xl shadow-xl border-b-4 border-purple-600 transform hover:scale-105 transition duration-300 ease-in-out cursor-pointer">
+            <h2 class="text-3xl font-bold text-purple-800 mb-5 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-9 w-9 mr-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                إحصائيات المحتوى
+            </h2>
+            <p class="text-gray-700 text-xl mb-3">إجمالي الأدعية: <span class="font-extrabold text-purple-700">{{ total_prayers }}</span></p>
+            <p class="text-gray-700 text-xl mb-3">الأدعية النشطة: <span class="font-extrabold text-purple-700">{{ active_prayers }}</span></p>
+            <p class="text-gray-700 text-xl mb-3">إجمالي النصائح: <span class="font-extrabold text-purple-700">{{ total_tips }}</span></p>
+            <p class="text-gray-700 text-xl">النصائح النشطة: <span class="font-extrabold text-purple-700">{{ active_tips }}</span></p>
+            {# يمكنك إضافة روابط لإدارة المحتوى هنا إذا كان لديك صفحات لذلك #}
+        </div>
+    </div>
+
+    <div class="text-center mt-12">
+        <h2 class="text-4xl font-bold text-gray-800 mb-8">روابط سريعة</h2>
+        <div class="flex flex-wrap justify-center gap-6">
+            <a href="{% url 'exam_prep:report_list' %}" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-4 px-8 rounded-full shadow-xl transform hover:scale-105 transition duration-300 ease-in-out text-xl">
+                إدارة الإبلاغات
+            </a>
+            <a href="{% url 'exam_prep:user_activity_list' %}" class="bg-teal-700 hover:bg-teal-800 text-white font-bold py-4 px-8 rounded-full shadow-xl transform hover:scale-105 transition duration-300 ease-in-out text-xl">
+                عرض أنشطة المستخدمين
+            </a>
+            {# أضف المزيد من الروابط السريعة هنا إذا لزم الأمر #}
+        </div>
+    </div>
+</div>
+{% endblock %}

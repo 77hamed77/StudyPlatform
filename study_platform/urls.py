@@ -15,6 +15,8 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('notes/', include('notes.urls', namespace='notes')),
     path('exam-prep/', include('exam_prep.urls', namespace='exam_prep')),
+    path('community/', include('community.urls')), 
+
 ]
 
 # هذا الجزء مخصص لخدمة الملفات الثابتة (STATIC) وملفات الوسائط (MEDIA)

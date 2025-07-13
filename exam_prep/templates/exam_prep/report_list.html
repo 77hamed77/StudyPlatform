@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}قائمة الإبلاغات{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-white shadow-lg rounded-lg my-8">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">قائمة الإبلاغات</h1>
+
+    {# نموذج التصفية #}
+    <div class="mb-8 p-6 bg-blue-50 rounded-xl shadow-md border border-blue-200">
+        <form method="GET" action="{% url 'exam_prep:report_list' %}" class="flex flex-wrap items-center justify-center gap-6">
+            <div class="flex items-center gap-2">
+                <label for="status" class="font-semibold text-gray-700 text-lg">تصفية حسب الحالة:</label>
+                <select name="status" id="status" class="form-select p-3 border border-blue-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-lg">
+                    <option value="">الكل</option>
+                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>معلقة</option>
+                    <option value="reviewed" {% if request.GET.status == 'reviewed' %}selected{% endif %}>تمت مراجعتها</option>
+                    <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>تم حلها</option>
+                    <option value="rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>مرفوضة</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-7 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                تطبيق التصفية
+            </button>
+            {% if request.GET.status %}
+                <a href="{% url 'exam_prep:report_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-7 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                    مسح التصفية
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if reports %}
+        <div class="overflow-x-auto rounded-xl shadow-2xl border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الرقم التعريفي</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">المبلغ</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">نوع المحتوى</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الكائن المبلغ عنه</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">السبب</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الحالة</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">تاريخ الإبلاغ</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for report in reports %}
+                        <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <td class="px-6 py-4 whitespace-nowrap text-base font-medium text-gray-900">{{ report.id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ report.reporter.username }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ report.content_type }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">
+                                {% if report.content_object %}
+                                    {{ report.content_object }}
+                                {% else %}
+                                    غير متاح
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ report.get_reason_display }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base">
+                                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full
+                                    {% if report.status == 'pending' %}bg-orange-100 text-orange-800
+                                    {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                                    {% elif report.status == 'resolved' %}bg-green-100 text-green-800
+                                    {% elif report.status == 'rejected' %}bg-red-100 text-red-800
+                                    {% endif %}">
+                                    {{ report.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ report.reported_at|date:"Y-m-d H:i" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base font-medium">
+                                <a href="{% url 'exam_prep:report_detail' pk=report.pk %}" class="text-indigo-600 hover:text-indigo-900 font-semibold">عرض/إدارة</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if is_paginated %}
+            <nav class="mt-8 flex justify-center" aria-label="Pagination">
+                <ul class="flex items-center -space-x-px shadow-md rounded-lg">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-4 py-2 ml-0 leading-tight text-gray-600 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-800 transition duration-150 ease-in-out">السابق</a>
+                        </li>
+                    {% endif %}
+
+                    {% for i in paginator.page_range %}
+                        <li>
+                            <a href="?page={{ i }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-4 py-2 leading-tight {% if page_obj.number == i %}text-blue-700 bg-blue-100 border border-blue-300 font-bold{% else %}text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-800{% endif %} transition duration-150 ease-in-out">
+                                {{ i }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-4 py-2 leading-tight text-gray-600 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-800 transition duration-150 ease-in-out">التالي</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% else %}
+        <p class="text-center text-gray-600 text-xl p-8 bg-gray-50 rounded-lg shadow-inner">لا توجد إبلاغات حالياً.</p>
+    {% endif %}
+</div>
+{% endblock %}

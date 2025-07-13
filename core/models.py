@@ -6,8 +6,37 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.urls import reverse # لاستخدامه في get_absolute_url إذا لزم الأمر
+from django.urls import reverse # For get_absolute_url if needed
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.postgres.fields import JSONField # For storing dashboard preferences as JSON (requires psycopg2)
+# If not using PostgreSQL, you might use TextField and serialize/deserialize manually
+
+# Fallback for JSONField if PostgreSQL is not used
+try:
+    from django.db.models import JSONField
+except ImportError:
+    # For older Django versions or non-PostgreSQL databases, use TextField and handle JSON manually
+    class JSONField(models.TextField):
+        def from_db_value(self, value, expression, connection):
+            if value is None:
+                return value
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return {} # Return empty dict on decode error
+
+        def to_python(self, value):
+            if isinstance(value, dict) or value is None:
+                return value
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return {}
+
+        def get_prep_value(self, value):
+            if value is None:
+                return value
+            return json.dumps(value)
 
 
 class UserProfile(models.Model):
@@ -22,7 +51,7 @@ class UserProfile(models.Model):
         default=False,
         verbose_name=_("تفعيل الوضع الليلي")
     )
-    # إعدادات مؤقت بومودورو الافتراضية للمستخدم
+    # Default Pomodoro timer settings for the user
     pomodoro_work_duration = models.PositiveIntegerField(
         default=25,
         verbose_name=_("مدة جلسة العمل (دقائق)"),
@@ -44,6 +73,24 @@ class UserProfile(models.Model):
         help_text=_("القيمة الافتراضية هي 4 جلسات. (من 1 إلى 10)")
     )
     
+    # New fields for Dashboard Customization
+    # Stores preferences as JSON: {'visible_sections': ['news', 'tasks'], 'section_order': ['tasks', 'news']}
+    dashboard_layout_preferences = JSONField(
+        default=dict, # Use dict as default for JSONField
+        blank=True,
+        null=True,
+        verbose_name=_("تفضيلات تخطيط لوحة التحكم"),
+        help_text=_("تفضيلات المستخدم لعرض وترتيب أقسام لوحة التحكم (JSON).")
+    )
+
+    # New field for AI Study Assistant - Study Goals
+    study_goals = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("أهداف الدراسة"),
+        help_text=_("أهداف الطالب الأكاديمية لمساعد الذكاء الاصطناعي.")
+    )
+
     class Meta:
         verbose_name = _("الملف الشخصي للمستخدم")
         verbose_name_plural = _("الملفات الشخصية للمستخدمين")
@@ -54,14 +101,14 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     """
-    إشارة لإنشاء أو تحديث UserProfile تلقائيًا عند إنشاء أو حفظ كائن User.
+    Signal to automatically create or update UserProfile when a User object is created or saved.
     """
     if created:
         UserProfile.objects.create(user=instance)
     try:
-        instance.profile.save() # التأكد من حفظ البروفايل إذا كان موجودًا وتم حفظ المستخدم
+        instance.profile.save() # Ensure profile is saved if it exists and user is saved
     except UserProfile.DoesNotExist:
-        # هذا الشرط قد لا يُستدعى إذا كان created صحيحًا، لكنه كاحتياط
+        # This condition might not be called if created is true, but it's a safeguard
         UserProfile.objects.create(user=instance)
 
 
@@ -72,7 +119,7 @@ class Notification(models.Model):
         related_name='notifications_received',
         verbose_name=_("المستلم")
     )
-    # الفاعل (اختياري)
+    # Actor (optional)
     actor_content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
@@ -85,7 +132,7 @@ class Notification(models.Model):
     verb = models.CharField(max_length=255, verbose_name=_("الفعل"))
     description = models.TextField(blank=True, null=True, verbose_name=_("الوصف التفصيلي للإشعار"))
 
-    # الهدف (الكائن الذي يتعلق به الإشعار)
+    # Target (the object the notification relates to)
     target_content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
@@ -97,6 +144,16 @@ class Notification(models.Model):
 
     unread = models.BooleanField(default=True, db_index=True, verbose_name=_("غير مقروء"))
     timestamp = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("التوقيت"))
+
+    # New field for AI-driven notifications (e.g., last interaction, importance)
+    # This can be used by the AI to decide when to send a reminder
+    metadata = JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name=_("بيانات وصفية للإشعار"),
+        help_text=_("بيانات إضافية للإشعار (مثل سبب التذكير، تاريخ آخر تفاعل).")
+    )
 
     class Meta:
         ordering = ('-timestamp',)
@@ -154,7 +211,7 @@ class DailyQuote(models.Model):
 
 class EducationalResource(models.Model):
     """
-    نموذج لتخزين الموارد التعليمية مثل الكورسات، الروابط، والمصادر.
+    Model for storing educational resources such as courses, links, and sources.
     """
     title = models.CharField(max_length=255, verbose_name="عنوان المورد")
     description = models.TextField(blank=True, null=True, verbose_name="الوصف")
@@ -171,8 +228,8 @@ class EducationalResource(models.Model):
     def __str__(self):
         return self.title
 
-    # --- حقول إضافية للتقييمات والمفضلة (غير مخزنة في النموذج مباشرة) ---
-    # هذه الخصائص ستكون طرقًا لحساب المتوسط من نموذج التقييمات
+    # --- Additional fields for ratings and favorites (not stored directly in the model) ---
+    # These properties will be methods to calculate the average from the ratings model
     @property
     def average_rating(self):
         return self.ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0.0
@@ -182,11 +239,11 @@ class EducationalResource(models.Model):
         return self.ratings.count()
 
 
-# --- نماذج جديدة للأدوات والمرافق (من التحديث السابق) ---
+# --- New models for Tools and Utilities (from previous update) ---
 
 class DiscussionPost(models.Model):
     """
-    نموذج لمنشور في لوحة المناقشات.
+    Model for a discussion board post.
     """
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='discussion_posts', verbose_name=_("الكاتب"))
     title = models.CharField(max_length=255, verbose_name=_("العنوان"))
@@ -210,7 +267,7 @@ class DiscussionPost(models.Model):
 
 class DiscussionComment(models.Model):
     """
-    نموذج لتعليق على منشور في لوحة المناقشات.
+    Model for a comment on a discussion post.
     """
     post = models.ForeignKey(DiscussionPost, on_delete=models.CASCADE, related_name='comments', verbose_name=_("المنشور"))
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='discussion_comments', verbose_name=_("الكاتب"))
@@ -222,7 +279,7 @@ class DiscussionComment(models.Model):
     class Meta:
         verbose_name = _("تعليق مناقشة")
         verbose_name_plural = _("تعليقات المناقشة")
-        ordering = ['created_at'] # التعليقات تظهر بترتيب زمني تصاعدي
+        ordering = ['created_at'] # Comments appear in chronological order
 
     def __str__(self):
         display_name = "مجهول" if self.is_anonymous else self.author.username
@@ -231,7 +288,7 @@ class DiscussionComment(models.Model):
 
 class FAQItem(models.Model):
     """
-    نموذج لعنصر سؤال شائع.
+    Model for a frequently asked question item.
     """
     question = models.CharField(max_length=255, verbose_name=_("السؤال"))
     answer = models.TextField(verbose_name=_("الإجابة"))
@@ -251,7 +308,7 @@ class FAQItem(models.Model):
 
 class AcademicProgress(models.Model):
     """
-    نموذج لتتبع التقدم الأكاديمي للطالب (مثل درجات المواد).
+    Model for tracking student academic progress (e.g., subject grades).
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='academic_progress', verbose_name=_("المستخدم"))
     subject = models.ForeignKey('files_manager.Subject', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("المادة الدراسية"))
@@ -263,17 +320,17 @@ class AcademicProgress(models.Model):
         verbose_name = _("تقدم أكاديمي")
         verbose_name_plural = _("التقدم الأكاديمي")
         ordering = ['-date_recorded', 'subject__name']
-        unique_together = ('user', 'subject', 'date_recorded') # لمنع تكرار الدرجات لنفس المادة في نفس اليوم
+        unique_together = ('user', 'subject', 'date_recorded') # Prevent duplicate grades for the same subject on the same day
 
     def __str__(self):
         return f"{self.user.username} - {self.subject.name if self.subject else 'N/A'} - Grade: {self.grade}"
 
 
-# --- نماذج جديدة للتقييمات والمفضلة ---
+# --- New models for Ratings and Favorites ---
 
 class EducationalResourceRating(models.Model):
     """
-    نموذج لتقييم ومراجعة مورد تعليمي بواسطة مستخدم.
+    Model for rating and reviewing an educational resource by a user.
     """
     resource = models.ForeignKey(
         EducationalResource,
@@ -302,7 +359,7 @@ class EducationalResourceRating(models.Model):
     class Meta:
         verbose_name = _("تقييم مورد تعليمي")
         verbose_name_plural = _("تقييمات الموارد التعليمية")
-        unique_together = ('resource', 'user') # المستخدم يمكنه تقييم مورد واحد مرة واحدة فقط
+        unique_together = ('resource', 'user') # A user can rate a resource only once
         ordering = ['-created_at']
 
     def __str__(self):
@@ -311,7 +368,7 @@ class EducationalResourceRating(models.Model):
 
 class UserFavoriteResource(models.Model):
     """
-    نموذج لتتبع الموارد التعليمية المفضلة للمستخدم.
+    Model for tracking user's favorite educational resources.
     """
     user = models.ForeignKey(
         User,
@@ -330,7 +387,7 @@ class UserFavoriteResource(models.Model):
     class Meta:
         verbose_name = _("مورد تعليمي مفضل")
         verbose_name_plural = _("الموارد التعليمية المفضلة")
-        unique_together = ('user', 'resource') # المستخدم يمكنه تفضيل مورد واحد مرة واحدة فقط
+        unique_together = ('user', 'resource') # A user can favorite a resource only once
         ordering = ['-added_at']
 
     def __str__(self):

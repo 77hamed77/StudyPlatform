@@ -6,37 +6,57 @@
 {% block extra_head %}
 {{ block.super }}
 <style>
+    :root {
+        --primary-color: #007bff; /* Bootstrap primary */
+        --primary-color-dark: #0056b3;
+        --accent-color-light: #e0f7fa;
+        --accent-color: #00bcd4;
+        --accent-color-dark: #00798a;
+        --success-color: #28a745;
+        --success-color-dark: #218838;
+        --card-bg: #fff;
+        --bg-light: #f8f9fa;
+        --text-color: #333;
+        --text-muted: #6c757d;
+        --border-color: #eee;
+    }
+
+    body.dark-mode {
+        --primary-color: #e4c975; /* Gold-like for dark mode primary */
+        --primary-color-dark: #d1b66a;
+        --accent-color-light: #2a4f5d;
+        --accent-color: #00bcd4;
+        --accent-color-dark: #a7d9e4;
+        --success-color: #8bc34a;
+        --success-color-dark: #7cb342;
+        --card-bg: #1d2c3b;
+        --bg-light: #293b54;
+        --text-color: #e8ecf1;
+        --text-muted: #b1bdd1;
+        --border-color: #3b4d66;
+    }
+
     .dashboard-container {
         max-width: 1200px;
         margin: 40px auto;
         padding: 30px;
-        background: var(--card-bg, #fff);
+        background: var(--card-bg);
         border-radius: 15px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        color: var(--text-color, #333);
-    }
-    body.dark-mode .dashboard-container {
-        background: #1d2c3b;
-        color: #e8ecf1;
+        color: var(--text-color);
     }
     .dashboard-header h2 {
         font-size: 2.5rem;
         font-weight: 700;
-        color: var(--primary-color, #007bff);
+        color: var(--primary-color);
         margin-bottom: 20px;
         text-align: center;
-    }
-    body.dark-mode .dashboard-header h2 {
-        color: #e4c975;
     }
     .welcome-message {
         font-size: 1.5rem;
         text-align: center;
         margin-bottom: 30px;
-        color: var(--text-color, #333);
-    }
-    body.dark-mode .welcome-message {
-        color: #e8ecf1;
+        color: var(--text-color);
     }
     .dashboard-grid {
         display: grid;
@@ -44,41 +64,32 @@
         gap: 30px;
     }
     .card-item {
-        background-color: var(--bg-light, #f8f9fa);
+        background-color: var(--bg-light);
         border-radius: 12px;
         padding: 25px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         transition: transform 0.2s ease-in-out;
-        text-align: right; /* لتنسيق المحتوى من اليمين لليسار */
-    }
-    body.dark-mode .card-item {
-        background-color: #293b54;
-        border: 1px solid #3b4d66;
+        text-align: right; /* For RTL */
+        border: 1px solid var(--border-color);
     }
     .card-item:hover {
         transform: translateY(-5px);
     }
     .card-item h3 {
         font-size: 1.6rem;
-        color: var(--primary-color-dark, #0056b3);
+        color: var(--primary-color-dark);
         margin-bottom: 15px;
         font-weight: 600;
-    }
-    body.dark-mode .card-item h3 {
-        color: #e4c975;
     }
     .card-item p {
         font-size: 1.1rem;
         line-height: 1.6;
-        color: var(--text-color, #333);
-    }
-    body.dark-mode .card-item p {
-        color: #e8ecf1;
+        color: var(--text-color);
     }
     .card-item .btn {
         margin-top: 15px;
-        background-color: var(--primary-color, #007bff);
-        border-color: var(--primary-color, #007bff);
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
         color: #fff;
         padding: 8px 15px;
         border-radius: 8px;
@@ -86,34 +97,20 @@
         text-decoration: none;
         transition: background-color 0.3s, border-color 0.3s;
     }
-    body.dark-mode .card-item .btn {
-        background-color: #e4c975;
-        border-color: #e4c975;
-        color: #1d2c3b;
-    }
     .card-item .btn:hover {
-        background-color: var(--primary-color-dark, #0056b3);
-        border-color: var(--primary-color-dark, #0056b3);
-    }
-    body.dark-mode .card-item .btn:hover {
-        background-color: #d1b66a;
-        border-color: #d1b66a;
+        background-color: var(--primary-color-dark);
+        border-color: var(--primary-color-dark);
     }
     .quote-card {
-        background-color: var(--accent-color-light, #e0f7fa);
-        border: 1px solid var(--accent-color, #00bcd4);
+        background-color: var(--accent-color-light);
+        border: 1px solid var(--accent-color);
         padding: 20px;
         border-radius: 12px;
         margin-bottom: 30px;
         text-align: center;
         font-style: italic;
-        color: var(--accent-color-dark, #00798a);
+        color: var(--accent-color-dark);
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    body.dark-mode .quote-card {
-        background-color: #2a4f5d;
-        border-color: #00bcd4;
-        color: #a7d9e4;
     }
     .quote-card p {
         font-size: 1.2rem;
@@ -121,44 +118,32 @@
     }
     .quote-card footer {
         font-size: 1rem;
-        color: var(--accent-color-dark, #00798a);
-    }
-    body.dark-mode .quote-card footer {
-        color: #a7d9e4;
+        color: var(--accent-color-dark);
     }
 
     /* Styles for Recommended Resources */
     .recommendations-section {
         margin-top: 50px;
         padding-top: 30px;
-        border-top: 1px solid var(--border-color, #eee);
+        border-top: 1px solid var(--border-color);
         text-align: right;
-    }
-    body.dark-mode .recommendations-section {
-        border-color: #3b4d66;
     }
     .recommendations-section h3 {
         font-size: 2rem;
         font-weight: 700;
-        color: var(--primary-color, #007bff);
+        color: var(--primary-color);
         margin-bottom: 25px;
         text-align: center;
     }
-    body.dark-mode .recommendations-section h3 {
-        color: #e4c975;
-    }
     .recommended-resource-item {
-        background-color: var(--bg-light, #f8f9fa);
+        background-color: var(--bg-light);
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         transition: transform 0.2s ease-in-out;
         text-align: right;
         margin-bottom: 20px;
-    }
-    body.dark-mode .recommended-resource-item {
-        background-color: #293b54;
-        border: 1px solid #3b4d66;
+        border: 1px solid var(--border-color);
     }
     .recommended-resource-item:hover {
         transform: translateY(-5px);
@@ -166,24 +151,18 @@
     .recommended-resource-item h4 {
         font-size: 1.5rem;
         font-weight: bold;
-        color: var(--primary-color-dark, #0056b3);
+        color: var(--primary-color-dark);
         margin-bottom: 10px;
-    }
-    body.dark-mode .recommended-resource-item h4 {
-        color: #e4c975;
     }
     .recommended-resource-item p {
         font-size: 1rem;
         line-height: 1.5;
-        color: var(--text-color, #333);
+        color: var(--text-color);
         margin-bottom: 15px;
     }
-    body.dark-mode .recommended-resource-item p {
-        color: #e8ecf1;
-    }
     .recommended-resource-item .btn {
-        background-color: var(--success-color, #28a745);
-        border-color: var(--success-color, #28a745);
+        background-color: var(--success-color);
+        border-color: var(--success-color);
         color: #fff;
         padding: 8px 15px;
         border-radius: 8px;
@@ -191,27 +170,71 @@
         text-decoration: none;
         transition: background-color 0.3s, border-color 0.3s;
     }
-    body.dark-mode .recommended-resource-item .btn {
-        background-color: #8bc34a;
-        border-color: #8bc34a;
-        color: #1d2c3b;
-    }
     .recommended-resource-item .btn:hover {
-        background-color: var(--success-color-dark, #218838);
-        border-color: var(--success-color-dark, #218838);
-    }
-    body.dark-mode .recommended-resource-item .btn:hover {
-        background-color: #7cb342;
-        border-color: #7cb342;
+        background-color: var(--success-color-dark);
+        border-color: var(--success-color-dark);
     }
     .recommended-resource-item .resource-rating {
         font-size: 0.9rem;
-        color: var(--text-muted, #6c757d);
+        color: var(--text-muted);
         margin-top: 5px;
         text-align: right;
     }
-    body.dark-mode .recommended-resource-item .resource-rating {
-        color: #b1bdd1;
+
+    /* Customization Panel Styles */
+    .customization-panel {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+    }
+    .customization-panel h4 {
+        font-size: 1.8rem;
+        color: var(--primary-color-dark);
+        margin-bottom: 20px;
+        text-align: right;
+    }
+    .customization-panel .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: var(--bg-light);
+        border: 1px solid var(--border-color);
+        margin-bottom: 8px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+    }
+    .customization-panel .list-group-item:hover {
+        background-color: var(--bg-light-hover, #e9ecef);
+    }
+    body.dark-mode .customization-panel .list-group-item:hover {
+        background-color: #3b4d66;
+    }
+    .customization-panel .list-group-item .form-check-label {
+        flex-grow: 1;
+        cursor: grab; /* Indicates draggable */
+        text-align: right;
+    }
+    .customization-panel .list-group-item.dragging {
+        opacity: 0.7;
+        border: 2px dashed var(--primary-color);
+    }
+    .customization-panel .btn-save-preferences {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+    .customization-panel .btn-save-preferences:hover {
+        background-color: var(--primary-color-dark);
+        border-color: var(--primary-color-dark);
+    }
+    .customization-panel .alert {
+        margin-top: 15px;
     }
 </style>
 {% endblock %}
@@ -232,75 +255,110 @@
         </div>
         {% endif %}
 
-        <div class="dashboard-grid">
-            <div class="card-item">
-                <h3><i class="fas fa-tasks me-2"></i> مهامك القادمة</h3>
-                {% if upcoming_tasks %}
-                    <ul class="list-unstyled">
-                        {% for task in upcoming_tasks %}
-                            <li>
-                                <strong>{{ task.title }}</strong> -
-                                <span class="text-muted">الموعد: {{ task.due_date|date:"d M Y" }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <a href="{% url 'tasks:task_list' %}" class="btn btn-primary">عرض كل المهام</a>
-                {% else %}
-                    <p>لا توجد مهام قادمة حالياً. استمتع بوقتك أو أضف مهمة جديدة!</p>
-                    <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">إضافة مهمة جديدة</a>
-                {% endif %}
+        {# Customization Panel #}
+        <div class="customization-panel mb-5">
+            <h4 class="mb-4">تخصيص لوحة التحكم</h4>
+            <p class="text-muted text-end">اسحب الأقسام لإعادة ترتيبها، واستخدم أزرار التبديل لإخفائها أو إظهارها.</p>
+            <div id="dashboard-sections-list" class="list-group">
+                {# Loop through all_available_sections_raw to populate the customization list #}
+                {% for key, data in all_available_sections_raw.items %} {# Use all_available_sections_raw for Django loop #}
+                    <div class="list-group-item" data-section-key="{{ key }}">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input section-toggle" type="checkbox" role="switch" id="toggle-{{ key }}"
+                                {% if key in user.profile.dashboard_layout_preferences.visible_sections or not user.profile.dashboard_layout_preferences.visible_sections %}checked{% endif %}>
+                            <label class="form-check-label me-2" for="toggle-{{ key }}">
+                                <i class="{{ data.icon }} me-2"></i> {{ data.title }}
+                            </label>
+                        </div>
+                        <i class="fas fa-grip-vertical text-muted handle" style="cursor: grab;"></i>
+                    </div>
+                {% endfor %}
             </div>
-
-            <div class="card-item">
-                <h3><i class="fas fa-bullhorn me-2"></i> آخر الأخبار الهامة</h3>
-                {% if latest_news %}
-                    <ul class="list-unstyled">
-                        {% for news in latest_news %}
-                            <li>
-                                <strong>{{ news.title }}</strong> -
-                                <span class="text-muted">{{ news.publication_date|date:"d M Y" }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <a href="{% url 'news:news_list' %}" class="btn btn-primary">عرض كل الأخبار</a>
-                {% else %}
-                    <p>لا توجد أخبار هامة حالياً.</p>
-                {% endif %}
+            <div class="text-center mt-4">
+                <button id="save-dashboard-preferences" class="btn btn-save-preferences">
+                    <i class="fas fa-save me-2"></i> حفظ التفضيلات
+                </button>
             </div>
-
-            <div class="card-item">
-                <h3><i class="fas fa-chart-line me-2"></i> تقدمك الأكاديمي</h3>
-                <p>تتبع درجاتك وتقدمك في المواد الدراسية المختلفة.</p>
-                <a href="{% url 'core:academic_progress' %}" class="btn btn-primary">عرض التقدم</a>
-            </div>
-
-            <div class="card-item">
-                <h3><i class="fas fa-book-open me-2"></i> الموارد التعليمية</h3>
-                <p>استكشف مجموعة واسعة من الكورسات والمصادر التعليمية.</p>
-                <a href="{% url 'core:educational_resources' %}" class="btn btn-primary">تصفح الموارد</a>
-            </div>
-            
-            <div class="card-item">
-                <h3><i class="fas fa-comments me-2"></i> لوحة المناقشات</h3>
-                <p>شارك في المناقشات واطرح أسئلتك وتفاعل مع زملائك.</p>
-                <a href="{% url 'core:discussion_board' %}" class="btn btn-primary">انتقل للمناقشات</a>
-            </div>
-
-            <div class="card-item">
-                <h3><i class="fas fa-tools me-2"></i> أدوات مفيدة</h3>
-                <p>استخدم الآلة الحاسبة، محول الوحدات، والأسئلة الشائعة.</p>
-                <a href="{% url 'core:scientific_calculator' %}" class="btn btn-primary">الآلة الحاسبة</a>
-                <a href="{% url 'core:unit_converter' %}" class="btn btn-primary ms-2">محول الوحدات</a>
-            </div>
+            <div id="preferences-message" class="alert mt-3 d-none" role="alert"></div>
         </div>
 
-        {# قسم الموارد الموصى بها #}
-        <div class="recommendations-section">
+
+        <div class="dashboard-grid" id="dynamic-dashboard-grid">
+            {# Sections will be rendered here dynamically by JavaScript based on preferences #}
+            {# Initial rendering can be done by Django, then JS takes over for reordering #}
+            {% for section in dashboard_sections %}
+                {% if section.key == 'tasks_card' %}
+                    <div class="card-item" data-section-key="tasks_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        {% if upcoming_tasks %}
+                            <ul class="list-unstyled">
+                                {% for task in upcoming_tasks %}
+                                    <li>
+                                        <strong>{{ task.title }}</strong> -
+                                        <span class="text-muted">الموعد: {{ task.due_date|date:"d M Y" }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{{ section.url }}" class="btn btn-primary">عرض كل المهام</a>
+                        {% else %}
+                            <p>لا توجد مهام قادمة حالياً. استمتع بوقتك أو أضف مهمة جديدة!</p>
+                            <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">إضافة مهمة جديدة</a>
+                        {% endif %}
+                    </div>
+                {% elif section.key == 'news_card' %}
+                    <div class="card-item" data-section-key="news_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        {% if latest_news %}
+                            <ul class="list-unstyled">
+                                {% for news in latest_news %}
+                                    <li>
+                                        <strong>{{ news.title }}</strong> -
+                                        <span class="text-muted">{{ news.publication_date|date:"d M Y" }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{{ section.url }}" class="btn btn-primary">عرض كل الأخبار</a>
+                        {% else %}
+                            <p>لا توجد أخبار هامة حالياً.</p>
+                        {% endif %}
+                    </div>
+                {% elif section.key == 'academic_progress_card' %}
+                    <div class="card-item" data-section-key="academic_progress_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        <p>تتبع درجاتك وتقدمك في المواد الدراسية المختلفة.</p>
+                        <a href="{{ section.url }}" class="btn btn-primary">عرض التقدم</a>
+                    </div>
+                {% elif section.key == 'educational_resources_card' %}
+                    <div class="card-item" data-section-key="educational_resources_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        <p>استكشف مجموعة واسعة من الكورسات والمصادر التعليمية.</p>
+                        <a href="{{ section.url }}" class="btn btn-primary">تصفح الموارد</a>
+                    </div>
+                {% elif section.key == 'discussion_board_card' %}
+                    <div class="card-item" data-section-key="discussion_board_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        <p>شارك في المناقشات واطرح أسئلتك وتفاعل مع زملائك.</p>
+                        <a href="{{ section.url }}" class="btn btn-primary">انتقل للمناقشات</a>
+                    </div>
+                {% elif section.key == 'tools_card' %}
+                    <div class="card-item" data-section-key="tools_card">
+                        <h3><i class="{{ section.icon }} me-2"></i> {{ section.title }}</h3>
+                        <p>استخدم الآلة الحاسبة، محول الوحدات، والأسئلة الشائعة.</p>
+                        <a href="{{ section.url_calculator }}" class="btn btn-primary">الآلة الحاسبة</a>
+                        <a href="{{ section.url_converter }}" class="btn btn-primary ms-2">محول الوحدات</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {# Recommended Resources Section - always visible, but can be managed by JS if needed #}
+        {% if 'recommendations_section' in user.profile.dashboard_layout_preferences.visible_sections or not user.profile.dashboard_layout_preferences.visible_sections %}
+        <div class="recommendations-section" data-section-key="recommendations_section">
             <h3><i class="fas fa-lightbulb me-2"></i> موارد موصى بها لك</h3>
             {% if recommended_resources %}
                 <div class="row">
                     {% for resource in recommended_resources %}
-                    <div class="col-md-6 col-lg-3 mb-4"> {# 4 أعمدة في الشاشات الكبيرة، 2 في المتوسطة #}
+                    <div class="col-md-6 col-lg-3 mb-4"> {# 4 columns on large screens, 2 on medium #}
                         <div class="recommended-resource-item h-100 d-flex flex-column">
                             <h4>{{ resource.title }}</h4>
                             {% if resource.description %}
@@ -328,6 +386,7 @@
                 </div>
             {% endif %}
         </div>
+        {% endif %}
 
     </div>
 </div>
@@ -335,7 +394,247 @@
 
 {% block extra_scripts %}
 {{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 <script>
-    // أي سكريبتات خاصة بلوحة التحكم يمكن وضعها هنا
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboardGrid = document.getElementById('dynamic-dashboard-grid');
+        const customizationList = document.getElementById('dashboard-sections-list');
+        const savePreferencesBtn = document.getElementById('save-dashboard-preferences');
+        const preferencesMessage = document.getElementById('preferences-message');
+        const settingsUrl = '{{ request.user.is_authenticated|yesno:settings_url,"" }}'; // Get from base.html data-settings-url
+
+        // Initial setup of visible sections based on Django context
+        // Ensure user.profile.dashboard_layout_preferences is correctly serialized/defaulted
+        const initialVisibleSections = JSON.parse('{{ user.profile.dashboard_layout_preferences.visible_sections|default:"[]"|escapejs }}');
+        const initialSectionOrder = JSON.parse('{{ user.profile.dashboard_layout_preferences.section_order|default:"[]"|escapejs }}');
+        
+        // Parse all_available_sections from the JSON string passed by Django
+        let allAvailableSections = {};
+        const allAvailableSectionsJsonString = '{{ all_available_sections_json|safe }}';
+        if (allAvailableSectionsJsonString && allAvailableSectionsJsonString.trim() !== '') {
+            try {
+                allAvailableSections = JSON.parse(allAvailableSectionsJsonString);
+            } catch (e) {
+                console.error("Error parsing all_available_sections_json:", e);
+                console.error("Malformed JSON string:", allAvailableSectionsJsonString);
+                // Fallback to an empty object if parsing fails
+                allAvailableSections = {};
+            }
+        }
+        
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Function to render dashboard sections based on current preferences
+        function renderDashboard() {
+            const currentVisibleSections = [];
+            const currentSectionOrder = [];
+            
+            // Get current state from customization panel
+            Array.from(customizationList.children).forEach(item => {
+                const sectionKey = item.dataset.sectionKey;
+                const isChecked = item.querySelector('.section-toggle').checked;
+                currentSectionOrder.push(sectionKey);
+                if (isChecked) {
+                    currentVisibleSections.push(sectionKey);
+                }
+            });
+
+            // Clear existing dashboard grid
+            dashboardGrid.innerHTML = '';
+
+            // Render sections in the specified order and visibility
+            currentSectionOrder.forEach(sectionKey => {
+                if (currentVisibleSections.includes(sectionKey)) {
+                    const sectionData = allAvailableSections[sectionKey];
+                    if (sectionData) {
+                        let cardHtml = '';
+                        // Render specific card content based on sectionKey
+                        if (sectionKey === 'tasks_card') {
+                            // Note: The content inside these if/else if blocks still relies on Django context
+                            // (e.g., upcoming_tasks, latest_news). This is fine for initial load,
+                            // but for dynamic re-rendering, these would ideally be fetched via AJAX
+                            // or have their data pre-loaded in JS if they are static for the session.
+                            // For now, we'll keep the Django template logic here for simplicity,
+                            // assuming the user won't re-render these specific data points dynamically.
+                            cardHtml = `
+                                <div class="card-item" data-section-key="tasks_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    {% if upcoming_tasks %}
+                                        <ul class="list-unstyled">
+                                            {% for task in upcoming_tasks %}
+                                                <li>
+                                                    <strong>{{ task.title }}</strong> -
+                                                    <span class="text-muted">الموعد: {{ task.due_date|date:"d M Y" }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <a href="${sectionData.url}" class="btn btn-primary">عرض كل المهام</a>
+                                    {% else %}
+                                        <p>لا توجد مهام قادمة حالياً. استمتع بوقتك أو أضف مهمة جديدة!</p>
+                                        <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">إضافة مهمة جديدة</a>
+                                    {% endif %}
+                                </div>
+                            `;
+                        } else if (sectionKey === 'news_card') {
+                            cardHtml = `
+                                <div class="card-item" data-section-key="news_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    {% if latest_news %}
+                                        <ul class="list-unstyled">
+                                            {% for news in latest_news %}
+                                                <li>
+                                                    <strong>{{ news.title }}</strong> -
+                                                    <span class="text-muted">{{ news.publication_date|date:"d M Y" }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <a href="${sectionData.url}" class="btn btn-primary">عرض كل الأخبار</a>
+                                    {% else %}
+                                        <p>لا توجد أخبار هامة حالياً.</p>
+                                    {% endif %}
+                                </div>
+                            `;
+                        } else if (sectionKey === 'academic_progress_card') {
+                            cardHtml = `
+                                <div class="card-item" data-section-key="academic_progress_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    <p>تتبع درجاتك وتقدمك في المواد الدراسية المختلفة.</p>
+                                    <a href="${sectionData.url}" class="btn btn-primary">عرض التقدم</a>
+                                </div>
+                            `;
+                        } else if (sectionKey === 'educational_resources_card') {
+                            cardHtml = `
+                                <div class="card-item" data-section-key="educational_resources_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    <p>استكشف مجموعة واسعة من الكورسات والمصادر التعليمية.</p>
+                                    <a href="${sectionData.url}" class="btn btn-primary">تصفح الموارد</a>
+                                </div>
+                            `;
+                        } else if (sectionKey === 'discussion_board_card') {
+                            cardHtml = `
+                                <div class="card-item" data-section-key="discussion_board_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    <p>شارك في المناقشات واطرح أسئلتك وتفاعل مع زملائك.</p>
+                                    <a href="${sectionData.url}" class="btn btn-primary">انتقل للمناقشات</a>
+                                </div>
+                            `;
+                        } else if (sectionKey === 'tools_card') {
+                            cardHtml = `
+                                <div class="card-item" data-section-key="tools_card">
+                                    <h3><i class="${sectionData.icon} me-2"></i> ${sectionData.title}</h3>
+                                    <p>استخدم الآلة الحاسبة، محول الوحدات، والأسئلة الشائعة.</p>
+                                    <a href="${sectionData.url_calculator}" class="btn btn-primary">الآلة الحاسبة</a>
+                                    <a href="${sectionData.url_converter}" class="btn btn-primary ms-2">محول الوحدات</a>
+                                </div>
+                            `;
+                        } else if (sectionKey === 'recommendations_section') {
+                            // Recommendations section is outside the grid, so handle its visibility directly
+                            const recommendationsDiv = document.querySelector('.recommendations-section');
+                            if (recommendationsDiv) {
+                                recommendationsDiv.style.display = 'block';
+                            }
+                            return; // Don't add to grid, just control its visibility
+                        }
+                        dashboardGrid.insertAdjacentHTML('beforeend', cardHtml);
+                    }
+                } else {
+                    // Hide recommendations section if toggled off
+                    if (sectionKey === 'recommendations_section') {
+                        const recommendationsDiv = document.querySelector('.recommendations-section');
+                        if (recommendationsDiv) {
+                            recommendationsDiv.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize SortableJS for drag-and-drop reordering
+        new Sortable(customizationList, {
+            animation: 150,
+            handle: '.handle', // Drag handle
+            ghostClass: 'dragging', // Class for the ghost element
+            onEnd: function (evt) {
+                // Re-render dashboard after drag-and-drop
+                renderDashboard();
+            }
+        });
+
+        // Event listeners for toggle switches
+        customizationList.querySelectorAll('.section-toggle').forEach(toggle => {
+            toggle.addEventListener('change', renderDashboard);
+        });
+
+        // Save Preferences button click listener
+        savePreferencesBtn.addEventListener('click', function() {
+            const visibleSections = [];
+            const sectionOrder = [];
+
+            Array.from(customizationList.children).forEach(item => {
+                const sectionKey = item.dataset.sectionKey;
+                const isChecked = item.querySelector('.section-toggle').checked;
+                sectionOrder.push(sectionKey);
+                if (isChecked) {
+                    visibleSections.push(sectionKey);
+                }
+            });
+
+            // Send preferences to Django backend via AJAX
+            fetch(settingsUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `update_dashboard_layout=true&visible_sections=${JSON.stringify(visibleSections)}&section_order=${JSON.stringify(sectionOrder)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    preferencesMessage.classList.remove('alert-danger', 'd-none');
+                    preferencesMessage.classList.add('alert-success', 'd-block');
+                    preferencesMessage.textContent = data.message;
+                    console.log('Dashboard preferences updated on server:', data);
+                } else {
+                    preferencesMessage.classList.remove('alert-success', 'd-none');
+                    preferencesMessage.classList.add('alert-danger', 'd-block');
+                    preferencesMessage.textContent = data.message;
+                    console.error('Failed to update dashboard preferences on server:', data.message);
+                }
+                // Hide message after a few seconds
+                setTimeout(() => {
+                    preferencesMessage.classList.add('d-none');
+                }, 5000);
+            })
+            .catch(error => {
+                preferencesMessage.classList.remove('alert-success', 'd-none');
+                preferencesMessage.classList.add('alert-danger', 'd-block');
+                preferencesMessage.textContent = 'حدث خطأ أثناء حفظ التفضيلات.';
+                console.error('Error sending dashboard preferences:', error);
+                setTimeout(() => {
+                    preferencesMessage.classList.add('d-none');
+                }, 5000);
+            });
+        });
+
+        // Initial render of the dashboard based on loaded preferences
+        renderDashboard();
+    });
 </script>
 {% endblock extra_scripts %}

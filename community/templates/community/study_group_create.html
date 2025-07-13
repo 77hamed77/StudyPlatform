@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}إنشاء مجموعة دراسية جديدة - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .create-group-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right; /* RTL */
+    }
+    body.dark-mode .create-group-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .create-group-header h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    body.dark-mode .create-group-header h2 {
+        color: #e4c975;
+    }
+    .form-group label {
+        font-weight: 600;
+        color: var(--text-color, #333);
+        margin-bottom: 5px;
+        display: block;
+    }
+    body.dark-mode .form-group label {
+        color: #e8ecf1;
+    }
+    .form-control {
+        background-color: var(--bg-light, #f8f9fa);
+        border: 1px solid var(--border-color, #ccc);
+        color: var(--text-color, #333);
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+    body.dark-mode .form-control {
+        background-color: #293b54;
+        border-color: #3b4d66;
+        color: #e8ecf1;
+    }
+    .form-control::placeholder {
+        color: var(--text-muted, #6c757d);
+    }
+    .btn-create {
+        background-color: var(--success-color, #28a745);
+        border-color: var(--success-color, #28a745);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.dark-mode .btn-create {
+        background-color: #8bc34a;
+        border-color: #8bc34a;
+        color: #1d2c3b;
+    }
+    .btn-create:hover {
+        background-color: var(--success-color-dark, #218838);
+        border-color: var(--success-color-dark, #218838);
+    }
+    body.dark-mode .btn-create:hover {
+        background-color: #7cb342;
+        border-color: #7cb342;
+    }
+    .errorlist {
+        color: #dc3545;
+        list-style-type: none;
+        padding: 0;
+        margin-top: 5px;
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="create-group-container">
+        <div class="create-group-header">
+            <h2><i class="fas fa-plus-circle me-2"></i> إنشاء مجموعة دراسية جديدة</h2>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.name.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.subject.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.description.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-create">إنشاء المجموعة</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

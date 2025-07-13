@@ -100,7 +100,7 @@
                             </li>
                             
                             <li class="nav-item">
-                                <a class="nav-link {% if request.resolver_match.app_name == 'exam_prep' %}active{% endif %}" href="{% url 'exam_prep:exam_resources' %}">
+                                <a class="nav-link {% if request.resolver_match.app_name == 'exam_prep' and request.resolver_match.url_name != 'admin_dashboard' %}active{% endif %}" href="{% url 'exam_prep:exam_resources' %}">
                                     <i class="fas fa-graduation-cap me-1"></i>
                                     ركن الامتحانات
                                 </a>
@@ -113,6 +113,27 @@
                                 </a>
                             </li>
                             
+                            <!-- Community & Gamification Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle 
+                                    {% if request.resolver_match.app_name == 'community' or request.resolver_match.app_name == 'achievements' %}active{% endif %}" 
+                                    href="#" id="communityGamificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-users me-1"></i>
+                                    المجتمع والتحفيز
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-animated" aria-labelledby="communityGamificationDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'community:study_group_list' %}">المجموعات الدراسية</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'achievements:my_achievements' %}">إنجازاتي</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'achievements:leaderboard' %}">لوحة الصدارة</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'achievements:challenge_list' %}">تحديات الدراسة</a></li>
+                                    {% comment %} 
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'community:private_message_list' %}">رسائلي الخاصة</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'community:question_list' %}">منصة السؤال والجواب</a></li>
+                                    {% endcomment %}
+                                </ul>
+                            </li>
+
                             <!-- Islamic Resources Dropdown -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'prayer_times' %}active{% endif %}" href="#" id="islamicResourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -127,6 +148,16 @@
                                     <li><a class="dropdown-item" href="{% url 'prayer_times:hadith_page' %}">الأحاديث</a></li>
                                 </ul>
                             </li>
+
+                            <!-- Admin Dashboard Link (Conditional) -->
+                            {% if user.is_staff %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'exam_prep:admin_dashboard' %}">
+                                        <i class="fas fa-user-shield me-1"></i>
+                                        لوحة تحكم المشرف
+                                    </a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                     </ul>
 
@@ -281,7 +312,7 @@
                         </a>
                         <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-instagram"></i>
-                        </a>
+                            </a>
                         <a href="#" class="text-muted hover-primary transition-colors fs-5">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
@@ -302,11 +333,18 @@
                         <li class="mb-2"><a href="{% url 'core:educational_resources' %}" class="text-muted text-decoration-none">الموارد التعليمية</a></li>
                         <li class="mb-2"><a href="{% url 'exam_prep:exam_resources' %}" class="text-muted hover-primary transition-colors">ركن الامتحانات</a></li>
                         <li class="mb-2"><a href="{% url 'chat_assistant:chat_assistant' %}" class="text-muted hover-primary transition-colors">الشات المساعد</a></li>
+                        <li class="mb-2"><a href="{% url 'community:study_group_list' %}" class="text-muted hover-primary transition-colors">المجموعات الدراسية</a></li> {# Added Community Link #}
+                        <li class="mb-2"><a href="{% url 'achievements:my_achievements' %}" class="text-muted hover-primary transition-colors">إنجازاتي</a></li> {# Added Achievements Link #}
+                        <li class="mb-2"><a href="{% url 'achievements:leaderboard' %}" class="text-muted hover-primary transition-colors">لوحة الصدارة</a></li> {# Added Leaderboard Link #}
+                        <li class="mb-2"><a href="{% url 'achievements:challenge_list' %}" class="text-muted hover-primary transition-colors">تحديات الدراسة</a></li> {# Added Challenges Link #}
                         <li class="mb-2"><a href="{% url 'prayer_times:prayer_times_list' %}" class="text-muted hover-primary transition-colors">أوقات الصلاة</a></li>
                         <li class="mb-2"><a href="{% url 'prayer_times:quran_page' %}" class="text-muted hover-primary transition-colors">القرآن الكريم</a></li>
                         <li class="mb-2"><a href="{% url 'prayer_times:adhkar_page' %}" class="text-muted hover-primary transition-colors">الأذكار</a></li>
                         <li class="mb-2"><a href="{% url 'prayer_times:duas_page' %}" class="text-muted hover-primary transition-colors">الأدعية</a></li>
                         <li class="mb-2"><a href="{% url 'prayer_times:hadith_page' %}" class="text-muted hover-primary transition-colors">الأحاديث</a></li>
+                        {% if user.is_staff %} {# Added Admin Dashboard Link #}
+                            <li class="mb-2"><a href="{% url 'exam_prep:admin_dashboard' %}" class="text-muted hover-primary transition-colors">لوحة تحكم المشرف</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <!-- Contact Info -->
@@ -416,9 +454,6 @@
             }
 
             // Notifications Dropdown Logic (if needed beyond Bootstrap's native behavior)
-            // Bootstrap's dropdowns handle visibility automatically with data-bs-toggle="dropdown"
-            // If you have custom animation classes (dropdown-menu-animated), ensure they are applied
-            // and the 'show' class is toggled by Bootstrap.
             const notificationsDropdown = document.getElementById('notificationsDropdown');
             if (notificationsDropdown) {
                 notificationsDropdown.addEventListener('show.bs.dropdown', function () {
@@ -435,24 +470,8 @@
                 });
             }
 
-            // Scroll to Top Button (if needed)
-            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-            if (scrollToTopBtn) {
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) { // Show button after scrolling 300px
-                        scrollToTopBtn.classList.add('show');
-                    } else {
-                        scrollToTopBtn.classList.remove('show');
-                    }
-                });
-
-                scrollToTopBtn.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                });
-            }
+            // Scroll to Top Button (if needed) - Removed as it's not in the provided HTML for now
+            // If you add a scroll-to-top button, remember to uncomment and adjust this part.
         });
     </script>
     {% block extra_scripts %}{% endblock %}

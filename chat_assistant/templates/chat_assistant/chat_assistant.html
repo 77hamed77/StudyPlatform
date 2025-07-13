@@ -4,28 +4,223 @@
 
 {% block title %}مساعد الشات - {{ block.super }}{% endblock %}
 
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .chat-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .chat-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .chat-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    body.dark-mode .chat-header h2 {
+        color: #e4c975;
+    }
+    .filter-section, .lecture-select-section, .predefined-questions-section {
+        margin-bottom: 25px;
+        padding: 20px;
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .filter-section,
+    body.dark-mode .lecture-select-section,
+    body.dark-mode .predefined-questions-section {
+        background-color: #293b54;
+        border-color: #3b4d66;
+    }
+    .filter-section label,
+    .lecture-select-section label,
+    .predefined-questions-section h4 {
+        color: var(--text-color, #333);
+        font-weight: 600;
+    }
+    body.dark-mode .filter-section label,
+    body.dark-mode .lecture-select-section label,
+    body.dark-mode .predefined-questions-section h4 {
+        color: #e8ecf1;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid var(--input-border, #ced4da);
+        background-color: var(--input-bg, #fff);
+        color: var(--text-color, #333);
+        padding: 10px 15px;
+    }
+    body.dark-mode .form-control,
+    body.dark-mode .form-select {
+        background-color: #20304a;
+        border-color: #293b54;
+        color: #e8ecf1;
+    }
+    .btn-primary, .btn-outline-primary {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-primary {
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        color: #fff;
+    }
+    body.dark-mode .btn-primary {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .btn-primary:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .btn-primary:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+    .btn-outline-primary {
+        color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+    }
+    body.dark-mode .btn-outline-primary {
+        color: #e4c975;
+        border-color: #e4c975;
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color, #007bff);
+        color: #fff;
+    }
+    body.dark-mode .btn-outline-primary:hover {
+        background-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .btn-secondary {
+        background-color: var(--secondary-color, #6c757d);
+        border-color: var(--secondary-color, #6c757d);
+        color: #fff;
+    }
+    body.dark-mode .btn-secondary {
+        background-color: #b1bdd1;
+        border-color: #b1bdd1;
+        color: #1d2c3b;
+    }
+    .btn-secondary:hover {
+        background-color: var(--secondary-color-dark, #5a6268);
+        border-color: var(--secondary-color-dark, #5a6268);
+    }
+    body.dark-mode .btn-secondary:hover {
+        background-color: #a0acbe;
+        border-color: #a0acbe;
+    }
+
+    .chat-area {
+        min-height: 250px;
+        max-height: 450px;
+        overflow-y: auto;
+        background-color: var(--bg-secondary, #f0f4fa);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color, #eee);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    body.dark-mode .chat-area {
+        background-color: #2a3d52;
+        border-color: #3b4d66;
+    }
+    .user-message {
+        background-color: var(--primary-color-light, #e0f0ff);
+        color: var(--primary-color-dark, #0056b3);
+        padding: 12px 18px;
+        border-radius: 15px 15px 0 15px;
+        align-self: flex-end;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+    body.dark-mode .user-message {
+        background-color: #e4c975;
+        color: #1d2c3b;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 15px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .ai-message {
+        background-color: var(--bg-tertiary, #e6ffe6);
+        color: var(--success-color-dark, #218838);
+        padding: 12px 18px;
+        border-radius: 15px 15px 15px 0;
+        align-self: flex-start;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+    body.dark-mode .ai-message {
+        background-color: #8bc34a;
+        color: #1d2c3b;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 15px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .loading-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: var(--primary-color, #007bff);
+        font-weight: 500;
+    }
+    body.dark-mode .loading-indicator {
+        color: #e4c975;
+    }
+    .spinner-border {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-width: 0.2em;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2><i class="fas fa-comments me-2"></i>مساعد الشات للطلاب</h2>
+<div class="container my-4 chat-container">
+    <div class="chat-header">
+        <h2><i class="fas fa-robot me-2"></i>مساعد دراسي ذكي</h2>
+        <p class="text-muted">اسأل عن المحاضرات، لخص النصوص، أو احصل على خطة دراسية مخصصة.</p>
+    </div>
 
     <!-- Filter Section -->
-    <div class="filter-section mb-4">
-        <form method="get" action="" class="row g-3 align-items-end">
-            <div class="col-auto">
-                <label for="search">ابحث عن محاضرة:</label>
-                <input type="text" name="q" id="search" class="form-control" value="{{ request.GET.q }}" placeholder="ابحث باسم المحاضرة...">
+    <div class="filter-section">
+        <form method="get" action="{% url 'chat_assistant:chat_assistant' %}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="search" class="form-label">ابحث عن محاضرة:</label>
+                <input type="text" name="q" id="search" class="form-control" value="{{ request.GET.q|default:'' }}" placeholder="ابحث باسم المحاضرة...">
             </div>
-            <div class="col-auto">
-                <label for="academic_year">السنة الدراسية:</label>
+            <div class="col-md-3">
+                <label for="academic_year" class="form-label">السنة الدراسية:</label>
                 <select name="academic_year" id="academic_year" class="form-select">
                     <option value="">--- جميع السنوات ---</option>
                     {% for year in academic_years %}
-                        <option value="{{ year }}" {% if request.GET.academic_year == year %}selected{% endif %}>{{ year }}</option>
+                        <option value="{{ year }}" {% if request.GET.academic_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-auto">
-                <label for="semester">الفصل الدراسي:</label>
+            <div class="col-md-3">
+                <label for="semester" class="form-label">الفصل الدراسي:</label>
                 <select name="semester" id="semester" class="form-select">
                     <option value="">--- جميع الفصول ---</option>
                     {% for value, label in semesters %}
@@ -33,76 +228,101 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">تصفية</button>
-                <a href="{% url 'chat_assistant:chat_assistant' %}" class="btn btn-outline-secondary">مسح الفلتر</a>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">تصفية</button>
+                <a href="{% url 'chat_assistant:chat_assistant' %}" class="btn btn-outline-secondary w-100 mt-2">مسح الفلتر</a>
             </div>
         </form>
     </div>
 
     <!-- List of Lectures -->
-    <div class="mb-4">
-        <h4>اختر محاضرة:</h4>
-        <select name="lecture" id="lecture" class="form-select">
+    <div class="lecture-select-section">
+        <h4 class="mb-3">اختر محاضرة للتفاعل معها:</h4>
+        <select name="lecture" id="lecture-select" class="form-select">
             <option value="">--- اختر محاضرة ---</option>
             {% for file in files %}
                 <option value="{{ file.id }}">{{ file.title }} ({{ file.academic_year|default:"غير محدد" }}, {{ file.semester|default:"غير محدد" }})</option>
             {% endfor %}
         </select>
+        <small class="form-text text-muted mt-2">اختر محاضرة لتمكين المساعد من الإجابة على أسئلة محددة أو تلخيص محتواها.</small>
     </div>
 
-    <!-- Predefined Questions -->
-    <div class="mb-4">
-        <h4>أسئلة جاهزة:</h4>
-        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('ترجم هذه المحاضرة')">ترجم هذه المحاضرة</button>
-        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('لخص لي أهم الأفكار')">لخص لي أهم الأفكار</button>
-        <button class="btn btn-outline-primary me-2 mb-2" onclick="askQuestion('ابحث عن عناوين يوتيوب')">ابحث عن عناوين يوتيوب</button>
+    <!-- Predefined Questions and Actions -->
+    <div class="predefined-questions-section">
+        <h4 class="mb-3">أو اختر إجراءً سريعاً:</h4>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary" onclick="triggerAIAction('summarize')">
+                <i class="fas fa-file-alt me-1"></i> تلخيص المحاضرة
+            </button>
+            <button class="btn btn-outline-primary" onclick="triggerAIAction('key_points')">
+                <i class="fas fa-lightbulb me-1"></i> استخراج النقاط الرئيسية
+            </button>
+            <button class="btn btn-outline-primary" onclick="triggerAIAction('study_plan')">
+                <i class="fas fa-calendar-alt me-1"></i> اقتراح خطة دراسية
+            </button>
+        </div>
     </div>
 
     <!-- Chat Area -->
-    <div id="chat-area" class="border p-3 rounded" style="min-height: 200px; max-height: 400px; overflow-y: auto;">
-        <p>أدخل سؤالك أو اختر من الأسئلة أعلاه...</p>
+    <div id="chat-area" class="chat-area">
+        <p class="text-muted">أدخل سؤالك أو اختر من الإجراءات أعلاه لبدء التفاعل مع المساعد الذكي...</p>
     </div>
-    <textarea id="chat-input" class="form-control mt-2" placeholder="اكتب سؤالك هنا..."></textarea>
-    <button class="btn btn-primary mt-2" onclick="sendQuestion()">إرسال</button>
-    <button class="btn btn-secondary mt-2" onclick="clearChat()">مسح الشات</button>
-    <div id="loading-indicator" class="mt-2 text-primary" style="display: none;">
-        <div class="spinner-border spinner-border-sm" role="status">
+    
+    <div class="input-group mt-3">
+        <textarea id="chat-input" class="form-control" placeholder="اكتب سؤالك هنا..." rows="3"></textarea>
+        <button class="btn btn-primary" type="button" onclick="sendQuestion()">
+            <i class="fas fa-paper-plane me-1"></i> إرسال
+        </button>
+    </div>
+    <button class="btn btn-secondary mt-2 w-100" onclick="clearChat()">
+        <i class="fas fa-eraser me-1"></i> مسح الشات
+    </button>
+    <div id="loading-indicator" class="loading-indicator mt-3" style="display: none;">
+        <div class="spinner-border" role="status">
             <span class="visually-hidden">جاري التحميل...</span>
         </div>
-        جاري معالجة طلبك...
+        <span>جاري معالجة طلبك...</span>
     </div>
+</div>
+{% endblock content %}
 
-    <script>
+{% block extra_scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.12/marked.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatArea = document.getElementById('chat-area');
+        const chatInput = document.getElementById('chat-input');
+        const lectureSelect = document.getElementById('lecture-select');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
         function showLoading() {
-            document.getElementById('loading-indicator').style.display = 'block';
+            loadingIndicator.style.display = 'flex';
         }
 
         function hideLoading() {
-            document.getElementById('loading-indicator').style.display = 'none';
+            loadingIndicator.style.display = 'none';
         }
 
-        function appendMessage(sender, message) {
-            const chatArea = document.getElementById('chat-area');
-            const messageElement = document.createElement('p');
-            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        function appendMessage(sender, message, isMarkdown = false) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(sender === 'أنت' ? 'user-message' : 'ai-message');
+            
+            if (isMarkdown) {
+                messageElement.innerHTML = marked.parse(message); // Render Markdown
+            } else {
+                messageElement.textContent = message;
+            }
             chatArea.appendChild(messageElement);
             chatArea.scrollTop = chatArea.scrollHeight; // Scroll to bottom
         }
 
-        function clearChat() {
-            const chatArea = document.getElementById('chat-area');
-            chatArea.innerHTML = '<p>أدخل سؤالك أو اختر من الأسئلة أعلاه...</p>';
-        }
+        window.clearChat = function() {
+            chatArea.innerHTML = '<p class="text-muted">أدخل سؤالك أو اختر من الإجراءات أعلاه لبدء التفاعل مع المساعد الذكي...</p>';
+        };
 
-        function askQuestion(question) {
-            document.getElementById('chat-input').value = question;
-            sendQuestion();
-        }
-
-        function sendQuestion() {
-            const input = document.getElementById('chat-input').value.trim();
-            const lectureSelect = document.getElementById('lecture');
+        window.sendQuestion = function() {
+            const input = chatInput.value.trim();
             const lectureId = lectureSelect.value;
             const lectureTitle = lectureSelect.options[lectureSelect.selectedIndex].text;
 
@@ -110,25 +330,29 @@
                 alert('يرجى كتابة سؤال.');
                 return;
             }
-            if (!lectureId) {
-                alert('يرجى اختيار محاضرة.');
+            if (!lectureId && !input.includes('خطة دراسية')) { // Allow study plan without lecture
+                alert('يرجى اختيار محاضرة أو طلب خطة دراسية.');
                 return;
             }
 
-            appendMessage('أنت', `(${lectureTitle}) ${input}`);
-            document.getElementById('chat-input').value = ''; // Clear input
+            appendMessage('أنت', `(${lectureTitle === '--- اختر محاضرة ---' ? 'عام' : lectureTitle}) ${input}`);
+            chatInput.value = ''; // Clear input
             showLoading();
 
-            fetch(`/chat/?question=${encodeURIComponent(input)}&lecture_id=${lectureId}`, {
+            let url = `/prayer/chat/?question=${encodeURIComponent(input)}`;
+            if (lectureId) {
+                url += `&lecture_id=${lectureId}`;
+            }
+
+            fetch(url, {
                 method: 'GET',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // للإشارة إلى طلب AJAX
+                    'X-Requested-With': 'XMLHttpRequest' // Signal AJAX request
                 }
             })
             .then(response => {
                 hideLoading();
                 if (!response.ok) {
-                    // إذا كان هناك خطأ في الاستجابة (مثل 404، 500)
                     return response.json().then(errorData => {
                         throw new Error(errorData.response || `خطأ في الخادم: ${response.status}`);
                     });
@@ -136,14 +360,71 @@
                 return response.json();
             })
             .then(data => {
-                appendMessage('المساعد', data.response);
+                appendMessage('المساعد', data.response, true); // Assume AI response might contain Markdown
             })
             .catch(error => {
                 hideLoading();
                 console.error('Error:', error);
                 appendMessage('خطأ', `حدث خطأ: ${error.message || 'فشل الاتصال.'}`);
             });
-        }
-    </script>
-</div>
-{% endblock %}
+        };
+
+        window.triggerAIAction = function(actionType) {
+            const lectureId = lectureSelect.value;
+            const lectureTitle = lectureSelect.options[lectureSelect.selectedIndex].text;
+
+            if (!lectureId && actionType !== 'study_plan') {
+                alert('يرجى اختيار محاضرة لهذا الإجراء.');
+                return;
+            }
+
+            let questionText = "";
+            switch (actionType) {
+                case 'summarize':
+                    questionText = "لخص لي المحاضرة";
+                    break;
+                case 'key_points':
+                    questionText = "استخرج أهم النقاط الرئيسية";
+                    break;
+                case 'study_plan':
+                    questionText = "اقترح خطة دراسية مخصصة لي";
+                    break;
+                default:
+                    questionText = "ما هو سؤالك؟"; // Fallback
+            }
+
+            appendMessage('أنت', `(${lectureTitle === '--- اختر محاضرة ---' ? 'عام' : lectureTitle}) ${questionText}`);
+            showLoading();
+
+            let url = `/prayer/chat/?question=${encodeURIComponent(questionText)}&action=${actionType}`;
+            if (lectureId && actionType !== 'study_plan') { // Do not send lecture_id for study_plan
+                url += `&lecture_id=${lectureId}`;
+            }
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                hideLoading();
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.response || `خطأ في الخادم: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                appendMessage('المساعد', data.response, true);
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                appendMessage('خطأ', `حدث خطأ: ${error.message || 'فشل الاتصال.'}`);
+            });
+        };
+    });
+</script>
+{% endblock extra_scripts %}

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}القرآن الكريم - {{ block.super }}{% endblock %}
 
 {% block extra_head %}
@@ -64,6 +63,36 @@
         border-color: #e4c975;
         color: #1d2c3b;
     }
+    .surah-select-form .btn-primary:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .surah-select-form .btn-primary:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+
+    /* Search Input */
+    .search-input-group {
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .search-input-group .form-control {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .search-input-group .btn {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
     .surah-content {
         text-align: justify;
         font-size: 1.3rem;
@@ -90,6 +119,11 @@
     body.dark-mode .surah-title-arabic {
         color: #e4c975;
     }
+    .ayah-wrapper {
+        display: inline; /* لجعل الآيات تتدفق كفقرة واحدة */
+        position: relative;
+        cursor: pointer; /* للإشارة إلى أنها قابلة للنقر */
+    }
     .ayah-text {
         margin-bottom: 10px;
     }
@@ -98,6 +132,60 @@
         vertical-align: super;
         margin-left: 5px;
         color: var(--text-muted, #6c757d);
+        font-weight: bold;
+    }
+    .ayah-controls {
+        display: none; /* مخفية افتراضياً */
+        position: absolute;
+        top: -10px; /* فوق الآية بقليل */
+        right: 0;
+        background-color: var(--bg-secondary, #f0f4fa);
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 5px;
+        padding: 5px;
+        z-index: 10;
+        white-space: nowrap; /* لمنع الأزرار من الالتفاف */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    body.dark-mode .ayah-controls {
+        background-color: #2a3d52;
+        border-color: #3b4d66;
+    }
+    .ayah-controls button {
+        background: none;
+        border: none;
+        color: var(--primary-color, #007bff);
+        font-size: 1rem;
+        cursor: pointer;
+        margin: 0 5px;
+        transition: color 0.2s;
+    }
+    body.dark-mode .ayah-controls button {
+        color: #e4c975;
+    }
+    .ayah-controls button:hover {
+        color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .ayah-controls button:hover {
+        color: #d1b66a;
+    }
+    .tafsir-text {
+        display: none; /* مخفي افتراضياً */
+        background-color: var(--bg-secondary, #e9f7ef);
+        border-right: 3px solid var(--success-color, #28a745);
+        padding: 10px 15px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-color, #333);
+        text-align: justify;
+    }
+    body.dark-mode .tafsir-text {
+        background-color: #2a3d52;
+        border-color: #8bc34a;
+        color: #e8ecf1;
     }
     .audio-player-container {
         margin-top: 20px;
@@ -116,6 +204,29 @@
         width: 100%;
         max-width: 400px;
     }
+    .play-full-surah-btn {
+        background-color: var(--success-color, #28a745);
+        border-color: var(--success-color, #28a745);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.dark-mode .play-full-surah-btn {
+        background-color: #8bc34a;
+        border-color: #8bc34a;
+        color: #1d2c3b;
+    }
+    .play-full-surah-btn:hover {
+        background-color: var(--success-color-dark, #218838);
+        border-color: var(--success-color-dark, #218838);
+    }
+    body.dark-mode .play-full-surah-btn:hover {
+        background-color: #7cb342;
+        border-color: #7cb342;
+    }
 </style>
 <!-- إضافة خط Amiri من Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -128,7 +239,7 @@
     <div class="quran-container">
         <div class="quran-header">
             <h2><i class="fas fa-quran me-2"></i> القرآن الكريم</h2>
-            <p class="text-muted">اختر سورة وقارئاً للاستماع والقراءة.</p>
+            <p class="text-muted">اختر سورة وقارئاً للاستماع والقراءة مع التفسير.</p>
         </div>
 
         <form method="GET" action="{% url 'prayer_times:quran_page' %}" class="surah-select-form">
@@ -157,23 +268,36 @@
             </div>
         </form>
 
+        {# شريط البحث #}
+        <div class="input-group mb-3 search-input-group">
+            <input type="text" class="form-control" id="ayah-search-input" placeholder="ابحث عن آية...">
+            <button class="btn btn-outline-secondary" type="button" id="clear-search-btn" style="display: none;">مسح</button>
+        </div>
+
         {% if surah_data %}
             <div class="surah-display-area">
                 <h3 class="surah-title-arabic">{{ surah_data.name }}</h3>
-                <p class="text-muted">القارئ: {{ reciter|default:"ar.alafasy" }}</p>
+                <p class="text-muted">القارئ: {{ reciter_list|get_reciter_name:reciter|default:"مشاري العفاسي" }}</p>
                 
                 {% if surah_data.audio %}
                 <div class="audio-player-container">
-                    <audio controls preload="none">
-                        <source src="{{ surah_data.audio }}" type="audio/mpeg">
-                        متصفحك لا يدعم عنصر الصوت.
-                    </audio>
+                    <button class="btn play-full-surah-btn" onclick="playFullSurah()">
+                        <i class="fas fa-play me-2"></i> تشغيل السورة كاملة
+                    </button>
+                    <audio id="full-surah-audio" src="{{ surah_data.audio }}" preload="none"></audio>
                 </div>
                 {% endif %}
 
-                <div class="surah-content text-right">
+                <div class="surah-content text-right" id="surah-content">
                     {% for ayah in surah_data.ayahs %}
-                        <span class="ayah-text">{{ ayah.text }}<span class="ayah-number">﴿{{ ayah.numberInSurah }}﴾</span> </span>
+                        <span class="ayah-wrapper" data-ayah-number="{{ ayah.numberInSurah }}" data-audio-url="{{ ayah.audio }}" data-tafsir="{{ ayah.tafsir }}">
+                            <span class="ayah-text">{{ ayah.text }}<span class="ayah-number">﴿{{ ayah.numberInSurah }}﴾</span> </span>
+                            <div class="ayah-controls">
+                                <button onclick="toggleTafsir(this)"><i class="fas fa-book-reader"></i> تفسير</button>
+                                <button onclick="playAyahAudio(this)"><i class="fas fa-play-circle"></i> استماع</button>
+                            </div>
+                            <div class="tafsir-text"></div> {# سيتم ملء هذا بواسطة JS #}
+                        </span>
                     {% endfor %}
                 </div>
             </div>
@@ -185,3 +309,133 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const surahContent = document.getElementById('surah-content');
+        const ayahWrappers = surahContent ? surahContent.querySelectorAll('.ayah-wrapper') : [];
+        const fullSurahAudio = document.getElementById('full-surah-audio');
+        const searchInput = document.getElementById('ayah-search-input');
+        const clearSearchBtn = document.getElementById('clear-search-btn');
+        let currentPlayingAyahAudio = null; // لتتبع الآية التي يتم تشغيلها حالياً
+
+        // Function to handle showing/hiding ayah controls
+        ayahWrappers.forEach(wrapper => {
+            wrapper.addEventListener('mouseenter', function() {
+                const controls = this.querySelector('.ayah-controls');
+                if (controls) {
+                    controls.style.display = 'block';
+                }
+            });
+
+            wrapper.addEventListener('mouseleave', function() {
+                const controls = this.querySelector('.ayah-controls');
+                if (controls) {
+                    controls.style.display = 'none';
+                }
+            });
+        });
+
+        // Toggle Tafsir function
+        window.toggleTafsir = function(button) {
+            const ayahWrapper = button.closest('.ayah-wrapper');
+            const tafsirTextDiv = ayahWrapper.querySelector('.tafsir-text');
+            const tafsirContent = ayahWrapper.dataset.tafsir;
+
+            if (tafsirTextDiv.style.display === 'block') {
+                tafsirTextDiv.style.display = 'none';
+            } else {
+                tafsirTextDiv.innerHTML = `<p>${tafsirContent}</p>`;
+                tafsirTextDiv.style.display = 'block';
+            }
+        };
+
+        // Play Ayah Audio function
+        window.playAyahAudio = function(button) {
+            const ayahWrapper = button.closest('.ayah-wrapper');
+            const audioUrl = ayahWrapper.dataset.audioUrl;
+
+            if (!audioUrl) {
+                alert('لا يوجد ملف صوتي متاح لهذه الآية.');
+                return;
+            }
+
+            // Stop current playing audio if any
+            if (currentPlayingAyahAudio) {
+                currentPlayingAyahAudio.pause();
+                currentPlayingAyahAudio.currentTime = 0;
+            }
+
+            // Pause full surah audio if playing
+            if (fullSurahAudio && !fullSurahAudio.paused) {
+                fullSurahAudio.pause();
+            }
+
+            const audio = new Audio(audioUrl);
+            audio.play();
+            currentPlayingAyahAudio = audio;
+
+            audio.addEventListener('ended', function() {
+                currentPlayingAyahAudio = null; // Reset when finished
+            });
+            audio.addEventListener('error', function() {
+                alert('حدث خطأ أثناء تشغيل الصوت. قد يكون الرابط غير صالح.');
+                currentPlayingAyahAudio = null;
+            });
+        };
+
+        // Play Full Surah Audio function
+        window.playFullSurah = function() {
+            if (fullSurahAudio) {
+                if (currentPlayingAyahAudio) {
+                    currentPlayingAyahAudio.pause();
+                    currentPlayingAyahAudio.currentTime = 0;
+                    currentPlayingAyahAudio = null;
+                }
+                if (fullSurahAudio.paused) {
+                    fullSurahAudio.play();
+                } else {
+                    fullSurahAudio.pause();
+                }
+            } else {
+                alert('لا يوجد ملف صوتي كامل للسورة.');
+            }
+        };
+
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toLowerCase();
+            if (searchTerm.length > 0) {
+                clearSearchBtn.style.display = 'inline-block';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+
+            ayahWrappers.forEach(wrapper => {
+                const ayahText = wrapper.querySelector('.ayah-text').textContent.toLowerCase();
+                const tafsirText = wrapper.dataset.tafsir.toLowerCase();
+
+                if (ayahText.includes(searchTerm) || tafsirText.includes(searchTerm)) {
+                    wrapper.style.display = 'inline'; // Show ayah
+                    // Highlight matches (optional, more complex)
+                } else {
+                    wrapper.style.display = 'none'; // Hide ayah
+                }
+            });
+        });
+
+        clearSearchBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input')); // Trigger input event to clear filter
+        });
+    });
+</script>
+
+{% comment %}
+    Helper filter to get reciter name from reciters_list by id.
+    Usage: {{ reciters_list|get_reciter_name:reciter }}
+{% endcomment %}
+{% load custom_filters %}
+{% endblock extra_scripts %}

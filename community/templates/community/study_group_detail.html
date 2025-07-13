@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ group.name }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .group-detail-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right; /* RTL */
+    }
+    body.dark-mode .group-detail-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .group-detail-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    body.dark-mode .group-detail-header h2 {
+        color: #e4c975;
+    }
+    .group-info p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-color, #333);
+        margin-bottom: 8px;
+    }
+    body.dark-mode .group-info p {
+        color: #e8ecf1;
+    }
+    .group-info .meta-item {
+        font-size: 0.95rem;
+        color: var(--text-muted, #6c757d);
+    }
+    body.dark-mode .group-info .meta-item {
+        color: #b1bdd1;
+    }
+    .btn-join-leave {
+        margin-top: 20px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    .chat-section, .members-section {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .chat-section, body.dark-mode .members-section {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .chat-section h3, .members-section h3 {
+        font-size: 1.8rem;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 20px;
+        font-weight: 600;
+        text-align: right;
+    }
+    body.dark-mode .chat-section h3, body.dark-mode .members-section h3 {
+        color: #e4c975;
+    }
+    .chat-messages {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid var(--border-color, #eee);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column; /* To stack messages */
+    }
+    body.dark-mode .chat-messages {
+        border-color: #3b4d66;
+    }
+    .message-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .message-item.sent {
+        align-self: flex-end; /* Align to right for sent messages */
+        background-color: var(--primary-color-light, #cfe2ff);
+        color: var(--text-color, #333);
+        border-bottom-right-radius: 2px;
+    }
+    body.dark-mode .message-item.sent {
+        background-color: #4a6a8c;
+        color: #e8ecf1;
+    }
+    .message-item.received {
+        align-self: flex-start; /* Align to left for received messages */
+        background-color: var(--bg-light-hover, #e9ecef);
+        color: var(--text-color, #333);
+        border-bottom-left-radius: 2px;
+    }
+    body.dark-mode .message-item.received {
+        background-color: #3b4d66;
+        color: #e8ecf1;
+    }
+    .message-sender {
+        font-weight: bold;
+        margin-bottom: 2px;
+        font-size: 0.9em;
+    }
+    .message-content {
+        font-size: 1em;
+    }
+    .message-timestamp {
+        font-size: 0.75em;
+        color: var(--text-muted, #6c757d);
+        align-self: flex-end;
+        margin-top: 5px;
+    }
+    body.dark-mode .message-timestamp {
+        color: #b1bdd1;
+    }
+    .chat-form .form-control {
+        border-radius: 8px;
+        background-color: var(--bg-light, #f8f9fa);
+        border: 1px solid var(--border-color, #ccc);
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .chat-form .form-control {
+        background-color: #293b54;
+        border-color: #3b4d66;
+        color: #e8ecf1;
+    }
+    .chat-form .btn-send {
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        color: #fff;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    body.dark-mode .chat-form .btn-send {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    .chat-form .btn-send:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .chat-form .btn-send:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+
+    .members-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .member-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .member-item {
+        border-color: #3b4d66;
+    }
+    .member-item:last-child {
+        border-bottom: none;
+    }
+    .member-item .fas {
+        margin-left: 10px; /* Adjust for RTL */
+        color: var(--primary-color, #007bff);
+    }
+    body.dark-mode .member-item .fas {
+        color: #e4c975;
+    }
+    .member-item .role {
+        font-size: 0.9em;
+        color: var(--text-muted, #6c757d);
+        margin-right: 10px; /* Adjust for RTL */
+    }
+    body.dark-mode .member-item .role {
+        color: #b1bdd1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="group-detail-container">
+        <div class="group-detail-header text-center">
+            <h2><i class="fas fa-users me-2"></i> {{ group.name }}</h2>
+            <p class="lead text-muted">{{ group.description }}</p>
+        </div>
+
+        <div class="group-info text-end mt-4">
+            <p class="meta-item"><i class="fas fa-book me-1"></i> المادة: {{ group.subject.name|default:"غير محددة" }}</p>
+            <p class="meta-item"><i class="fas fa-user-circle me-1"></i> المنشئ: {{ group.creator.username }}</p>
+            <p class="meta-item"><i class="fas fa-calendar-alt me-1"></i> تاريخ الإنشاء: {{ group.created_at|date:"d M Y" }}</p>
+            
+            <div class="text-center">
+                {% if is_member %}
+                    <button id="join-leave-btn" class="btn btn-danger btn-join-leave" data-group-id="{{ group.pk }}">
+                        <i class="fas fa-sign-out-alt me-2"></i> مغادرة المجموعة
+                    </button>
+                {% else %}
+                    <button id="join-leave-btn" class="btn btn-primary btn-join-leave" data-group-id="{{ group.pk }}">
+                        <i class="fas fa-sign-in-alt me-2"></i> الانضمام للمجموعة
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if is_member %}
+            <div class="row mt-5">
+                <div class="col-md-8">
+                    <div class="chat-section">
+                        <h3><i class="fas fa-comments me-2"></i> دردشة المجموعة</h3>
+                        <div class="chat-messages" id="chat-messages">
+                            {% for message in messages %}
+                                <div class="message-item {% if message.sender == user %}sent{% else %}received{% endif %}">
+                                    <div class="message-sender">{{ message.sender.username }}</div>
+                                    <div class="message-content">{{ message.content }}</div>
+                                    <div class="message-timestamp">{{ message.timestamp|date:"H:i" }}</div>
+                                </div>
+                            {% empty %}
+                                <div class="text-center text-muted">لا توجد رسائل بعد. كن أول من يرسل رسالة!</div>
+                            {% endfor %}
+                        </div>
+                        <form id="chat-form" class="chat-form">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                {{ message_form.content }}
+                                <button class="btn btn-primary btn-send" type="submit">
+                                    <i class="fas fa-paper-plane"></i> إرسال
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="members-section">
+                        <h3><i class="fas fa-users me-2"></i> أعضاء المجموعة</h3>
+                        <ul class="members-list">
+                            {% for membership in members %}
+                                <li class="member-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ membership.user.username }}</span>
+                                    <span class="role">({{ membership.get_role_display }})</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning text-center mt-4" role="alert">
+                <p>يجب عليك الانضمام إلى هذه المجموعة لعرض الدردشة والأعضاء.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<!-- Use json_script to safely pass group.pk to JavaScript -->
+<script id="group-id-data" type="application/json">
+    {{ group.pk|default:0 }}
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const groupIdScriptTag = document.getElementById('group-id-data');
+        let groupId = 0; // Default fallback value
+
+        if (groupIdScriptTag && groupIdScriptTag.textContent.trim() !== '') {
+            try {
+                // Safely parse the JSON content from the script tag
+                let parsedId = JSON.parse(groupIdScriptTag.textContent.trim());
+                
+                // Ensure the parsed value is a number
+                if (typeof parsedId === 'number') {
+                    groupId = parsedId;
+                } else if (typeof parsedId === 'string') {
+                    // If it somehow parsed as a string (e.g., "123"), convert to number
+                    groupId = parseInt(parsedId);
+                    if (isNaN(groupId)) {
+                        console.error("Parsed group ID is NaN after parseInt. Original content:", groupIdScriptTag.textContent.trim());
+                        groupId = 0; // Fallback if conversion fails
+                    }
+                } else {
+                    console.error("Unexpected type for group ID from script tag:", typeof parsedId, "Content:", groupIdScriptTag.textContent.trim());
+                    groupId = 0; // Fallback for unexpected types
+                }
+
+            } catch (e) {
+                console.error("Error parsing group ID from json_script tag:", e);
+                groupId = 0; // Fallback to 0 if JSON parsing fails
+            }
+        } else {
+            console.warn("group-id-data script tag not found or is empty. Defaulting groupId to 0.");
+        }
+        
+        // Add console logs for debugging
+        console.log("Final groupId value:", groupId);
+        console.log("Type of final groupId:", typeof groupId);
+
+        // Critical check: If groupId is invalid (NaN or 0), disable functionalities
+        if (typeof groupId !== 'number' || isNaN(groupId) || groupId === 0) {
+            console.error("Critical Error: groupId is invalid or 0. Disabling AJAX functionalities for this page.");
+            const joinLeaveBtn = document.getElementById('join-leave-btn');
+            const chatForm = document.getElementById('chat-form');
+
+            if (joinLeaveBtn) {
+                joinLeaveBtn.disabled = true;
+                joinLeaveBtn.textContent = "المجموعة غير متاحة";
+                joinLeaveBtn.classList.remove('btn-primary', 'btn-danger');
+                joinLeaveBtn.classList.add('btn-secondary');
+            }
+            if (chatForm) {
+                chatForm.querySelector('[name="content"]').disabled = true;
+                chatForm.querySelector('.btn-send').disabled = true;
+                chatForm.querySelector('.btn-send').textContent = "الدردشة غير متاحة";
+                chatForm.querySelector('.btn-send').classList.remove('btn-primary');
+                chatForm.querySelector('.btn-send').classList.add('btn-secondary');
+            }
+            // Stop further script execution that relies on a valid groupId
+            return; 
+        }
+
+        // Now, groupId is guaranteed to be a valid number (or 0 if truly invalid/missing)
+        // Proceed with the rest of the script only if groupId is valid.
+        const joinLeaveBtn = document.getElementById('join-leave-btn'); // Re-get if disabled above
+        const chatForm = document.getElementById('chat-form'); // Re-get if disabled above
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        let lastMessageTimestamp = null; // To keep track of the latest message timestamp
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Initial scroll to bottom of chat
+        if (chatMessagesDiv) {
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            // Get the timestamp of the last message on initial load
+            const lastMessageElement = chatMessagesDiv.lastElementChild;
+            if (lastMessageElement && lastMessageElement.classList.contains('message-item')) {
+                const timestampText = lastMessageElement.querySelector('.message-timestamp').textContent;
+                // Assuming timestamp format is H:i (e.g., 14:35)
+                // We need to combine it with today's date for a full datetime object
+                const today = new Date();
+                const [hours, minutes] = timestampText.split(':').map(Number);
+                lastMessageTimestamp = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes, 0);
+                // Convert to YYYY-MM-DD HH:MM:SS format for backend
+                lastMessageTimestamp = lastMessageTimestamp.getFullYear() + '-' + 
+                                       String(lastMessageTimestamp.getMonth() + 1).padStart(2, '0') + '-' +
+                                       String(lastMessageTimestamp.getDate()).padStart(2, '0') + ' ' +
+                                       String(hours).padStart(2, '0') + ':' +
+                                       String(minutes).padStart(2, '0') + ':00';
+            }
+        }
+
+        // --- Join/Leave Group functionality ---
+        if (joinLeaveBtn) {
+            joinLeaveBtn.addEventListener('click', function() {
+                const url = `/community/study-groups/${groupId}/join-leave/`;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'joined' || data.status === 'left') {
+                        messages.success(data.message);
+                        // Reload the page to update content based on membership status
+                        location.reload(); 
+                    } else {
+                        messages.error(data.message || "حدث خطأ.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messages.error("حدث خطأ في الاتصال بالخادم.");
+                });
+            });
+        }
+
+        // --- Chat Message Sending functionality ---
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+                
+                const messageContentInput = chatForm.querySelector('[name="content"]');
+                const messageContent = messageContentInput.value.trim();
+
+                if (!messageContent) {
+                    messages.warning("الرسالة لا يمكن أن تكون فارغة.");
+                    return;
+                }
+
+                const url = `/community/study-groups/${groupId}/send-message/`;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/x-www-form-urlencoded', // Form data
+                    },
+                    body: `content=${encodeURIComponent(messageContent)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Append new message to chat UI
+                        const newMessageHtml = `
+                            <div class="message-item sent">
+                                <div class="message-sender">${data.data.sender}</div>
+                                <div class="message-content">${data.data.content}</div>
+                                <div class="message-timestamp">${data.data.timestamp.substring(11, 16)}</div>
+                            </div>
+                        `;
+                        chatMessagesDiv.insertAdjacentHTML('beforeend', newMessageHtml);
+                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+                        messageContentInput.value = ''; // Clear input
+                        lastMessageTimestamp = data.data.timestamp; // Update last timestamp
+                    } else {
+                        messages.error(data.message || "حدث خطأ أثناء إرسال الرسالة.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    messages.error("حدث خطأ في الاتصال بالخادم عند إرسال الرسالة.");
+                });
+            });
+
+            // --- Poll for new messages every few seconds ---
+            function pollForNewMessages() {
+                const url = `/community/study-groups/${groupId}/get-messages/`;
+                let fetchUrl = url;
+                if (lastMessageTimestamp) {
+                    fetchUrl += `?last_timestamp=${encodeURIComponent(lastMessageTimestamp)}`;
+                }
+
+                fetch(fetchUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest', // Indicate AJAX request
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.messages.length > 0) {
+                        data.messages.forEach(message => {
+                            const messageClass = message.is_current_user ? 'sent' : 'received';
+                            const newMessageHtml = `
+                                <div class="message-item ${messageClass}">
+                                    <div class="message-sender">${message.sender}</div>
+                                    <div class="message-content">${message.content}</div>
+                                    <div class="message-timestamp">${message.timestamp.substring(11, 16)}</div>
+                                </div>
+                            `;
+                            chatMessagesDiv.insertAdjacentHTML('beforeend', newMessageHtml);
+                        });
+                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+                        // Update lastMessageTimestamp to the timestamp of the very last message received
+                        lastMessageTimestamp = data.messages[data.messages.length - 1].timestamp;
+                    } else if (data.status === 'error') {
+                        console.error('Error polling for messages:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching new messages:', error);
+                })
+                .finally(() => {
+                    // Poll again after a delay (e.g., 3 seconds)
+                    setTimeout(pollForNewMessages, 3000); 
+                });
+            }
+
+            // Start polling if user is a member (chatForm exists)
+            if (chatMessagesDiv) { // Check if chat section is rendered (i.e., user is a member)
+                pollForNewMessages();
+            }
+        }
+    });
+</script>
+{% endblock extra_scripts %}

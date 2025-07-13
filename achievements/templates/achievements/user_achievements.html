@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .achievements-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right; /* RTL */
+    }
+    body.dark-mode .achievements-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .achievements-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    body.dark-mode .achievements-header h2 {
+        color: #e4c975;
+    }
+    .stats-card {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        text-align: center;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .stats-card {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .stats-card h3 {
+        font-size: 1.8rem;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 15px;
+    }
+    body.dark-mode .stats-card h3 {
+        color: #e4c975;
+    }
+    .stats-card .stat-value {
+        font-size: 3rem;
+        font-weight: bold;
+        color: var(--accent-color, #00bcd4);
+        margin-bottom: 10px;
+    }
+    body.dark-mode .stats-card .stat-value {
+        color: #a7d9e4;
+    }
+    .xp-bar-container {
+        background-color: var(--border-color, #eee);
+        border-radius: 10px;
+        height: 20px;
+        margin-top: 15px;
+        overflow: hidden;
+    }
+    body.dark-mode .xp-bar-container {
+        background-color: #3b4d66;
+    }
+    .xp-bar {
+        height: 100%;
+        background-color: var(--success-color, #28a745);
+        border-radius: 10px;
+        width: 0%; /* Will be set by JS/inline style */
+        transition: width 0.5s ease-in-out;
+    }
+    body.dark-mode .xp-bar {
+        background-color: #8bc34a;
+    }
+    .xp-text {
+        font-size: 0.9em;
+        color: var(--text-muted, #6c757d);
+        margin-top: 5px;
+    }
+    body.dark-mode .xp-text {
+        color: #b1bdd1;
+    }
+
+    .badges-section h3, .xp-transactions-section h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    body.dark-mode .badges-section h3, body.dark-mode .xp-transactions-section h3 {
+        color: #e4c975;
+    }
+    .badge-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        text-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .badge-item {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .badge-icon {
+        font-size: 3rem;
+        color: var(--accent-color, #00bcd4);
+        margin-bottom: 10px;
+    }
+    body.dark-mode .badge-icon {
+        color: #a7d9e4;
+    }
+    .badge-icon img {
+        max-width: 60px;
+        max-height: 60px;
+        border-radius: 8px;
+    }
+    .badge-name {
+        font-weight: bold;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 5px;
+    }
+    body.dark-mode .badge-name {
+        color: #e4c975;
+    }
+    .badge-description {
+        font-size: 0.9em;
+        color: var(--text-muted, #6c757d);
+    }
+    body.dark-mode .badge-description {
+        color: #b1bdd1;
+    }
+    .badge-earned-at {
+        font-size: 0.8em;
+        color: var(--text-muted, #6c757d);
+        margin-top: 10px;
+    }
+    body.dark-mode .badge-earned-at {
+        color: #b1bdd1;
+    }
+
+    .xp-transaction-item {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .xp-transaction-item {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .xp-transaction-info {
+        text-align: right;
+    }
+    .xp-transaction-info strong {
+        color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .xp-transaction-info strong {
+        color: #e4c975;
+    }
+    .xp-transaction-amount {
+        font-weight: bold;
+        color: var(--success-color, #28a745);
+        font-size: 1.2em;
+    }
+    body.dark-mode .xp-transaction-amount {
+        color: #8bc34a;
+    }
+    .xp-transaction-timestamp {
+        font-size: 0.8em;
+        color: var(--text-muted, #6c757d);
+    }
+    body.dark-mode .xp-transaction-timestamp {
+        color: #b1bdd1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="achievements-container">
+        <div class="achievements-header">
+            <h2><i class="fas fa-medal me-2"></i> {{ page_title }}</h2>
+            <p class="text-center lead">تتبع تقدمك وإنجازاتك في رحلتك التعليمية.</p>
+        </div>
+
+        <div class="row text-center mb-5">
+            <div class="col-md-6 mb-4">
+                <div class="stats-card">
+                    <h3>نقاط الخبرة (XP)</h3>
+                    <div class="stat-value">{{ user_stats.total_xp }}</div>
+                    <div class="xp-bar-container">
+                        {% comment %} Assuming 1000 XP per level for simplicity, adjust as needed {% endcomment %}
+                        {% with xp_for_next_level=1000 %}
+                            {% with xp_in_current_level=user_stats.total_xp|mod:xp_for_next_level %}
+                                {% with progress_percentage=xp_in_current_level|div:xp_for_next_level|mul:100 %}
+                                    <div class="xp-bar" style="width: {{ progress_percentage|floatformat:0 }}%;"></div>
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
+                    </div>
+                    {% with xp_for_next_level=1000 %}
+                        {% with xp_in_current_level=user_stats.total_xp|mod:xp_for_next_level %}
+                            <p class="xp-text">{{ xp_in_current_level }} / {{ xp_for_next_level }} XP للمستوى التالي</p>
+                        {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="stats-card">
+                    <h3>المستوى</h3>
+                    <div class="stat-value">{{ user_stats.level }}</div>
+                    <p class="text-muted">استمر في التعلم لترفع مستواك!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="badges-section mt-5">
+            <h3><i class="fas fa-award me-2"></i> شاراتي المكتسبة</h3>
+            {% if earned_badges %}
+                <div class="row">
+                    {% for user_badge in earned_badges %}
+                        <div class="col-md-4 col-lg-3 mb-4">
+                            <div class="badge-item">
+                                {% if user_badge.badge.icon_image %}
+                                    <img src="{{ user_badge.badge.icon_image.url }}" alt="{{ user_badge.badge.name }}" class="badge-icon">
+                                {% elif user_badge.badge.icon_class %}
+                                    <i class="{{ user_badge.badge.icon_class }} badge-icon"></i>
+                                {% else %}
+                                    <i class="fas fa-certificate badge-icon"></i> {# Default icon #}
+                                {% endif %}
+                                <div class="badge-name">{{ user_badge.badge.name }}</div>
+                                <div class="badge-description">{{ user_badge.badge.description }}</div>
+                                <div class="badge-earned-at">اكتسبت في: {{ user_badge.earned_at|date:"d M Y" }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'achievements:all_badges' %}" class="btn btn-outline-primary">عرض جميع الشارات</a>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    <p>لم تكتسب أي شارات بعد. ابدأ في إكمال المهام والمساهمة لكسب شاراتك الأولى!</p>
+                    <a href="{% url 'achievements:all_badges' %}" class="btn btn-primary">استكشف الشارات</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="xp-transactions-section mt-5">
+            <h3><i class="fas fa-history me-2"></i> آخر معاملات نقاط الخبرة</h3>
+            {% if recent_xp_transactions %}
+                <div class="list-group">
+                    {% for transaction in recent_xp_transactions %}
+                        <div class="xp-transaction-item">
+                            <div class="xp-transaction-info">
+                                <strong>{{ transaction.activity }}</strong>
+                                <p class="mb-0">{{ transaction.timestamp|date:"d M Y H:i" }}</p>
+                            </div>
+                            <div class="xp-transaction-amount">
+                                +{{ transaction.amount }} XP
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning text-center" role="alert">
+                    لا توجد معاملات نقاط خبرة حديثة.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

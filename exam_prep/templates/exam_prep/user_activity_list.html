@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}أنشطة المستخدمين{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-white shadow-lg rounded-lg my-8">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">أنشطة المستخدمين</h1>
+
+    {# نموذج التصفية #}
+    <div class="mb-8 p-6 bg-green-50 rounded-xl shadow-md border border-green-200">
+        <form method="GET" action="{% url 'exam_prep:user_activity_list' %}" class="flex flex-wrap items-center justify-center gap-6">
+            <div class="flex items-center gap-2">
+                <label for="user_id" class="font-semibold text-gray-700 text-lg">تصفية حسب معرف المستخدم:</label>
+                <input type="text" name="user_id" id="user_id" value="{{ request.GET.user_id }}" placeholder="أدخل معرف المستخدم" class="form-input p-3 border border-green-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg">
+            </div>
+
+            <div class="flex items-center gap-2">
+                <label for="activity_type" class="font-semibold text-gray-700 text-lg">تصفية حسب نوع النشاط:</label>
+                <select name="activity_type" id="activity_type" class="form-select p-3 border border-green-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg">
+                    <option value="">جميع الأنواع</option>
+                    {% for type in activity_types %}
+                        <option value="{{ type }}" {% if request.GET.activity_type == type %}selected{% endif %}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-7 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                تطبيق التصفية
+            </button>
+            {% if request.GET.user_id or request.GET.activity_type %}
+                <a href="{% url 'exam_prep:user_activity_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-7 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                    مسح التصفية
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if activities %}
+        <div class="overflow-x-auto rounded-xl shadow-2xl border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الرقم التعريفي</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">المستخدم</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">نوع النشاط</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">الوصف</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">نوع المحتوى</th>
+                        <th scope="col" class="px-6 py-4 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">التاريخ والوقت</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for activity in activities %}
+                        <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <td class="px-6 py-4 whitespace-nowrap text-base font-medium text-gray-900">{{ activity.id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ activity.user.username }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ activity.activity_type }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ activity.description|default_if_none:"لا يوجد" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">
+                                {% if activity.content_type %}
+                                    {{ activity.content_type }}
+                                {% else %}
+                                    غير متاح
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-700">{{ activity.timestamp|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# Pagination #}
+        {% if is_paginated %}
+            <nav class="mt-8 flex justify-center" aria-label="Pagination">
+                <ul class="flex items-center -space-x-px shadow-md rounded-lg">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.user_id %}&user_id={{ request.GET.user_id }}{% endif %}{% if request.GET.activity_type %}&activity_type={{ request.GET.activity_type }}{% endif %}" class="px-4 py-2 ml-0 leading-tight text-gray-600 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-800 transition duration-150 ease-in-out">السابق</a>
+                        </li>
+                    {% endif %}
+
+                    {% for i in paginator.page_range %}
+                        <li>
+                            <a href="?page={{ i }}{% if request.GET.user_id %}&user_id={{ request.GET.user_id }}{% endif %}{% if request.GET.activity_type %}&activity_type={{ request.GET.activity_type }}{% endif %}" class="px-4 py-2 leading-tight {% if page_obj.number == i %}text-blue-700 bg-blue-100 border border-blue-300 font-bold{% else %}text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-800{% endif %} transition duration-150 ease-in-out">
+                                {{ i }}
+                            </a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.user_id %}&user_id={{ request.GET.user_id }}{% endif %}{% if request.GET.activity_type %}&activity_type={{ request.GET.activity_type }}{% endif %}" class="px-4 py-2 leading-tight text-gray-600 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-800 transition duration-150 ease-in-out">التالي</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% else %}
+        <p class="text-center text-gray-600 text-xl p-8 bg-gray-50 rounded-lg shadow-inner">لا توجد أنشطة للمستخدمين حالياً.</p>
+    {% endif %}
+</div>
+{% endblock %}

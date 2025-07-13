@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}المجموعات الدراسية - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+    .study-group-list-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: var(--card-bg, #fff);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: var(--text-color, #333);
+        text-align: right; /* RTL */
+    }
+    body.dark-mode .study-group-list-container {
+        background: #1d2c3b;
+        color: #e8ecf1;
+    }
+    .study-group-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color, #007bff);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    body.dark-mode .study-group-header h2 {
+        color: #e4c975;
+    }
+    .group-card {
+        background-color: var(--bg-light, #f8f9fa);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease-in-out;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color, #eee);
+    }
+    body.dark-mode .group-card {
+        background-color: #293b54;
+        border: 1px solid #3b4d66;
+    }
+    .group-card:hover {
+        transform: translateY(-5px);
+    }
+    .group-card h3 {
+        font-size: 1.8rem;
+        color: var(--primary-color-dark, #0056b3);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    body.dark-mode .group-card h3 {
+        color: #e4c975;
+    }
+    .group-card p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .group-card p {
+        color: #e8ecf1;
+    }
+    .group-card .meta-info {
+        font-size: 0.95rem;
+        color: var(--text-muted, #6c757d);
+        margin-top: 10px;
+    }
+    body.dark-mode .group-card .meta-info {
+        color: #b1bdd1;
+    }
+    .group-card .btn-group-actions {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-end; /* Align buttons to the right */
+        gap: 10px;
+    }
+    .group-card .btn {
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+    .group-card .btn-primary {
+        background-color: var(--primary-color, #007bff);
+        border-color: var(--primary-color, #007bff);
+        color: #fff;
+    }
+    .group-card .btn-primary:hover {
+        background-color: var(--primary-color-dark, #0056b3);
+        border-color: var(--primary-color-dark, #0056b3);
+    }
+    body.dark-mode .group-card .btn-primary {
+        background-color: #e4c975;
+        border-color: #e4c975;
+        color: #1d2c3b;
+    }
+    body.dark-mode .group-card .btn-primary:hover {
+        background-color: #d1b66a;
+        border-color: #d1b66a;
+    }
+    .group-card .btn-outline-secondary {
+        border-color: var(--border-color, #ccc);
+        color: var(--text-color, #333);
+    }
+    body.dark-mode .group-card .btn-outline-secondary {
+        border-color: #555;
+        color: #e8ecf1;
+    }
+    .group-card .btn-outline-secondary:hover {
+        background-color: var(--bg-light-hover, #e9ecef);
+    }
+    body.dark-mode .group-card .btn-outline-secondary:hover {
+        background-color: #3b4d66;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="study-group-list-container">
+        <div class="study-group-header">
+            <h2><i class="fas fa-users me-2"></i> المجموعات الدراسية</h2>
+            <p class="text-center lead">تعاون مع زملائك وشارك المعرفة.</p>
+        </div>
+
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a href="{% url 'community:study_group_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i> إنشاء مجموعة جديدة
+            </a>
+            <form class="d-flex" method="GET" action="{% url 'community:study_group_list' %}">
+                <input class="form-control me-2" type="search" placeholder="ابحث عن مجموعات..." aria-label="Search" name="q" value="{{ request.GET.q }}">
+                <button class="btn btn-outline-primary" type="submit">بحث</button>
+            </form>
+        </div>
+
+        {% if study_groups %}
+            <div class="row">
+                {% for group in study_groups %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="group-card">
+                            <h3><a href="{{ group.get_absolute_url }}" class="text-decoration-none">{{ group.name }}</a></h3>
+                            {% if group.subject %}
+                                <p class="meta-info"><i class="fas fa-book me-1"></i> المادة: {{ group.subject.name }}</p>
+                            {% endif %}
+                            <p>{{ group.description|truncatechars:150 }}</p>
+                            <p class="meta-info">
+                                <i class="fas fa-user-circle me-1"></i> المنشئ: {{ group.creator.username }}
+                            </p>
+                            <p class="meta-info">
+                                <i class="fas fa-calendar-alt me-1"></i> تاريخ الإنشاء: {{ group.created_at|date:"d M Y" }}
+                            </p>
+                            <div class="btn-group-actions">
+                                <a href="{{ group.get_absolute_url }}" class="btn btn-primary">عرض المجموعة</a>
+                                {% if group.is_member %}
+                                    <button class="btn btn-outline-secondary leave-group-btn" data-group-id="{{ group.pk }}">مغادرة المجموعة</button>
+                                {% else %}
+                                    <button class="btn btn-primary join-group-btn" data-group-id="{{ group.pk }}">الانضمام للمجموعة</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">السابق</a></li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">التالي</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <p>لا توجد مجموعات دراسية متاحة حالياً. كن أول من ينشئ واحدة!</p>
+                <a href="{% url 'community:study_group_create' %}" class="btn btn-primary">إنشاء مجموعة جديدة</a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Handle Join/Leave Group buttons
+        document.querySelectorAll('.join-group-btn, .leave-group-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const groupId = this.dataset.groupId;
+                const url = `/community/study-groups/${groupId}/join-leave/`;
+                const isJoining = this.classList.contains('join-group-btn');
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json', // Indicate JSON payload
+                    },
+                    body: JSON.stringify({}) // Empty body for simplicity, can send more data if needed
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'joined' || data.status === 'left') {
+                        // Update button text and class immediately
+                        if (isJoining) {
+                            this.textContent = 'مغادرة المجموعة';
+                            this.classList.remove('btn-primary', 'join-group-btn');
+                            this.classList.add('btn-outline-secondary', 'leave-group-btn');
+                            messages.success("لقد انضممت إلى المجموعة بنجاح!");
+                        } else {
+                            this.textContent = 'الانضمام للمجموعة';
+                            this.classList.remove('btn-outline-secondary', 'leave-group-btn');
+                            this.classList.add('btn-primary', 'join-group-btn');
+                            messages.info("لقد غادرت المجموعة.");
+                        }
+                        // Reload the page to update member count or other dynamic data if necessary
+                        // For a real-time update, you might need to update the DOM without full reload
+                        location.reload(); 
+                    } else {
+                        messages.error(data.message || "حدث خطأ.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messages.error("حدث خطأ في الاتصال بالخادم.");
+                });
+            });
+        });
+    });
+</script>
+{% endblock extra_scripts %}

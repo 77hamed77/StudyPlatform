@@ -1,11 +1,25 @@
 from django.urls import path
-from .views import AllBadgesListView # استيراد الـ ListView مباشرة
+from .views import (
+    AllBadgesListView,
+    UserAchievementsView,
+    LeaderboardView,
+    StudyChallengeListView,
+    StudyChallengeDetailView,
+)
 
-app_name = 'achievements' # تعريف اسم التطبيق للمسارات
+app_name = 'achievements' # Define app_name for namespacing URLs
 
 urlpatterns = [
-    # مسار لعرض جميع الشارات
-    # .as_view() يستخدم مع الـ Class-Based Views مثل ListView
-    path('all/', AllBadgesListView.as_view(), name='all_badges'),
-    # يمكنك إضافة المزيد من المسارات هنا لاحقاً إذا كان لديك المزيد من الـ Views
+    # User Achievements and Badges
+    path('my-achievements/', UserAchievementsView.as_view(), name='my_achievements'),
+    path('all-badges/', AllBadgesListView.as_view(), name='all_badges'),
+    
+    # Leaderboard
+    path('leaderboard/', LeaderboardView.as_view(), name='leaderboard'),
+
+    # Study Challenges
+    path('challenges/', StudyChallengeListView.as_view(), name='challenge_list'),
+    path('challenges/<int:pk>/', StudyChallengeDetailView.as_view(), name='challenge_detail'),
+
+    # You can add more paths here later for specific actions if needed
 ]

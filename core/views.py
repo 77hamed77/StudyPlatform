@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 import re # لاستخدام التعبيرات العادية لتنظيف النصوص
 from collections import defaultdict # لاستخدام defaultdict لجمع البيانات
+from datetime import timedelta
 
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm, \
     DiscussionPostForm, DiscussionCommentForm, AcademicProgressForm, \
@@ -24,9 +25,9 @@ from .models import UserProfile, Notification, DailyQuote, EducationalResource, 
     EducationalResourceRating, UserFavoriteResource
 from achievements.models import UserBadge
 from tasks.models import Task
-from files_manager.models import UserFileInteraction, Subject
+from files_manager.models import UserFileInteraction, Subject, MainFile # Import MainFile for AI notifications
 
-# قائمة بسيطة للكلمات المتوقفة باللغة العربية (يمكن توسيعها)
+# Simple list of Arabic stop words (can be expanded)
 ARABIC_STOP_WORDS = set([
     "و", "في", "من", "إلى", "على", "عن", "مع", "أو", "أن", "لا", "ب", "ك", "ل", "هذا", "هذه", "هو", "هي", "هم", "هن",
     "الذي", "التي", "الذين", "اللاتي", "أين", "كيف", "متى", "ماذا", "لماذا", "هل", "قد", "لقد", "ثم", "إذ", "إذا",
@@ -43,28 +44,28 @@ ARABIC_STOP_WORDS = set([
 
 def clean_text(text):
     """
-    ينظف النص بإزالة علامات الترقيم والأرقام وتحويله إلى حروف صغيرة.
+    Cleans text by removing punctuation, numbers, and converting to lowercase.
     """
     if not text:
         return ""
-    # إزالة علامات الترقيم والأرقام
-    text = re.sub(r'[^\w\s]', '', text) # إبقاء الحروف والأرقام والمسافات
-    text = re.sub(r'\d+', '', text) # إزالة الأرقام
-    # تحويل إلى حروف صغيرة (للتطابق الأفضل، على الرغم من أن العربية لا تفرق في الحالة)
+    # Remove punctuation and numbers
+    text = re.sub(r'[^\w\s]', '', text) # Keep letters, numbers, and spaces
+    text = re.sub(r'\d+', '', text) # Remove numbers
+    # Convert to lowercase (for better matching, though Arabic is not case-sensitive)
     text = text.lower()
     return text
 
 def get_recommended_resources_for_user(user, limit=5):
     """
-    يقترح موارد تعليمية للمستخدم بناءً على مزيج من التصفية المستندة إلى المحتوى
-    وعناصر من التصفية التعاونية (تشابه المستخدمين والعناصر).
+    Suggests educational resources to the user based on a mix of content-based filtering
+    and elements of collaborative filtering (user and item similarity).
     """
     if not user.is_authenticated:
-        # للمستخدمين غير المسجلين، أظهر أحدث الموارد النشطة
+        # For unauthenticated users, show the latest active resources
         return EducationalResource.objects.filter(is_active=True).order_by('-created_at')[:limit]
 
-    # 1. جمع الموارد التي فضلها المستخدم أو قيمها عالياً
-    # هذه هي "سلة" تفضيلات المستخدم الأساسية
+    # 1. Collect resources the user has favorited or rated highly
+    # This is the user's primary "basket" of preferences
     user_liked_resources_ids = set(
         UserFavoriteResource.objects.filter(user=user).values_list('resource_id', flat=True)
     )
@@ -72,22 +73,22 @@ def get_recommended_resources_for_user(user, limit=5):
         EducationalResourceRating.objects.filter(user=user, rating__gte=4).values_list('resource_id', flat=True)
     )
 
-    # 2. تحديد الموارد التي تفاعل معها المستخدم بالفعل (لعدم التوصية بها مرة أخرى)
-    # تشمل المفضلة، المقيمة، أو التي تم التفاعل مع ملفاتها
+    # 2. Identify resources the user has already interacted with (to avoid recommending them again)
+    # Includes favorited, rated, or files interacted with
     interacted_resource_ids = set(user_liked_resources_ids)
     interacted_resource_ids.update(
         UserFileInteraction.objects.filter(user=user).values_list('resource_id', flat=True)
     )
 
-    # إذا لم يكن لدى المستخدم أي تفاعلات، أظهر أحدث الموارد النشطة
+    # If the user has no interactions, show the latest active resources
     if not user_liked_resources_ids:
         return EducationalResource.objects.filter(is_active=True).exclude(id__in=list(interacted_resource_ids)).order_by('-created_at')[:limit]
 
-    # جلب كائنات الموارد التي أعجب بها المستخدم
+    # Fetch resource objects that the user liked
     user_liked_resources = EducationalResource.objects.filter(id__in=list(user_liked_resources_ids))
 
     # --- Phase 1: Content-Based Filtering ---
-    # استخلاص الكلمات الرئيسية من تفضيلات المستخدم
+    # Extract keywords from user preferences
     user_keywords = set()
     for resource in user_liked_resources:
         cleaned_title = clean_text(resource.title)
@@ -95,13 +96,13 @@ def get_recommended_resources_for_user(user, limit=5):
         user_keywords.update(word for word in cleaned_title.split() if word and word not in ARABIC_STOP_WORDS)
         user_keywords.update(word for word in cleaned_description.split() if word and word not in ARABIC_STOP_WORDS)
     
-    # تهيئة قاموس لتخزين درجات الموارد المرشحة
-    # المفتاح: resource_id, القيمة: (score, resource_object)
+    # Initialize dictionary to store scores of candidate resources
+    # Key: resource_id, Value: (score, resource_object)
     recommended_scores = {}
 
-    # البحث عن موارد بناءً على الكلمات الرئيسية (Content-Based)
+    # Search for resources based on keywords (Content-Based)
     if user_keywords:
-        # ابحث عن موارد أخرى نشطة لم يتفاعل معها المستخدم بعد
+        # Find other active resources the user hasn't interacted with yet
         potential_content_based_resources = EducationalResource.objects.filter(
             is_active=True
         ).exclude(
@@ -117,20 +118,20 @@ def get_recommended_resources_for_user(user, limit=5):
             
             match_score = len(user_keywords.intersection(resource_words))
             
-            if match_score > 0: # فقط إذا كان هناك تطابق في الكلمات
-                # وزن متوسط التقييم العام للمورد
+            if match_score > 0: # Only if there's a keyword match
+                # Weight by overall average rating of the resource
                 rating_score = (resource.avg_rating or 0) * 0.5
-                total_score = match_score * 2 + rating_score # وزن أعلى للمطابقة النصية
+                total_score = match_score * 2 + rating_score # Higher weight for text matching
                 
                 if resource.id not in recommended_scores or total_score > recommended_scores[resource.id][0]:
                     recommended_scores[resource.id] = (total_score, resource)
 
     # --- Phase 2: User-Similarity Inspired Filtering ---
-    # الفكرة: ابحث عن مستخدمين آخرين لديهم موارد مفضلة/مقيمة عالياً مشتركة مع المستخدم الحالي.
-    # ثم اقترح الموارد التي أعجبتهم ولم يتفاعل معها المستخدم الحالي.
+    # Idea: Find other users who have common favorited/highly-rated resources with the current user.
+    # Then suggest resources they liked that the current user hasn't interacted with.
     
-    # ابحث عن المستخدمين الذين فضلوا أو قيموا نفس الموارد التي فضلها المستخدم الحالي
-    # (على الأقل مورد واحد مشترك)
+    # Find users who favorited or rated the same resources as the current user
+    # (at least one common resource)
     similar_users_ids = UserFavoriteResource.objects.filter(
         resource__id__in=list(user_liked_resources_ids)
     ).exclude(
@@ -139,7 +140,7 @@ def get_recommended_resources_for_user(user, limit=5):
 
     similar_users_ids_from_ratings = EducationalResourceRating.objects.filter(
         resource__id__in=list(user_liked_resources_ids),
-        rating__gte=4 # نعتبر التقييمات العالية فقط
+        rating__gte=4 # Consider only high ratings
     ).exclude(
         user=user
     ).values_list('user_id', flat=True).distinct()
@@ -147,7 +148,7 @@ def get_recommended_resources_for_user(user, limit=5):
     all_similar_users_ids = list(set(list(similar_users_ids) + list(similar_users_ids_from_ratings)))
 
     if all_similar_users_ids:
-        # جلب الموارد التي فضلها هؤلاء المستخدمون المشابهون أو قيموها عالياً
+        # Fetch resources favored/highly rated by these similar users
         resources_from_similar_users = EducationalResource.objects.filter(is_active=True).filter(
             Q(favorited_by__user__id__in=all_similar_users_ids) |
             Q(ratings__user__id__in=all_similar_users_ids, ratings__rating__gte=4)
@@ -156,18 +157,19 @@ def get_recommended_resources_for_user(user, limit=5):
         ).annotate(
             avg_rating=Avg('ratings__rating'),
             num_ratings=Count('ratings')
-        ).distinct() # للتأكد من عدم تكرار الموارد
+        ).distinct() # Ensure no duplicate resources
 
         for resource in resources_from_similar_users:
-            # يمكن إعطاء وزن أقل لهذه التوصيات مقارنة بالمحتوى المباشر
-            score = (resource.avg_rating or 0) * 0.75 # وزن أقل
+            # Can give lower weight to these recommendations compared to direct content match
+            score = (resource.avg_rating or 0) * 0.75 # Lower weight
             if resource.id not in recommended_scores or score > recommended_scores[resource.id][0]:
                 recommended_scores[resource.id] = (score, resource)
 
     # --- Phase 3: Item-Similarity Inspired Filtering ---
-    # الفكرة: إذا أعجب المستخدم بالموارد X و Y، فابحث عن الموارد التي غالباً ما تظهر مع X و Y في تفضيلات المستخدمين الآخرين.
+    # Idea: If the user liked resources X and Y, find resources that frequently appear with X and Y
+    # in other users' preferences.
 
-    # جمع جميع التفاعلات (المفضلة والتقييمات العالية) من جميع المستخدمين
+    # Collect all interactions (favorites and high ratings) from all users
     all_favorites = UserFavoriteResource.objects.all().values('user_id', 'resource_id')
     all_high_ratings = EducationalResourceRating.objects.filter(rating__gte=4).values('user_id', 'resource_id')
 
@@ -177,50 +179,50 @@ def get_recommended_resources_for_user(user, limit=5):
     for entry in all_high_ratings:
         user_resource_map[entry['user_id']].add(entry['resource_id'])
 
-    # بناء مصفوفة تشابه العناصر (بشكل مبسط)
-    # item_pair_counts[(item1, item2)] = عدد المستخدمين الذين تفاعلوا مع كليهما
+    # Build item similarity matrix (simplified)
+    # item_pair_counts[(item1, item2)] = number of users who interacted with both
     item_pair_counts = defaultdict(int)
     for user_id, resources_set in user_resource_map.items():
-        resources_list = sorted(list(resources_set)) # لضمان الترتيب المتسق للأزواج
+        resources_list = sorted(list(resources_set)) # Ensure consistent order for pairs
         for i in range(len(resources_list)):
             for j in range(i + 1, len(resources_list)):
                 item1, item2 = resources_list[i], resources_list[j]
                 item_pair_counts[(item1, item2)] += 1
-                item_pair_counts[(item2, item1)] += 1 # الترتيب لا يهم
+                item_pair_counts[(item2, item1)] += 1 # Order doesn't matter
 
-    # اقتراح موارد بناءً على تشابه العناصر
+    # Recommend resources based on item similarity
     for liked_resource_id in user_liked_resources_ids:
         for (item1, item2), count in item_pair_counts.items():
             if item1 == liked_resource_id and item2 not in interacted_resource_ids:
-                # كلما زاد عدد المستخدمين الذين فضلوا كلا الموردين، زادت درجة التوصية
-                # يمكن استخدام مقاييس تشابه أكثر تعقيداً هنا (مثل Jaccard, Cosine)
-                score = count * 0.1 # وزن منخفض نسبياً
+                # The more users who liked both resources, the higher the recommendation score
+                # More complex similarity measures (e.g., Jaccard, Cosine) could be used here
+                score = count * 0.1 # Relatively low weight
                 
-                # جلب كائن المورد إذا لم يكن موجوداً بالفعل
+                # Fetch resource object if not already present
                 if item2 not in recommended_scores:
                     try:
                         resource = EducationalResource.objects.get(id=item2, is_active=True)
-                        resource.avg_rating = resource.average_rating # تحميل الخصائص
+                        resource.avg_rating = resource.average_rating # Load properties
                         resource.num_ratings = resource.total_ratings
                         recommended_scores[item2] = (score, resource)
                     except EducationalResource.DoesNotExist:
-                        continue # تخطي الموارد غير الموجودة أو غير النشطة
+                        continue # Skip non-existent or inactive resources
                 else:
-                    # تحديث النتيجة إذا كانت النتيجة الجديدة أعلى
+                    # Update score if new score is higher
                     current_score, current_resource = recommended_scores[item2]
                     if score > current_score:
                         recommended_scores[item2] = (score, current_resource)
 
 
-    # 4. تجميع وفرز الموارد الموصى بها
+    # 4. Aggregate and sort recommended resources
     final_recommendations_list = sorted(
         recommended_scores.values(),
-        key=lambda x: x[0], # الفرز حسب درجة المطابقة
+        key=lambda x: x[0], # Sort by match score
         reverse=True
     )
 
-    # إرجاع أفضل N مورد
-    # تأكد من إرجاع كائنات الموارد فقط
+    # Return top N resources
+    # Ensure only resource objects are returned
     return [res_obj for score, res_obj in final_recommendations_list][:limit]
 
 
@@ -250,12 +252,32 @@ class UserSettingsView(LoginRequiredMixin, View):
         return render(request, self.template_name, {'user_form': user_form, 'profile_form': profile_form})
 
     def post(self, request, *args, **kwargs):
+        # Handle theme update via AJAX separately
         if request.POST.get('update_theme_only') == 'true' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
             is_dark_mode = request.POST.get('dark_mode_enabled') == 'on'
             profile = request.user.profile
             profile.dark_mode_enabled = is_dark_mode
             profile.save(update_fields=['dark_mode_enabled'])
             return JsonResponse({'status': 'success', 'dark_mode_enabled': is_dark_mode})
+        
+        # Handle dashboard layout preferences update via AJAX
+        if request.POST.get('update_dashboard_layout') == 'true' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                visible_sections = json.loads(request.POST.get('visible_sections', '[]'))
+                section_order = json.loads(request.POST.get('section_order', '[]'))
+                
+                profile = request.user.profile
+                profile.dashboard_layout_preferences = {
+                    'visible_sections': visible_sections,
+                    'section_order': section_order
+                }
+                profile.save(update_fields=['dashboard_layout_preferences'])
+                return JsonResponse({'status': 'success', 'message': 'تم حفظ تفضيلات لوحة التحكم بنجاح.'})
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'error', 'message': 'بيانات JSON غير صالحة لتفضيلات لوحة التحكم.'}, status=400)
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'حدث خطأ أثناء حفظ تفضيلات لوحة التحكم: {str(e)}'}, status=500)
+
 
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, instance=request.user.profile)
@@ -277,6 +299,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # Fetch Daily Quote
         active_quotes = DailyQuote.objects.filter(is_active=True)
         if active_quotes.exists():
             count = active_quotes.count()
@@ -284,23 +309,152 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context['daily_quote'] = active_quotes[random_index]
         else:
             context['daily_quote'] = None
+
+        # Fetch Latest News
         try:
             from news.models import NewsItem
             context['latest_news'] = NewsItem.objects.filter(is_important=True).order_by('-publication_date')[:3]
         except Exception:
             context['latest_news'] = None
+
+        # Fetch Upcoming Tasks
         try:
             context['upcoming_tasks'] = Task.objects.filter(
-                user=self.request.user,
+                user=user,
                 status__in=['pending', 'in_progress']
             ).order_by('due_date')[:3]
         except Exception:
             context['upcoming_tasks'] = None
         
-        # إضافة الموارد الموصى بها
-        context['recommended_resources'] = get_recommended_resources_for_user(self.request.user, limit=4) # عرض 4 موارد
+        # Add Recommended Resources
+        context['recommended_resources'] = get_recommended_resources_for_user(user, limit=4)
+
+        # Get Dashboard Layout Preferences
+        user_profile = user.profile
+        default_sections = {
+            'tasks_card': {'title': _("مهامك القادمة"), 'icon': 'fas fa-tasks', 'url': str(reverse_lazy('tasks:task_list'))},
+            'news_card': {'title': _("آخر الأخبار الهامة"), 'icon': 'fas fa-bullhorn', 'url': str(reverse_lazy('news:news_list'))},
+            'academic_progress_card': {'title': _("تقدمك الأكاديمي"), 'icon': 'fas fa-chart-line', 'url': str(reverse_lazy('core:academic_progress'))},
+            'educational_resources_card': {'title': _("الموارد التعليمية"), 'icon': 'fas fa-book-open', 'url': str(reverse_lazy('core:educational_resources'))},
+            'discussion_board_card': {'title': _("لوحة المناقشات"), 'icon': 'fas fa-comments', 'url': str(reverse_lazy('core:discussion_board'))},
+            'tools_card': {'title': _("أدوات مفيدة"), 'icon': 'fas fa-tools', 'url_calculator': str(reverse_lazy('core:scientific_calculator')), 'url_converter': str(reverse_lazy('core:unit_converter'))},
+            'recommendations_section': {'title': _("موارد موصى بها لك"), 'icon': 'fas fa-lightbulb'},
+        }
+        
+        # Pass the raw dictionary for the Django template loop in the customization panel
+        context['all_available_sections_raw'] = default_sections 
+
+        # Pass default_sections as a JSON string to the context
+        context['all_available_sections_json'] = json.dumps(default_sections, ensure_ascii=False)
         
         return context
+
+    def _check_and_create_ai_notifications(self, user):
+        """
+        Checks for conditions to create AI-driven notifications based on user behavior.
+        Examples:
+        - Remind user to review a subject if no interaction for a long time.
+        - Remind user about upcoming deadlines if tasks are pending.
+        """
+        now = timezone.now()
+        
+        # --- Notification 1: Remind to review subjects not interacted with recently ---
+        # Define what "long time" means (e.g., 30 days)
+        inactivity_threshold = timedelta(days=30)
+        
+        # Get all subjects the user has tasks or file interactions for
+        user_subjects_from_tasks = Task.objects.filter(user=user, subject__isnull=False).values_list('subject', flat=True).distinct()
+        user_subjects_from_files = UserFileInteraction.objects.filter(user=user, file__subject__isnull=False).values_list('file__subject', flat=True).distinct()
+        
+        all_user_subject_ids = list(set(list(user_subjects_from_tasks) + list(user_subjects_from_files)))
+        
+        for subject_id in all_user_subject_ids:
+            subject = Subject.objects.get(pk=subject_id)
+            
+            # Find last interaction for this subject (task completion or file interaction)
+            last_task_completion = Task.objects.filter(user=user, subject=subject, status='completed').order_by('-updated_at').first()
+            last_file_interaction = UserFileInteraction.objects.filter(user=user, file__subject=subject).order_by('-last_accessed').first()
+            
+            last_interaction_time = None
+            if last_task_completion:
+                last_interaction_time = last_task_completion.updated_at
+            if last_file_interaction and (not last_interaction_time or last_file_interaction.last_accessed > last_interaction_time):
+                last_interaction_time = last_file_interaction.last_accessed
+            
+            if last_interaction_time:
+                time_since_last_interaction = now - last_interaction_time
+                if time_since_last_interaction > inactivity_threshold:
+                    # Check if a similar notification has been sent recently (e.g., in the last 7 days)
+                    recent_notification_exists = Notification.objects.filter(
+                        recipient=user,
+                        verb=_("تذكير بمراجعة مادة"),
+                        target_content_type=ContentType.objects.get_for_model(Subject),
+                        target_object_id=subject.pk,
+                        timestamp__gte=now - timedelta(days=7)
+                    ).exists()
+
+                    if not recent_notification_exists:
+                        Notification.objects.create(
+                            recipient=user,
+                            verb=_("تذكير بمراجعة مادة"),
+                            description=f"{_('لم تقم بمراجعة مادة')} '{subject.name}' {_('منذ فترة. قد يكون الوقت مناسباً للمراجعة!')}",
+                            target_content_type=ContentType.objects.get_for_model(Subject),
+                            target_object_id=subject.pk,
+                            metadata={'reason': 'inactivity', 'last_interaction': last_interaction_time.isoformat()}
+                        )
+                        print(f"AI Notification: User {user.username} reminded to review {subject.name}")
+
+        # --- Notification 2: Remind about overdue tasks (if any) ---
+        overdue_tasks = Task.objects.filter(user=user, due_date__lt=now.date(), status__in=['pending', 'in_progress'])
+        if overdue_tasks.exists():
+            # Check if an overdue task reminder has been sent today
+            recent_notification_exists = Notification.objects.filter(
+                recipient=user,
+                verb=_("تذكير بمهام متأخرة"),
+                timestamp__date=now.date()
+            ).exists()
+
+            if not recent_notification_exists:
+                num_overdue = overdue_tasks.count()
+                Notification.objects.create(
+                    recipient=user,
+                    verb=_("تذكير بمهام متأخرة"),
+                    description=f"{_('لديك')} {num_overdue} {_('مهام متأخرة. يرجى مراجعتها!')}",
+                    metadata={'reason': 'overdue_tasks', 'count': num_overdue}
+                )
+                print(f"AI Notification: User {user.username} reminded about {num_overdue} overdue tasks.")
+
+        # --- Notification 3: Suggest exploring new resources based on academic progress (e.g., low grade in a subject) ---
+        # This is a more complex AI notification that might require LLM interaction or more sophisticated logic
+        # For demonstration, let's say if a user has a low grade in a subject, suggest related resources.
+        low_grade_threshold = 60.0 # Example threshold
+        recent_academic_progress = AcademicProgress.objects.filter(
+            user=user,
+            grade__lt=low_grade_threshold,
+            date_recorded__gte=now.date() - timedelta(days=90) # Check recent grades (last 3 months)
+        ).select_related('subject').distinct('subject') # Get unique subjects with low grades recently
+
+        for progress_entry in recent_academic_progress:
+            subject = progress_entry.subject
+            if subject:
+                # Check if a similar notification has been sent recently for this subject
+                recent_notification_exists = Notification.objects.filter(
+                    recipient=user,
+                    verb=_("اقتراح موارد دراسية"),
+                    target_content_type=ContentType.objects.get_for_model(Subject),
+                    target_object_id=subject.pk,
+                    timestamp__gte=now - timedelta(days=14) # Don't spam
+                ).exists()
+
+                if not recent_notification_exists:
+                    Notification.objects.create(
+                        recipient=user,
+                        verb=_("اقتراح موارد دراسية"),
+                        description=f"{_('لاحظنا أنك قد تواجه صعوبة في مادة')} '{subject.name}'. {_('قد تساعدك بعض الموارد الإضافية!')}",
+                        metadata={'reason': 'low_grade', 'subject_id': subject.pk, 'grade': float(progress_entry.grade)}
+                    )
+                    print(f"AI Notification: User {user.username} suggested resources for {subject.name} due to low grade.")
+
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'core/profile.html'
@@ -316,7 +470,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             count = Task.objects.filter(user=user, status='completed', updated_at__date=day).count()
             completed_tasks_per_day_raw.append(count)
         context['tasks_completion_labels_raw'] = [d.strftime('%Y-%m-%d') for d in days_range_raw]
-        context['tasks_completion_data_raw'] = completed_tasks_per_day_raw
+        context['tasks_completion_data_raw'] = completed_tasks_per_per_day_raw
         tasks_by_subject_raw = list(Task.objects.filter(user=user, status='completed', subject__isnull=False).values('subject__name').annotate(count=Count('id')).order_by('-count'))
         context['tasks_by_subject_raw'] = tasks_by_subject_raw
         context['total_tasks_completed'] = Task.objects.filter(user=user, status='completed').count()
@@ -342,6 +496,7 @@ class NotificationListView(GenericListView):
             except (Notification.DoesNotExist, ValueError):
                 pass
         if not notification_to_mark_read_id:
+            # Mark all unread notifications as read when viewing the list page
             Notification.objects.filter(recipient=self.request.user, unread=True).update(unread=False)
         return context
 
@@ -366,7 +521,7 @@ def mark_notification_read(request):
 
 class EducationalResourcesView(GenericListView):
     """
-    عرض قائمة بالموارد التعليمية مع دعم التقييمات والمفضلة.
+    View a list of educational resources with ratings and favorites support.
     """
     model = EducationalResource
     template_name = 'core/educational_resources.html'
@@ -374,7 +529,7 @@ class EducationalResourcesView(GenericListView):
     paginate_by = 10
     
     def get_queryset(self):
-        # جلب الموارد النشطة فقط، مع إضافة متوسط التقييم وعدد التقييمات
+        # Fetch active resources only, with average rating and number of ratings
         queryset = EducationalResource.objects.filter(is_active=True).annotate(
             avg_rating=Avg('ratings__rating'),
             num_ratings=Count('ratings')
@@ -384,20 +539,20 @@ class EducationalResourcesView(GenericListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
-            # جلب تقييم المستخدم الحالي لكل مورد
+            # Get current user's rating for each resource
             user_ratings = EducationalResourceRating.objects.filter(user=self.request.user)
             context['user_ratings_map'] = {rating.resource_id: rating for rating in user_ratings}
             
-            # جلب الموارد المفضلة للمستخدم الحالي
+            # Get current user's favorite resources
             favorite_resources = UserFavoriteResource.objects.filter(user=self.request.user).values_list('resource_id', flat=True)
             context['user_favorite_resources'] = list(favorite_resources)
 
-            # نموذج التقييم الجديد (يمكن استخدامه في مودال أو جزء مخفي)
+            # New rating form (can be used in a modal or hidden part)
             context['rating_form'] = EducationalResourceRatingForm()
         return context
 
     def post(self, request, *args, **kwargs):
-        # معالجة إرسال التقييم
+        # Handle rating submission
         if not request.user.is_authenticated:
             return JsonResponse({'status': 'error', 'message': 'Authentication required'}, status=403)
 
@@ -412,7 +567,7 @@ class EducationalResourcesView(GenericListView):
             rating_value = form.cleaned_data['rating']
             review_text = form.cleaned_data['review_text']
 
-            # حاول تحديث التقييم الموجود أو إنشاء تقييم جديد
+            # Try to update existing rating or create a new one
             rating_obj, created = EducationalResourceRating.objects.update_or_create(
                 resource=resource,
                 user=request.user,
@@ -424,14 +579,14 @@ class EducationalResourcesView(GenericListView):
             else:
                 messages.success(request, "تم تحديث تقييمك بنجاح!")
             
-            # يمكنك إعادة التوجيه أو إرجاع JsonResponse لـ AJAX
-            return redirect('core:educational_resources') # أو JsonResponse({'status': 'success', 'message': 'Rating saved'})
+            # You can redirect or return JsonResponse for AJAX
+            return redirect('core:educational_resources') # Or JsonResponse({'status': 'success', 'message': 'Rating saved'})
         else:
             messages.error(request, "حدث خطأ في التقييم. يرجى التحقق من البيانات.")
-            # إذا كان النموذج غير صالح، أعد عرض الصفحة مع الأخطاء
+            # If form is invalid, re-render the page with errors
             self.object_list = self.get_queryset()
             context = self.get_context_data()
-            context['rating_form'] = form # أعد النموذج مع الأخطاء
+            context['rating_form'] = form # Return form with errors
             return render(request, self.template_name, context)
 
 
@@ -439,7 +594,7 @@ class EducationalResourcesView(GenericListView):
 @require_POST
 def toggle_favorite_resource(request):
     """
-    تبديل حالة المفضلة لمورد تعليمي عبر AJAX.
+    Toggle favorite status for an educational resource via AJAX.
     """
     resource_id = request.POST.get('resource_id')
     if not resource_id:
@@ -453,17 +608,17 @@ def toggle_favorite_resource(request):
     )
 
     if not created:
-        # إذا كان موجوداً بالفعل، احذفه (إزالة من المفضلة)
+        # If already exists, delete it (remove from favorites)
         favorite.delete()
         return JsonResponse({'status': 'removed', 'message': 'تمت إزالة المورد من المفضلة.'})
     else:
-        # إذا تم إنشاؤه للتو، فهذا يعني أنه أضيف للمفضلة
+        # If just created, it means it was added to favorites
         return JsonResponse({'status': 'added', 'message': 'تمت إضافة المورد إلى المفضلة.'})
 
 
 class UserFavoriteResourcesListView(LoginRequiredMixin, GenericListView):
     """
-    عرض قائمة بالموارد التعليمية المفضلة للمستخدم الحالي.
+    View a list of the current user's favorite educational resources.
     """
     model = UserFavoriteResource
     template_name = 'core/favorite_resources.html'
@@ -471,12 +626,12 @@ class UserFavoriteResourcesListView(LoginRequiredMixin, GenericListView):
     paginate_by = 10
 
     def get_queryset(self):
-        # جلب الموارد المفضلة للمستخدم الحالي فقط
-        # select_related('resource') لتحميل بيانات المورد لتجنب استعلامات إضافية
+        # Fetch current user's favorite resources only
+        # select_related('resource') to load resource data to avoid extra queries
         return UserFavoriteResource.objects.filter(user=self.request.user).select_related('resource').order_by('-added_at')
 
 
-# --- دوال عرض جديدة للأدوات والمرافق (من التحديث السابق) ---
+# --- New views for Tools and Utilities (from previous update) ---
 
 class ScientificCalculatorView(LoginRequiredMixin, TemplateView):
     template_name = 'core/scientific_calculator.html'

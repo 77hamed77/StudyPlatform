@@ -275,141 +275,82 @@ class QuranView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         surah_number = self.request.GET.get('surah', '1')
-        reciter = self.request.GET.get('reciter', 'ar.alafasy')
+        reciter_audio_id = self.request.GET.get('reciter', 'ar.alafasy') # المعرف الصوتي للقارئ
+        tafsir_edition_id = 'ar.muyassar' # معرف تفسير الميسر
 
-        api_url = f"https://api.alquran.cloud/v1/surah/{surah_number}/{reciter}"
+        # جلب بيانات السورة والنص القرآني
+        quran_api_url = f"https://api.alquran.cloud/v1/surah/{surah_number}/{reciter_audio_id}"
         
-        try:
-            response = requests.get(api_url, timeout=10)
-            response.raise_for_status()
-            data = response.json()
+        # جلب بيانات التفسير للسورة
+        tafsir_api_url = f"https://api.alquran.cloud/v1/surah/{surah_number}/{tafsir_edition_id}"
 
-            if data and data['data']:
-                context['surah_data'] = data['data']
+        try:
+            # طلب بيانات السورة
+            quran_response = requests.get(quran_api_url, timeout=10)
+            quran_response.raise_for_status()
+            quran_data = quran_response.json()
+
+            # طلب بيانات التفسير
+            tafsir_response = requests.get(tafsir_api_url, timeout=10)
+            tafsir_response.raise_for_status()
+            tafsir_data = tafsir_response.json()
+
+            if quran_data and quran_data['data'] and tafsir_data and tafsir_data['data']:
+                context['surah_data'] = quran_data['data']
                 context['surah_number'] = surah_number
-                context['reciter'] = reciter
+                context['reciter'] = reciter_audio_id
+
+                # ربط التفسير بالآيات
+                tafsir_ayahs = {ayah['numberInSurah']: ayah['text'] for ayah in tafsir_data['data']['ayahs']}
+                for ayah in context['surah_data']['ayahs']:
+                    ayah['tafsir'] = tafsir_ayahs.get(ayah['numberInSurah'], _("لا يوجد تفسير متاح لهذه الآية."))
             else:
-                messages.error(self.request, _("تعذر جلب بيانات السورة. يرجى المحاولة لاحقاً."))
+                messages.error(self.request, _("تعذر جلب بيانات السورة أو التفسير. يرجى المحاولة لاحقاً."))
         except requests.exceptions.RequestException as e:
             messages.error(self.request, _(f"خطأ في الاتصال بـ API القرآن: {e}"))
         except Exception as e:
             messages.error(self.request, _(f"حدث خطأ غير متوقع: {e}"))
 
+        # قائمة السور (كاملة)
         context['surahs_list'] = [
-            {'number': 1, 'name': _('الفاتحة')},
-            {'number': 2, 'name': _('البقرة')},
-            {'number': 3, 'name': _('آل عمران')},
-            {'number': 4, 'name': _('النساء')},
-            {'number': 5, 'name': _('المائدة')},
-            {'number': 6, 'name': _('الأنعام')},
-            {'number': 7, 'name': _('الأعراف')},
-            {'number': 8, 'name': _('الأنفال')},
-            {'number': 9, 'name': _('التوبة')},
-            {'number': 10, 'name': _('يونس')},
-            {'number': 11, 'name': _('هود')},
-            {'number': 12, 'name': _('يوسف')},
-            {'number': 13, 'name': _('الرعد')},
-            {'number': 14, 'name': _('إبراهيم')},
-            {'number': 15, 'name': _('الحجر')},
-            {'number': 16, 'name': _('النحل')},
-            {'number': 17, 'name': _('الإسراء')},
-            {'number': 18, 'name': _('الكهف')},
-            {'number': 19, 'name': _('مريم')},
-            {'number': 20, 'name': _('طه')},
-            {'number': 21, 'name': _('الأنبياء')},
-            {'number': 22, 'name': _('الحج')},
-            {'number': 23, 'name': _('المؤمنون')},
-            {'number': 24, 'name': _('النور')},
-            {'number': 25, 'name': _('الفرقان')},
-            {'number': 26, 'name': _('الشعراء')},
-            {'number': 27, 'name': _('النمل')},
-            {'number': 28, 'name': _('القصص')},
-            {'number': 29, 'name': _('العنكبوت')},
-            {'number': 30, 'name': _('الروم')},
-            {'number': 31, 'name': _('لقمان')},
-            {'number': 32, 'name': _('السجدة')},
-            {'number': 33, 'name': _('الأحزاب')},
-            {'number': 34, 'name': _('سبأ')},
-            {'number': 35, 'name': _('فاطر')},
-            {'number': 36, 'name': _('يس')},
-            {'number': 37, 'name': _('الصافات')},
-            {'number': 38, 'name': _('ص')},
-            {'number': 39, 'name': _('الزمر')},
-            {'number': 40, 'name': _('غافر')},
-            {'number': 41, 'name': _('فصلت')},
-            {'number': 42, 'name': _('الشورى')},
-            {'number': 43, 'name': _('الزخرف')},
-            {'number': 44, 'name': _('الدخان')},
-            {'number': 45, 'name': _('الجاثية')},
-            {'number': 46, 'name': _('الأحقاف')},
-            {'number': 47, 'name': _('محمد')},
-            {'number': 48, 'name': _('الفتح')},
-            {'number': 49, 'name': _('الحجرات')},
-            {'number': 50, 'name': _('ق')},
-            {'number': 51, 'name': _('الذاريات')},
-            {'number': 52, 'name': _('الطور')},
-            {'number': 53, 'name': _('النجم')},
-            {'number': 54, 'name': _('القمر')},
-            {'number': 55, 'name': _('الرحمن')},
-            {'number': 56, 'name': _('الواقعة')},
-            {'number': 57, 'name': _('الحديد')},
-            {'number': 58, 'name': _('المجادلة')},
-            {'number': 59, 'name': _('الحشر')},
-            {'number': 60, 'name': _('الممتحنة')},
-            {'number': 61, 'name': _('الصف')},
-            {'number': 62, 'name': _('الجمعة')},
-            {'number': 63, 'name': _('المنافقون')},
-            {'number': 64, 'name': _('التغابن')},
-            {'number': 65, 'name': _('الطلاق')},
-            {'number': 66, 'name': _('التحريم')},
-            {'number': 67, 'name': _('الملك')},
-            {'number': 68, 'name': _('القلم')},
-            {'number': 69, 'name': _('الحاقة')},
-            {'number': 70, 'name': _('المعارج')},
-            {'number': 71, 'name': _('نوح')},
-            {'number': 72, 'name': _('الجن')},
-            {'number': 73, 'name': _('المزمل')},
-            {'number': 74, 'name': _('المدثر')},
-            {'number': 75, 'name': _('القيامة')},
-            {'number': 76, 'name': _('الإنسان')},
-            {'number': 77, 'name': _('المرسلات')},
-            {'number': 78, 'name': _('النبأ')},
-            {'number': 79, 'name': _('النازعات')},
-            {'number': 80, 'name': _('عبس')},
-            {'number': 81, 'name': _('التكوير')},
-            {'number': 82, 'name': _('الانفطار')},
-            {'number': 83, 'name': _('المطففين')},
-            {'number': 84, 'name': _('الانشقاق')},
-            {'number': 85, 'name': _('البروج')},
-            {'number': 86, 'name': _('الطارق')},
-            {'number': 87, 'name': _('الأعلى')},
-            {'number': 88, 'name': _('الغاشية')},
-            {'number': 89, 'name': _('الفجر')},
-            {'number': 90, 'name': _('البلد')},
-            {'number': 91, 'name': _('الشمس')},
-            {'number': 92, 'name': _('الليل')},
-            {'number': 93, 'name': _('الضحى')},
-            {'number': 94, 'name': _('الشرح')},
-            {'number': 95, 'name': _('التين')},
-            {'number': 96, 'name': _('العلق')},
-            {'number': 97, 'name': _('القدر')},
-            {'number': 98, 'name': _('البينة')},
-            {'number': 99, 'name': _('الزلزلة')},
-            {'number': 100, 'name': _('العاديات')},
-            {'number': 101, 'name': _('القارعة')},
-            {'number': 102, 'name': _('التكاثر')},
-            {'number': 103, 'name': _('العصر')},
-            {'number': 104, 'name': _('الهمزة')},
-            {'number': 105, 'name': _('الفيل')},
-            {'number': 106, 'name': _('قريش')},
-            {'number': 107, 'name': _('الماعون')},
-            {'number': 108, 'name': _('الكوثر')},
-            {'number': 109, 'name': _('الكافرون')},
-            {'number': 110, 'name': _('النصر')},
-            {'number': 111, 'name': _('المسد')},
-            {'number': 112, 'name': _('الإخلاص')},
-            {'number': 113, 'name': _('الفلق')},
-            {'number': 114, 'name': _('الناس')},
+            {'number': 1, 'name': _('الفاتحة')}, {'number': 2, 'name': _('البقرة')}, {'number': 3, 'name': _('آل عمران')},
+            {'number': 4, 'name': _('النساء')}, {'number': 5, 'name': _('المائدة')}, {'number': 6, 'name': _('الأنعام')},
+            {'number': 7, 'name': _('الأعراف')}, {'number': 8, 'name': _('الأنفال')}, {'number': 9, 'name': _('التوبة')},
+            {'number': 10, 'name': _('يونس')}, {'number': 11, 'name': _('هود')}, {'number': 12, 'name': _('يوسف')},
+            {'number': 13, 'name': _('الرعد')}, {'number': 14, 'name': _('إبراهيم')}, {'number': 15, 'name': _('الحجر')},
+            {'number': 16, 'name': _('النحل')}, {'number': 17, 'name': _('الإسراء')}, {'number': 18, 'name': _('الكهف')},
+            {'number': 19, 'name': _('مريم')}, {'number': 20, 'name': _('طه')}, {'number': 21, 'name': _('الأنبياء')},
+            {'number': 22, 'name': _('الحج')}, {'number': 23, 'name': _('المؤمنون')}, {'number': 24, 'name': _('النور')},
+            {'number': 25, 'name': _('الفرقان')}, {'number': 26, 'name': _('الشعراء')}, {'number': 27, 'name': _('النمل')},
+            {'number': 28, 'name': _('القصص')}, {'number': 29, 'name': _('العنكبوت')}, {'number': 30, 'name': _('الروم')},
+            {'number': 31, 'name': _('لقمان')}, {'number': 32, 'name': _('السجدة')}, {'number': 33, 'name': _('الأحزاب')},
+            {'number': 34, 'name': _('سبأ')}, {'number': 35, 'name': _('فاطر')}, {'number': 36, 'name': _('يس')},
+            {'number': 37, 'name': _('الصافات')}, {'number': 38, 'name': _('ص')}, {'number': 39, 'name': _('الزمر')},
+            {'number': 40, 'name': _('غافر')}, {'number': 41, 'name': _('فصلت')}, {'number': 42, 'name': _('الشورى')},
+            {'number': 43, 'name': _('الزخرف')}, {'number': 44, 'name': _('الدخان')}, {'number': 45, 'name': _('الجاثية')},
+            {'number': 46, 'name': _('الأحقاف')}, {'number': 47, 'name': _('محمد')}, {'number': 48, 'name': _('الفتح')},
+            {'number': 49, 'name': _('الحجرات')}, {'number': 50, 'name': _('ق')}, {'number': 51, 'name': _('الذاريات')},
+            {'number': 52, 'name': _('الطور')}, {'number': 53, 'name': _('النجم')}, {'number': 54, 'name': _('القمر')},
+            {'number': 55, 'name': _('الرحمن')}, {'number': 56, 'name': _('الواقعة')}, {'number': 57, 'name': _('الحديد')},
+            {'number': 58, 'name': _('المجادلة')}, {'number': 59, 'name': _('الحشر')}, {'number': 60, 'name': _('الممتحنة')},
+            {'number': 61, 'name': _('الصف')}, {'number': 62, 'name': _('الجمعة')}, {'number': 63, 'name': _('المنافقون')},
+            {'number': 64, 'name': _('التغابن')}, {'number': 65, 'name': _('الطلاق')}, {'number': 66, 'name': _('التحريم')},
+            {'number': 67, 'name': _('الملك')}, {'number': 68, 'name': _('القلم')}, {'number': 69, 'name': _('الحاقة')},
+            {'number': 70, 'name': _('المعارج')}, {'number': 71, 'name': _('نوح')}, {'number': 72, 'name': _('الجن')},
+            {'number': 73, 'name': _('المزمل')}, {'number': 74, 'name': _('المدثر')}, {'number': 75, 'name': _('القيامة')},
+            {'number': 76, 'name': _('الإنسان')}, {'number': 77, 'name': _('المرسلات')}, {'number': 78, 'name': _('النبأ')},
+            {'number': 79, 'name': _('النازعات')}, {'number': 80, 'name': _('عبس')}, {'number': 81, 'name': _('التكوير')},
+            {'number': 82, 'name': _('الانفطار')}, {'number': 83, 'name': _('المطففين')}, {'number': 84, 'name': _('الانشقاق')},
+            {'number': 85, 'name': _('البروج')}, {'number': 86, 'name': _('الطارق')}, {'number': 87, 'name': _('الأعلى')},
+            {'number': 88, 'name': _('الغاشية')}, {'number': 89, 'name': _('الفجر')}, {'number': 90, 'name': _('البلد')},
+            {'number': 91, 'name': _('الشمس')}, {'number': 92, 'name': _('الليل')}, {'number': 93, 'name': _('الضحى')},
+            {'number': 94, 'name': _('الشرح')}, {'number': 95, 'name': _('التين')}, {'number': 96, 'name': _('العلق')},
+            {'number': 97, 'name': _('القدر')}, {'number': 98, 'name': _('البينة')}, {'number': 99, 'name': _('الزلزلة')},
+            {'number': 100, 'name': _('العاديات')}, {'number': 101, 'name': _('القارعة')}, {'number': 102, 'name': _('التكاثر')},
+            {'number': 103, 'name': _('العصر')}, {'number': 104, 'name': _('الهمزة')}, {'number': 105, 'name': _('الفيل')},
+            {'number': 106, 'name': _('قريش')}, {'number': 107, 'name': _('الماعون')}, {'number': 108, 'name': _('الكوثر')},
+            {'number': 109, 'name': _('الكافرون')}, {'number': 110, 'name': _('النصر')}, {'number': 111, 'name': _('المسد')},
+            {'number': 112, 'name': _('الإخلاص')}, {'number': 113, 'name': _('الفلق')}, {'number': 114, 'name': _('الناس')},
         ]
         context['reciters_list'] = [
             {'id': 'ar.alafasy', 'name': _('مشاري العفاسي')},
@@ -520,10 +461,14 @@ class HadithView(LoginRequiredMixin, TemplateView):
                 if isinstance(data, list):
                     # قد تحتاج لتعديل هذه البنية حسب محتوى ملف nawawi40.json
                     # افتراضياً، كل عنصر في القائمة هو حديث
-                    for hadith_item in data:
+                    for i, hadith_item in enumerate(data):
                         # تأكد من أن الحقول مثل 'arabic' و 'translation' موجودة
                         hadith_item['arabic'] = hadith_item.get('arabic', '')
-                        hadith_item['translation'] = hadith_item.get('translation', '')
+                        # بما أن ملف nawawi40.json الذي قدمته لا يحتوي على 'translation' أو 'number'
+                        # سأضيف حقولاً افتراضية لها هنا.
+                        # إذا كنت تملك ملف JSON يحتوي على هذه الحقول، فيمكنك إزالتها.
+                        hadith_item['translation'] = hadith_item.get('translation', _("لا يوجد ترجمة متاحة."))
+                        hadith_item['number'] = hadith_item.get('number', i + 1) # إضافة رقم تسلسلي
                         hadith_data.append(hadith_item)
                 else:
                     messages.warning(self.request, _(f"تحذير: تنسيق بيانات غير متوقع للملف {hadith_file}. يتوقع قائمة من الأحاديث."))

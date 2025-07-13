@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}تفاصيل الإبلاغ - {{ report.id }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-white shadow-lg rounded-lg my-8">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">تفاصيل الإبلاغ #{{ report.id }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+        <div class="bg-gray-50 p-8 rounded-xl shadow-md border-l-4 border-gray-400">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-5">معلومات الإبلاغ</h2>
+            <p class="mb-3 text-lg"><strong class="text-gray-700">المبلغ:</strong> {{ report.reporter.username }}</p>
+            <p class="mb-3 text-lg"><strong class="text-gray-700">تاريخ الإبلاغ:</strong> {{ report.reported_at|date:"Y-m-d H:i" }}</p>
+            <p class="mb-3 text-lg"><strong class="text-gray-700">السبب:</strong> {{ report.get_reason_display }}</p>
+            <p class="mb-3 text-lg"><strong class="text-gray-700">الوصف:</strong> {{ report.description|default_if_none:"لا يوجد" }}</p>
+            <p class="mb-3 text-lg"><strong class="text-gray-700">الحالة الحالية:</strong>
+                <span class="px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full
+                    {% if report.status == 'pending' %}bg-orange-100 text-orange-800
+                    {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                    {% elif report.status == 'resolved' %}bg-green-100 text-green-800
+                    {% elif report.status == 'rejected' %}bg-red-100 text-red-800
+                    {% endif %}">
+                    {{ report.get_status_display }}
+                </span>
+            </p>
+            {% if report.reviewed_by %}
+                <p class="mb-3 text-lg"><strong class="text-gray-700">تمت المراجعة بواسطة:</strong> {{ report.reviewed_by.username }}</p>
+                <p class="mb-3 text-lg"><strong class="text-gray-700">تاريخ المراجعة:</strong> {{ report.reviewed_at|date:"Y-m-d H:i" }}</p>
+            {% endif %}
+            {% if report.admin_notes %}
+                <p class="mb-3 text-lg"><strong class="text-gray-700">ملاحظات المشرف:</strong> {{ report.admin_notes }}</p>
+            {% endif %}
+        </div>
+
+        <div class="bg-gray-50 p-8 rounded-xl shadow-md border-l-4 border-blue-400">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-5">المحتوى المبلغ عنه</h2>
+            {% if report.content_object %}
+                <p class="mb-3 text-lg"><strong class="text-gray-700">نوع المحتوى:</strong> {{ report.content_type }}</p>
+                <p class="mb-3 text-lg"><strong class="text-gray-700">معرف الكائن:</strong> {{ report.object_id }}</p>
+                <p class="mb-3 text-lg"><strong class="text-gray-700">تفاصيل الكائن:</strong>
+                    {% if report.content_type.model == 'exampraver' %}
+                        <p class="ml-6 text-gray-600 text-base"><strong>نص الدعاء:</strong> {{ report.content_object.text }}</p>
+                        <p class="ml-6 text-gray-600 text-base"><strong>نشط:</strong> {{ report.content_object.is_active|yesno:"نعم,لا" }}</p>
+                    {% elif report.content_type.model == 'examtip' %}
+                        <p class="ml-6 text-gray-600 text-base"><strong>عنوان النصيحة:</strong> {{ report.content_object.title }}</p>
+                        <p class="ml-6 text-gray-600 text-base"><strong>محتوى النصيحة:</strong> {{ report.content_object.description|truncatechars:100 }}</p>
+                        <p class="ml-6 text-gray-600 text-base"><strong>الفئة:</strong> {{ report.content_object.get_category_display }}</p>
+                        <p class="ml-6 text-gray-600 text-base"><strong>نشط:</strong> {{ report.content_object.is_active|yesno:"نعم,لا" }}</p>
+                    {% else %}
+                        <p class="ml-6 text-gray-600 text-base">التفاصيل غير متاحة لهذا النوع من المحتوى.</p>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="text-gray-600 text-lg p-4 bg-red-50 rounded-lg border border-red-200">المحتوى المبلغ عنه لم يعد موجودًا أو التفاصيل غير متاحة.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-10 border-gray-300">
+
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">إدارة الإبلاغ</h2>
+    <form method="post" class="w-full max-w-xl mx-auto bg-gray-50 p-10 rounded-xl shadow-xl border-l-4 border-indigo-400">
+        {% csrf_token %}
+        <div class="mb-6">
+            <label for="{{ form.status.id_for_label }}" class="block text-gray-700 text-lg font-bold mb-3">الحالة:</label>
+            {{ form.status }}
+            {% if form.status.errors %}
+                <p class="text-red-500 text-sm italic mt-1">{{ form.status.errors }}</p>
+            {% endif %}
+        </div>
+        <div class="mb-8">
+            <label for="{{ form.admin_notes.id_for_label }}" class="block text-gray-700 text-lg font-bold mb-3">ملاحظات المشرف:</label>
+            {{ form.admin_notes }}
+            {% if form.admin_notes.errors %}
+                <p class="text-red-500 text-sm italic mt-1">{{ form.admin_notes.errors }}</p>
+            {% endif %}
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button type="submit" class="w-full sm:w-auto bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                تحديث الإبلاغ
+            </button>
+            <a href="{% url 'exam_prep:report_list' %}" class="w-full sm:w-auto text-center bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition duration-300 ease-in-out text-lg">
+                العودة للقائمة
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
